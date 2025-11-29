@@ -1,0 +1,39 @@
+﻿.chat-bar {
+    display: flex;
+    align-items: center;
+    background: #222327;        /* Discord dark background */
+    padding: 8px;
+    border-radius: 8px;
+    width: 50%;
+}
+
+.chat-input {
+    flex: 1;
+    background: #222327;        /* slightly lighter gray */
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.chat-input::placeholder {
+    color: #aaa;
+}
+
+.send-btn {
+    margin-left: 8px;
+    background: #222327;        /* Discord blurple */
+    border: none;
+    border-radius: 6px;
+    padding: 1em 2em;
+    color: #aaa;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.send-btn:hover {
+    background: #4752c4;        /* darker hover */
+}

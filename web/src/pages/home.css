@@ -1,0 +1,78 @@
+﻿body {
+    margin: 3em 2em;
+    display: flex;
+    place-items: baseline;
+}
+
+.bar {
+    display: flex;
+    align-items: center;
+    background: #222327;        /* Discord dark background */
+    padding: 0.7em 0;  /* Discord dark background */
+    margin: 0.5em 0;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.bar-input {
+    flex: 1;
+    background: #222327;        /* slightly lighter gray */
+    border: none;
+    border-radius: 6px;
+    min-width: 20em;
+    font-weight: bold;
+    padding-left: 1em;
+    color: #dddddd;
+    font-size: 14px;
+    outline: none;
+}
+
+.section-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.server-section {
+    padding: 1em;
+}
+
+.server-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.server-name {
+    display: inline-block;   /* or block, or flex */
+    min-width: 20em;
+    font-weight: bold;
+    padding-left: 1em;
+}
+
+.server-item {
+    flex: 1;
+    background: #222327;        /* slightly lighter gray */
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    color: #dddddd;
+    font-size: 14px;
+    outline: none;
+}
+
+.btn {
+    margin: 0 1em;
+    background: #222327;        /* Discord blurple */
+    border: none;
+    border-radius: 6px;
+    min-width: 7em;
+    padding: 1em 1.5em;
+    color: #aaa;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background-color: #d12121;
+}
