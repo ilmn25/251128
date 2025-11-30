@@ -30,8 +30,7 @@ async def login(request: Request):
 
     try:
         bot = selfbot.Main()
-        # Start bot in background, don't block FastAPI
-        asyncio.create_task(bot.start(token))
+        asyncio.create_task(bot.start(token, reconnect=True))
         active_bots[token] = bot
         return {"success": True}
     except Exception as e:
@@ -47,6 +46,21 @@ async def logout(request: Request):
         await bot.close()
         return {"success": True, "message": "Logged out"}
     return JSONResponse({"error": "No active session"}, status_code=400)
+
+@app.post("/channel_info")
+async def channel_info(request: Request):
+    data = await request.json()
+    token = data.get("token")
+    channel_id = int(data.get("channel_id", 0))
+
+    channel = active_bots.get("***REMOVED***").get_channel(channel_id)
+    if not channel:
+        return JSONResponse({"error": "Channel not found"}, status_code=403)
+
+    server_name = channel.guild.name if channel.guild else "DM"
+    channel_name = getattr(channel, "name", "DM")
+
+    return {"info": f"{server_name} | #{channel_name}"}
 
 # ==================== ENTRY POINT ====================
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 ﻿body {
     margin: 3em 2em;
     display: flex;
-    place-items: baseline;
 }
 
 .bar {

@@ -1,52 +1,18 @@
 ﻿import '../index.css';
 import '../discord.css';
 import './home.css';
+import ChannelPanel from './home/channel_panel.jsx';
 
 export default function Home() {
-  const servers = [
-    "#General in Fortnite",
-    "#General in Apex",
-    "#General in Myserver",
-    "#General in Fortnite",
-    "#General in Apex",
-    "#General in Myserver",
-    "#General in Fortnite",
-    "#General in Apex",
-    "#General in Myserver",
-    "#General in Fortnite",
-    "#General in Apex",
-    "#General in Myserver",
-    "#General in Fortnite",
-    "#General in Apex",
-    "#General in Myserver",
-    "@someone in DMs"
-  ];
+  // In a real app, you'd keep the token in state/context after login
+  const token = "YOUR_DISCORD_TOKEN";
 
   return (
     <div className="home-container">
       <h2 className="home-title">Discord Posting Automation Tool</h2>
 
       <div className="section-container">
-        <div className="server-section">
-          <h3 className="section-title">Servers</h3>
-
-
-          <div className="server-list">
-            <div className="server-item">
-              <input
-                className="bar-input"
-                placeholder="Enter Channel ID"
-              />
-              <button className="btn">Add</button>
-            </div>
-            {servers.map((srv, idx) => (
-              <div key={idx} className="server-item">
-                <span className="server-name">{srv}</span>
-                <button className="btn">Remove</button>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ChannelPanel token={token} />
 
         <div className="server-section">
           <h3 className="section-title">Message</h3>
@@ -58,12 +24,6 @@ export default function Home() {
               />
               <button className="btn">Add</button>
             </div>
-            {servers.map((srv, idx) => (
-              <div key={idx} className="server-item">
-                <span className="server-name">{srv}</span>
-                <button className="btn">Remove</button>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -73,16 +33,10 @@ export default function Home() {
             <div className="server-item">
               <input
                 className="bar-input"
-                placeholder="Enter a Message"
+                placeholder="Enter Image Path"
               />
               <button className="btn">Add</button>
             </div>
-            {servers.map((srv, idx) => (
-              <div key={idx} className="server-item">
-                <span className="server-name">{srv}</span>
-                <button className="btn">Remove</button>
-              </div>
-            ))}
           </div>
         </div>
 
