@@ -2,6 +2,7 @@
 import '../discord.css';
 import './home.css';
 import ChannelPanel from './home/channel_panel.jsx';
+import MessagePanel from './home/message_panel.jsx';
 
 export default function Home() {
   // In a real app, you'd keep the token in state/context after login
@@ -13,19 +14,7 @@ export default function Home() {
 
       <div className="section-container">
         <ChannelPanel token={token} />
-
-        <div className="server-section">
-          <h3 className="section-title">Message</h3>
-          <div className="server-list">
-            <div className="server-item">
-              <input
-                className="bar-input"
-                placeholder="Enter a Message"
-              />
-              <button className="btn">Add</button>
-            </div>
-          </div>
-        </div>
+        <MessagePanel/>
 
         <div className="server-section">
           <h3 className="section-title">Images</h3>

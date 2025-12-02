@@ -6,7 +6,7 @@ export default function ChannelPanel({ token }) {
   const [channelId, setChannelId] = useState("");
   const [channels, setChannels] = useState([]);
 
-  async function addChannel() {
+  async function find() {
     if (!channelId.trim()) return;
 
     try {
@@ -21,7 +21,7 @@ export default function ChannelPanel({ token }) {
 
       const data = await res.json();
       if (data.info) {
-        setChannels([...channels, { id: channelId, name: data.info }]);
+        setChannels([{ id: channelId, name: data.info }, ...channels]);
         setChannelId("");
       } else {
         alert(data.error || "Failed to fetch channel info");
@@ -32,7 +32,7 @@ export default function ChannelPanel({ token }) {
     }
   }
 
-  function removeChannel(id) {
+  function remove(id) {
     setChannels(channels.filter(c => c.id !== id));
   }
 
@@ -46,13 +46,18 @@ export default function ChannelPanel({ token }) {
             placeholder="Enter Channel ID"
             value={channelId}
             onChange={e => setChannelId(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // prevent newline
+                find();
+              }
+            }}
           />
-          <button className="btn" onClick={addChannel}>Add</button>
         </div>
         {channels.map(ch => (
           <div key={ch.id} className="server-item">
             <span className="server-name">{ch.name}</span>
-            <button className="btn" onClick={() => removeChannel(ch.id)}>Remove</button>
+            <button className="btn" onClick={() => remove(ch.id)}>Remove</button>
           </div>
         ))}
       </div>
