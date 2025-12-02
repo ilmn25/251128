@@ -16,6 +16,13 @@ class Main(commands.Bot):
             self_bot=True,
             help_command=None
         )
+
+    async def validate_token(self, token):
+        try:
+            await self.login(token.strip())
+            return True
+        except discord.errors.LoginFailure:
+            return False
     #
     # async def send(self):
     #     for channel_id in CHANNEL_IDS:

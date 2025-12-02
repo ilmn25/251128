@@ -8,7 +8,7 @@ export default function Login() {
   const [status, setStatus] = useState('Made by illu');
   const navigate = useNavigate();
 
-  const go = async () => {
+  async function check() {
     if (!token.trim()) {
       setStatus('Enter token first');
       return;
@@ -35,9 +35,9 @@ export default function Login() {
       }
     } catch (err) {
       console.error(err);
-      setStatus('Server offline');
+      setStatus('Backend offline');
     }
-  };
+  }
 
   return (
     <div>
@@ -50,9 +50,9 @@ export default function Login() {
           placeholder="Enter Token"
           value={token}
           onChange={(e) => setToken(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && go()}
+          onKeyDown={(e) => e.key === 'Enter' && check()}
         />
-        <button onClick={go} className="send-btn">
+        <button onClick={check} className="send-btn">
           Go
         </button>
       </div>
