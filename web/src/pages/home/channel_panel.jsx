@@ -2,7 +2,7 @@
 import "../../discord.css";
 import "../home.css";
 
-export default function ChannelPanel({ token }) {
+export default function ChannelPanel() {
   const [channelId, setChannelId] = useState("");
   const [channels, setChannels] = useState([]);
 
@@ -12,9 +12,9 @@ export default function ChannelPanel({ token }) {
     try {
       const res = await fetch("http://localhost:8000/channel_info", {
         method: "POST",
+        credentials: "include",   // must be here
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token,
           channel_id: channelId
         })
       });
