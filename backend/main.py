@@ -1,7 +1,11 @@
-﻿import uvicorn
+﻿import os, uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from session import ROOT
+os.makedirs(ROOT, exist_ok=True)
 from router import token, channel, message, attachment
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,

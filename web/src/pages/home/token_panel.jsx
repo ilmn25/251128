@@ -17,7 +17,7 @@ export default function TokenPanel() {
         method: 'POST',
         credentials: 'include', // keep cookies
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token.trim() })
+        body: JSON.stringify(token.trim)
       });
 
       const data = await res.json();

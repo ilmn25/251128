@@ -4,16 +4,10 @@ export default function AttachmentPanel() {
   const [items, setItems] = useState([]); // always strings
   const fileInputRef = useRef(null);
 
+
   useEffect(() => {
     async function fetchAll() {
-      try {
-        const res = await fetch("http://localhost:8000/attachment");
-        if (res.ok) {
-          setItems(await res.json());
-        }
-      } catch (err) {
-        console.error("Failed to fetch attachments", err);
-      }
+      setItems(await (await fetch("http://localhost:8000/attachment")).json());
     }
     fetchAll();
   }, []);
@@ -73,8 +67,14 @@ export default function AttachmentPanel() {
             const ext = parts.pop().toLowerCase();
             const name = parts.join(".");
 
-            const isImage = ["png","jpg","jpeg","gif","webp"].includes(ext);
-            const isVideo = ["mp4","mov","webm","avi","mkv"].includes(ext);
+            const isImage = [
+              "png","jpg","jpeg","gif","webp","jfif","bmp","tiff","tif",
+              "svg","heic","heif","ico","raw","psd"
+            ].includes(ext);
+            const isVideo = [
+              "mp4","mov","webm","avi","mkv","flv","wmv","mpeg","mpg",
+              "3gp","m4v","ts","vob"
+            ].includes(ext);
 
             return (
               <div key={url} className="section-item attachment-container">

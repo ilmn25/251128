@@ -14,8 +14,7 @@ async def login(request: Request):
     if cookie_token and cookie_token in active_bots:
         return JSONResponse({"success": True, "message": "Already logged in with cookie"})
 
-    data = await request.json()
-    token = data.get("token").strip()
+    token = await request.json()
 
     if token in active_bots:
         resp = JSONResponse({"success": True, "message": "token in Selfbot list"})
