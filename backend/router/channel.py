@@ -3,6 +3,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from session import active_bots
 router = APIRouter()
+
 @router.post("/channel_info")
 async def channel_info(request: Request):
     token = request.cookies.get("auth")

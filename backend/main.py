@@ -1,7 +1,7 @@
 ﻿import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from router import discord, auth
+from router import channel, auth, attachment
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -11,7 +11,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(discord.router)
+app.include_router(channel.router)
+app.include_router(attachment.router)
 app.include_router(auth.router)
 # ==================== ENTRY POINT ====================
 if __name__ == "__main__":
