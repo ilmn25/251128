@@ -2,10 +2,10 @@
 from fastapi import APIRouter
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from session import active_bots
+from utility import bots
 router = APIRouter()
 
-from session import ROOT, write, read
+from utility import ROOT, write, read
 CHANNEL_FILE = os.path.join(ROOT, "channel.json")
 if not os.path.exists(CHANNEL_FILE):
     with open(CHANNEL_FILE, "w") as f:
@@ -23,14 +23,16 @@ async def lookup_channel(request: Request):
     if not token:
         return JSONResponse({"error": "No auth cookie"}, status_code=401)
 
-    data = await request.json()
-    channel_id = int(data)
+    channel_id = await request.json()
+    channels = await read(CHANNEL_FILE)
+    if any(str(c.get("id")) == str(channel_id) if isinstance(c, dict) else str(c) == str(channel_id) for c in channels):
+        return JSONResponse({"error": "Channel already exists"}, status_code=409)
 
-    bot = active_bots.get(token)
+    bot = bots.get(token)
     if not bot:
         return JSONResponse({"error": "Bot not active"}, status_code=403)
 
-    channel = bot.get_channel(channel_id)
+    channel = bot.get_channel(int(channel_id))
     if not channel:
         return JSONResponse({"error": "Channel not found"}, status_code=403)
 

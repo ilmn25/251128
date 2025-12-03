@@ -2,6 +2,7 @@
 import TextareaAutosize from "react-textarea-autosize";
 
 export default function MessagePanel() {
+  // eslint-disable-next-line react-hooks/purity
   const [items, setItems] = useState([{ id: Date.now(), text: "" }]);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function MessagePanel() {
               placeholder={i === 0 ? "Enter message" : ""}
               value={item.text}
               onChange={e => update(item.id, e.target.value)}
-              style={{ resize: "none"}}
+              style={{ resize: "none", overflow: "hidden" }}
               onKeyDown={e => {
                 if ( e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();

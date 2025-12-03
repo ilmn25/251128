@@ -2,7 +2,7 @@
 
 from starlette.responses import JSONResponse
 
-active_bots = {}
+bots = {}
 ROOT = "Data"
 
 async def write(data, path):

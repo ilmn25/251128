@@ -72,9 +72,9 @@ export default function ChannelPanel() {
           />
         </div>
         {items.map(item => (
-          <div key={item.id} className="section-item">
+          <div key={item.id} className="section-item section-input-channel">
             <span className="section-title">{item.name}</span>
-            <button className="btn" onClick={() => remove(item.id)}>Remove</button>
+            <button onClick={() => remove(item.id)} className="delete-btn">✖</button>
           </div>
         ))}
       </div>

@@ -1,37 +1,42 @@
-﻿import asyncio
-
+﻿import asyncio, os,json
 from fastapi import APIRouter
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from selfbot import selfbot
-from session import active_bots
-
+from utility import bots
 router = APIRouter()
 
-@router.post("/login")
-async def login(request: Request):
-    cookie_token = request.cookies.get("auth")
-    if cookie_token and cookie_token in active_bots:
-        return JSONResponse({"success": True, "message": "Already logged in with cookie"})
+from utility import ROOT, write, read
+TOKEN_FILE = os.path.join(ROOT, "token.json")
+if not os.path.exists(TOKEN_FILE):
+    with open(TOKEN_FILE, "w") as f:
+        json.dump([], f)
 
-    token = await request.json()
+@router.get("/token")
+async def read_token():
+    return await read(TOKEN_FILE)
+@router.post("/token")
+async def write_token(request: Request):
+    token = request.cookies.get("auth")
+    if not token:
+        token = await request.json()
+    token = token.strip()
 
-    if token in active_bots:
-        resp = JSONResponse({"success": True, "message": "token in Selfbot list"})
+    if token in bots:
+        resp = JSONResponse({"success": True, "message": "bot active"})
         set_auth_cookie(resp, token)
         return resp
 
     bot = selfbot.Main()
     if not await bot.validate_token(token):
         return JSONResponse({"error": "Token Invalid"}, status_code=400)
+
     asyncio.create_task(bot.start(token, reconnect=True))
-    active_bots[token] = bot
+    bots[token] = bot
 
-    resp = JSONResponse({"success": True})
+    resp = JSONResponse({{"success": True, "message": "bot active"}})
     set_auth_cookie(resp, token)
-
     return resp
-
 
 def set_auth_cookie(resp, token):
     resp.set_cookie(

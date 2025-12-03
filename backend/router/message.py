@@ -2,7 +2,7 @@
 import os, json
 router = APIRouter()
 
-from session import ROOT, write, read
+from utility import ROOT, write, read
 MESSAGE_FILE = os.path.join(ROOT, "messages.json")
 if not os.path.exists(MESSAGE_FILE):
     with open(MESSAGE_FILE, "w") as f:

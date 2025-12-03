@@ -77,7 +77,7 @@ export default function AttachmentPanel() {
             ].includes(ext);
 
             return (
-              <div key={url} className="section-item attachment-container">
+              <div key={url} className="section-item">
                 {isImage && (
                   <img
                     src={`http://localhost:8000/attachment/${url}`}

@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from session import ROOT
+from utility import ROOT
 os.makedirs(ROOT, exist_ok=True)
 from router import token, channel, message, attachment
 
