@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse, FileResponse
 import os, shutil, uuid
 
 router = APIRouter()
-UPLOAD_DIR = "Data"
+UPLOAD_DIR = "Data/Attachment"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
