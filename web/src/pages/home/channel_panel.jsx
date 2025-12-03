@@ -1,6 +1,4 @@
 ﻿import { useState } from "react";
-import "../../discord.css";
-import "../home.css";
 
 export default function ChannelPanel() {
   const [channelId, setChannelId] = useState("");
@@ -37,17 +35,17 @@ export default function ChannelPanel() {
   }
 
   return (
-    <div className="server-section">
-      <h3 className="section-title">Channels</h3>
-      <div className="server-list">
-        <div className="server-item">
+    <div className="section">
+      <h3>Channels</h3>
+      <div className="section-list">
+        <div className="section-item">
           <input
-            className="bar-input"
+            className="section-input section-input-channel"
             placeholder="Enter Channel ID"
             value={channelId}
             onChange={e => setChannelId(e.target.value)}
             onKeyDown={e => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter") {
                 e.preventDefault(); // prevent newline
                 find();
               }
@@ -55,8 +53,8 @@ export default function ChannelPanel() {
           />
         </div>
         {channels.map(ch => (
-          <div key={ch.id} className="server-item">
-            <span className="server-name">{ch.name}</span>
+          <div key={ch.id} className="section-item">
+            <span className="section-title">{ch.name}</span>
             <button className="btn" onClick={() => remove(ch.id)}>Remove</button>
           </div>
         ))}

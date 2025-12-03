@@ -1,7 +1,5 @@
 ﻿import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
-import "../../discord.css";
-import "../home.css";
 
 export default function MessagePanel() {
   const [message, setMessage] = useState("");
@@ -31,12 +29,12 @@ export default function MessagePanel() {
   }
 
   return (
-    <div className="server-section">
-      <h3 className="section-title">Messages</h3>
-      <div className="server-list">
-        <div className="server-item">
+    <div className="section">
+      <h3>Messages</h3>
+      <div className="section-list">
+        <div className="section-item">
           <TextareaAutosize
-            className="bar-input"
+            className="section-input section-input-message"
             placeholder="Enter message"
             value={message}
             onChange={e => setMessage(e.target.value)}
@@ -51,9 +49,9 @@ export default function MessagePanel() {
         </div>
 
         {items.map(i => (
-          <div key={i.id} className="server-item">
+          <div key={i.id} className="section-item">
             <TextareaAutosize
-              className="bar-input"
+              className="section-input section-input-message"
               value={i.text}
               onChange={e => update(i.id, e.target.value)}
               style={{ resize: "none"}}
