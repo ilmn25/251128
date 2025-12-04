@@ -5,8 +5,7 @@ from starlette.responses import JSONResponse
 from utility import bots
 router = APIRouter()
 
-from utility import ROOT, write, read
-CHANNEL_FILE = os.path.join(ROOT, "channel.json")
+from utility import CHANNEL_FILE, write, read
 if not os.path.exists(CHANNEL_FILE):
     with open(CHANNEL_FILE, "w") as f:
         json.dump([], f)

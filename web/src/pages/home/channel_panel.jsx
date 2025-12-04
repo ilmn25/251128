@@ -25,7 +25,7 @@ export default function ChannelPanel() {
     try {
       const res = await fetch("http://localhost:8000/channel/lookup", {
         method: "POST",
-        credentials: "include",   // must be here
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(channelId)
       });

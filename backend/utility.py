@@ -1,9 +1,12 @@
-﻿import json
-
+﻿import json, os
 from starlette.responses import JSONResponse
 
 bots = {}
+
 ROOT = "Data"
+ATTACHMENT_PATH = ROOT + "/Attachment"
+MESSAGE_FILE = os.path.join(ROOT, "messages.json")
+CHANNEL_FILE = os.path.join(ROOT, "channel.json")
 
 async def write(data, path):
     try:

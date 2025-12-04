@@ -3,11 +3,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import random
-
-# from temp.data import IMAGE_PATHS, CHANNEL_IDS, MESSAGES
-#
-# def get_random():
-#     return random.choice(MESSAGES)
+from utility import read, MESSAGE_FILE, CHANNEL_FILE, ATTACHMENT_PATH
 
 class Main(commands.Bot):
     def __init__(self):
@@ -23,45 +19,36 @@ class Main(commands.Bot):
             return True
         except discord.errors.LoginFailure:
             return False
-    #
-    # async def send(self):
-    #     for channel_id in CHANNEL_IDS:
-    #         print("==================================================================")
-    #         channel = self.get_channel(channel_id)
-    #         server_name = channel.guild.name if channel.guild else "DM"
-    #         if not channel:
-    #             print(f"Channel not accessible: {server_name} | {channel_id}")
-    #             continue
-    #
-    #         try:
-    #             selected_images = random.sample(IMAGE_PATHS, 9)
-    #             files = [discord.File(img_path, filename=os.path.basename(img_path))
-    #                      for img_path in selected_images]
-    #
-    #             names = ", ".join(os.path.basename(p) for p in selected_images)
-    #             print(f"Ready to send → {server_name} | #{getattr(channel, 'name', 'DM')} ({channel_id}) | {names}")
-    #             print("""
-    #             Enter - send
-    #             1 - skip
-    #             """)
-    #
-    #             choice = input("> ").strip().lower()
-    #
-    #             if choice != "":
-    #                 print("Skipped.")
-    #                 continue
-    #
-    #             await channel.send(
-    #                 get_random(),
-    #                 files=files
-    #             )
-    #
-    #             print(f"Sent → {server_name} | #{getattr(channel, 'name', 'DM')} ({channel_id})")
-    #             await asyncio.sleep(4)
-    #
-    #         except discord.Forbidden:
-    #             print(f"No permission in {server_name} | {channel_id}")
-    #         except discord.HTTPException as e:
-    #             print(f"HTTP error {server_name} | {channel_id}: {e}")
-    #         except Exception as e:
-    #             print(f"Unexpected error {server_name} | {channel_id}: {e}")
+
+    async def begin(self, attachment_count):
+        channel_data = await read(CHANNEL_FILE)
+        message_data = await read(MESSAGE_FILE)
+        attachment_ids = os.listdir(ATTACHMENT_PATH)
+
+        for channel_id in channel_data:
+            channel_id = channel_id["id"]
+            try:
+                channel = await self.fetch_channel(int(channel_id))
+                selected_images = random.sample(attachment_ids, attachment_count)
+                selected_message = random.choice(message_data)["text"]
+
+                files = [
+                    discord.File(
+                        os.path.join(ATTACHMENT_PATH, image),
+                        filename=os.path.basename(image)
+                    )
+                    for image in selected_images
+                ]
+                await channel.send(
+                    selected_message,
+                    files=files
+                )
+
+                await asyncio.sleep(4)
+
+            except discord.Forbidden:
+                print(f"No permission in {channel_id}")
+            except discord.HTTPException as e:
+                print(f"HTTP error {channel_id}: {e}")
+            except Exception as e:
+                print(f"Unexpected error {channel_id}: {e}")

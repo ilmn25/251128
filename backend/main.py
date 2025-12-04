@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from utility import ROOT
 os.makedirs(ROOT, exist_ok=True)
-from router import token, channel, message, attachment
+from router import token, channel, message, attachment, task
 
 app = FastAPI()
 app.add_middleware(
@@ -19,6 +19,7 @@ app.include_router(token.router)
 app.include_router(channel.router)
 app.include_router(message.router)
 app.include_router(attachment.router)
+app.include_router(task.router)
 # ==================== ENTRY POINT ====================
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

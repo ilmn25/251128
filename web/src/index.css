@@ -40,6 +40,14 @@ body {
     height: 20px;
 }
 
+.section-input-task {
+    padding: 1em;
+}
+.section-input-task::-webkit-inner-spin-button,
+.section-input-task::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
 .section-input-channel {
     width: 20em;
 }
@@ -83,6 +91,19 @@ body {
     outline: none;
     min-height: 28px;
     position: relative;
+}
+
+.section-subitem {
+    margin: 0 0.8em;
+    background: #222327;
+    border: none;
+    border-radius: 6px;
+    min-width: 7em;
+    padding: 1em 1.5em;
+    color: #aaa;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
 .btn {

@@ -29,7 +29,7 @@ export default function AttachmentPanel() {
   }
 
   async function remove(id) {
-    const res = await fetch("http://localhost:8000/attachment/", {
+    const res = await fetch("http://localhost:8000/attachment", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(id),
