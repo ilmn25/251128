@@ -2,9 +2,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-import random
 from utility import ATTACHMENT_PATH, get_attachments, get_message, get_channel
-
 
 class Main(commands.Bot):
     def __init__(self):

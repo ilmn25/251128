@@ -6,12 +6,9 @@ import utility
 
 @router.post("/task/get")
 async def get(request: Request):
-    token = request.cookies.get("auth")
-    if not token:
-        return JSONResponse({"error": "No auth cookie"}, status_code=401)
-    bot = utility.bots.get(token)
-    if not bot:
+    if utility.token not in utility.bots:
         return JSONResponse({"error": "Bot not active"}, status_code=403)
+    bot = utility.bots[utility.token]
     data = await request.json()
     if data["task"] == "next":
         utility.channel_index += 1
@@ -22,11 +19,8 @@ async def get(request: Request):
     return JSONResponse(await bot.get(data["attachment_count"]))
 
 @router.post("/task/post")
-async def post(request: Request):
-    token = request.cookies.get("auth")
-    if not token:
-        return JSONResponse({"error": "No auth cookie"}, status_code=401)
-    bot = utility.bots.get(token)
+async def post():
+    bot = utility.bots[utility.token]
     if not bot:
         return JSONResponse({"error": "Bot not active"}, status_code=403)
     return JSONResponse(await bot.post())

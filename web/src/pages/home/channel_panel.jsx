@@ -25,7 +25,6 @@ export default function ChannelPanel() {
     try {
       const res = await fetch("http://localhost:8000/channel/lookup", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(channelId)
       });
@@ -74,7 +73,7 @@ export default function ChannelPanel() {
         {items.map(item => (
           <div key={item.id} className="section-item section-input-channel">
             <span className="section-title">{item.name}</span>
-            <button onClick={() => remove(item.id)} className="delete-btn">✖</button>
+            <button onClick={() => remove(item.id)} className="absolute-btn">✖</button>
           </div>
         ))}
       </div>

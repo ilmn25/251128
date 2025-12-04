@@ -103,7 +103,7 @@ export default function AttachmentPanel() {
                     </p>
                   </div>
                 )}
-                <button onClick={() => remove(url)} className="delete-btn">✖</button>
+                <button onClick={() => remove(url)} className="absolute-btn">✖</button>
               </div>
             );
           })}

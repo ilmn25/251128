@@ -2,33 +2,48 @@ import {useEffect, useState} from 'react';
 
 export default function TokenPanel() {
   const [token, setToken] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('PLEASE SELECT A USER');
+  const [items, setItems] = useState([]);
 
-  async function post(token) {
-    await fetch("http://localhost:8000/token", {
+  useEffect(() => {
+    async function fetchAll() {
+      setItems(await (await fetch("http://localhost:8000/user")).json());
+    }
+    fetchAll();
+  }, []);
+
+  async function sync(data) {
+    await fetch("http://localhost:8000/user", {
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(token)
+      body: JSON.stringify(data),
     });
   }
 
-  useEffect(() => {post("")}, []);
-
-  async function check() {
+  async function add(token) {
     if (!token.trim()) {
       setStatus('Enter token first');
       return;
     }
     setStatus('Checking...');
     try {
-      const res = await post(token.trim())
+      const res = await fetch("http://localhost:8000/user/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(token.trim())
+      });
 
       if (res.ok) {
         setStatus('Logged in');
+        setToken("")
+        let data = await res.json();
+        setItems(() => {
+          const newItems = [data, ...items]
+          sync(newItems);
+          return newItems;
+        });
       } else {
-        const data = await res.json();
-        setStatus(data.error || 'Invalid token');
+        setStatus((await res.json()).error || 'Invalid token');
       }
     } catch (err) {
       console.error(err);
@@ -36,26 +51,46 @@ export default function TokenPanel() {
     }
   }
 
+  function remove(token) {
+    setItems(prevItems => {
+      const newItems = prevItems.filter(c => c.token !== token);
+      sync(newItems);
+      return newItems;
+    });
+  }
+
   return (
     <div className="section">
       <h3>Token</h3>
       <div className="section-list">
-        <div className="section-item">
+        <div className="section-item" style={{width:'50em'}}>
           <input
-            className="section-input section-input-message"
-            placeholder="DevTools → Network → Click on a DM Channel → Messages?limit=50 → Req Headers → Authorization"
+            className="section-input"
+            style={{width:'100%'}}
+            placeholder="DevTools → Network → Click on a Channel → Messages?limit=50 → Req Headers → Authorization"
             value={token}
             onChange={e => setToken(e.target.value)}
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault(); // prevent newline
-                check();
+                add(token);
               }
             }}
             type="password"
           />
         </div>
-        <p className="comment">{status}</p>
+        <h5 style={{margin: "1em"}}>{status}</h5>
+        <div className={"user-list"}>
+          {items.map(item => (
+            <div key={item.token} className="section-item section-input-token">
+              <p className="section-title" style={{padding: "0", width: "7em", overflowWrap: "anywhere"}}>
+                @{item.username}
+              </p>
+              <button onClick={() => {add(item.token)}} className="btn">pick</button>
+              <button onClick={() => {remove(item.token)}} className="btn">delete</button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

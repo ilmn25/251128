@@ -4,6 +4,8 @@ import random
 from starlette.responses import JSONResponse
 
 bots = {}
+channel_index = 0
+token = ""
 
 ROOT = "Data"
 ATTACHMENT_PATH = ROOT + "/Attachment"
@@ -27,7 +29,6 @@ async def read(path):
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
 
-channel_index = 0
 async def get_channel():
     global channel_index
     channel_data = await read(CHANNEL_FILE)
@@ -44,3 +45,12 @@ async def get_attachments(count):
     attachment_ids = os.listdir(ATTACHMENT_PATH)
     i = min(len(attachment_ids), int(count))
     return random.sample(attachment_ids, i)
+
+# def set_auth_cookie(resp, token):
+#     resp.set_cookie(
+#         key="auth",
+#         value=token,
+#         httponly=True,
+#         secure=False,
+#         samesite="strict"
+#     )
