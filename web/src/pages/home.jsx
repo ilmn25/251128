@@ -10,16 +10,17 @@ export default function Home() {
 
 
   return (
-    <div className="home-container">
-      <h2 className="home-title">Discord Posting Automation Tool</h2>
-
-      <LoginPanel/>
-      <MessagePanel/>
-      <div className="section-container">
-        <ChannelPanel/>
-        <AttachmentPanel/>
-        <TaskPanel/>
+    <div className="home-container attachment-list">
+      <div>
+        <h2 className="home-title">Discord Posting Automation Tool</h2>
+        <LoginPanel/>
+        <MessagePanel/>
+        <div className="section-container">
+          <ChannelPanel/>
+          <AttachmentPanel/>
+        </div>
       </div>
+      <TaskPanel/>
     </div>
   );
 }

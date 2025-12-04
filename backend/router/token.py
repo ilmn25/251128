@@ -34,7 +34,7 @@ async def write_token(request: Request):
     asyncio.create_task(bot.start(token, reconnect=True))
     bots[token] = bot
 
-    resp = JSONResponse({{"success": True, "message": "bot active"}})
+    resp = JSONResponse({"success": True, "message": "bot active"})
     set_auth_cookie(resp, token)
     return resp
 

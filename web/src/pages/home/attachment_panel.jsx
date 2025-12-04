@@ -1,7 +1,7 @@
 ﻿import { useState, useRef, useEffect } from "react";
 
 export default function AttachmentPanel() {
-  const [items, setItems] = useState([]); // always strings
+  const [items, setItems] = useState([]);
   const fileInputRef = useRef(null);
 
 

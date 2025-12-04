@@ -3,7 +3,8 @@ import discord
 from discord.ext import commands
 import asyncio
 import random
-from utility import read, MESSAGE_FILE, CHANNEL_FILE, ATTACHMENT_PATH
+from utility import ATTACHMENT_PATH, get_attachments, get_message, get_channel
+
 
 class Main(commands.Bot):
     def __init__(self):
@@ -12,6 +13,66 @@ class Main(commands.Bot):
             self_bot=True,
             help_command=None
         )
+        self.channel_id = None
+        self.selected_message = ""
+        self.selected_images = []
+
+    async def get(self, attachment_count):
+        channel_info = await get_channel()
+        if not channel_info:
+            return {"channel": None}
+        self.channel_id = channel_info["id"]
+        self.selected_message = await get_message()
+        self.selected_images = await get_attachments(attachment_count)
+
+        return {
+            "channel": channel_info["name"],
+            "message": self.selected_message,
+            "attachments": self.selected_images
+        }
+
+    async def post(self):
+        try:
+            channel = await self.fetch_channel(int(self.channel_id))
+
+            files = [
+                discord.File(
+                    os.path.join(ATTACHMENT_PATH, image),
+                    filename=os.path.basename(image)
+                )
+                for image in self.selected_images
+            ]
+
+            await channel.send(
+                self.selected_message,
+                files=files
+            )
+
+            await asyncio.sleep(4)
+            return {"success": True}
+
+        except discord.Forbidden:
+            return {
+                "success": False,
+                "error": "forbidden",
+                "message": f"No permission in {self.channel_id}"
+            }
+
+        except discord.HTTPException as e:
+            return {
+                "success": False,
+                "error": "http_error",
+                "message": f"HTTP error in {self.channel_id}",
+                "details": str(e)
+            }
+
+        except Exception as e:
+            return {
+                "success": False,
+                "error": "unexpected",
+                "message": f"Unexpected error in {self.channel_id}",
+                "details": str(e)
+            }
 
     async def validate_token(self, token):
         try:
@@ -20,35 +81,3 @@ class Main(commands.Bot):
         except discord.errors.LoginFailure:
             return False
 
-    async def begin(self, attachment_count):
-        channel_data = await read(CHANNEL_FILE)
-        message_data = await read(MESSAGE_FILE)
-        attachment_ids = os.listdir(ATTACHMENT_PATH)
-
-        for channel_id in channel_data:
-            channel_id = channel_id["id"]
-            try:
-                channel = await self.fetch_channel(int(channel_id))
-                selected_images = random.sample(attachment_ids, attachment_count)
-                selected_message = random.choice(message_data)["text"]
-
-                files = [
-                    discord.File(
-                        os.path.join(ATTACHMENT_PATH, image),
-                        filename=os.path.basename(image)
-                    )
-                    for image in selected_images
-                ]
-                await channel.send(
-                    selected_message,
-                    files=files
-                )
-
-                await asyncio.sleep(4)
-
-            except discord.Forbidden:
-                print(f"No permission in {channel_id}")
-            except discord.HTTPException as e:
-                print(f"HTTP error {channel_id}: {e}")
-            except Exception as e:
-                print(f"Unexpected error {channel_id}: {e}")

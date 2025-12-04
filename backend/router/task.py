@@ -2,14 +2,42 @@
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 router = APIRouter()
-from utility import bots
+import utility
 
-@router.post("/run")
-async def run(request: Request):
+@router.post("/task/get")
+async def get(request: Request):
     token = request.cookies.get("auth")
     if not token:
         return JSONResponse({"error": "No auth cookie"}, status_code=401)
-    bot = bots.get(token)
+    bot = utility.bots.get(token)
     if not bot:
         return JSONResponse({"error": "Bot not active"}, status_code=403)
-    return await bot.begin(await request.json())
+    data = await request.json()
+    if data["task"] == "next":
+        utility.channel_index += 1
+    if data["task"] == "prev":
+        utility.channel_index -= 1
+    if data["task"] == "reset":
+        utility.channel_index = 9999
+    return JSONResponse(await bot.get(data["attachment_count"]))
+
+@router.post("/task/post")
+async def post(request: Request):
+    token = request.cookies.get("auth")
+    if not token:
+        return JSONResponse({"error": "No auth cookie"}, status_code=401)
+    bot = utility.bots.get(token)
+    if not bot:
+        return JSONResponse({"error": "Bot not active"}, status_code=403)
+    return JSONResponse(await bot.post())
+
+@router.post("/task/reset")
+async def reset():
+    utility.channel_index = 0
+    return JSONResponse({"success": True})
+
+@router.post("/task/skip")
+async def reset():
+    utility.channel_index += 1
+    return JSONResponse({"success": True})
+

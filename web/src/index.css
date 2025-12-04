@@ -55,7 +55,7 @@ body {
     width: 60em;
 }
 .section-input-attachment {
-    width: 23em;
+    width: 36em;
 }
 
 .section-container {
@@ -157,7 +157,7 @@ body {
 
 .attachment-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
 }
 
