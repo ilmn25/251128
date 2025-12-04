@@ -39,15 +39,15 @@ async def lookup_user(request: Request):
 
     if token in utility.bots:
         utility.token = token
-        return JSONResponse({"error": "User Selected"}, status_code=409)
+        return JSONResponse({"success": True, "token": token, "username": utility.bots[token].user.name})
 
     bot = selfbot.Main()
     if not await bot.validate_token(token):
-        return JSONResponse({"error": "Token Invalid"}, status_code=400)
+        return JSONResponse({"success": False, "error": "Token Invalid"}, status_code=400)
 
     utility.token = token
     asyncio.create_task(bot.start(token, reconnect=True))
     utility.bots[token] = bot
 
-    return JSONResponse({"token": token, "username": bot.user.name})
+    return JSONResponse({"success": True, "token": token, "username": bot.user.name})
 
