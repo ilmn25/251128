@@ -1,35 +1,46 @@
 ﻿import '../index.css';
 
-import TokenPanel from './home/token_panel.jsx';
-import ChannelPanel from './home/channel_panel.jsx';
-import MessagePanel from './home/message_panel.jsx';
-import AttachmentPanel from "./home/attachment_panel.jsx";
-import TaskPanel from "./home/task_panel.jsx";
+import Composition from "./composition.jsx";
+import { useState } from "react";
+
+const Tabs = {
+  COMPOSITION: "COMPOSITION",
+  CONNECTION: "CONNECTION",
+  SETTINGS: "SETTIINGS",
+};
 
 export default function Home() {
-
+  const [selected, setSelected] = useState(Tabs.COMPOSITION);
 
   return (
-    <div className="home-container attachment-list">
-      <div>
-        <div className={"attachment-list"}>
-          <div>
-            <h2 className="home-title">Discord Posting Automation Tool</h2>
-            <p className="comment">
-              Discord API wrapper-wrapper made by illu <br/><br/>
-              github.com/ilmn25/251128
-              Vite React, Fast API, etc<br/> <br/>
-            </p>
-          </div>
-          <TokenPanel/>
-        </div>
-        <MessagePanel/>
-        <div className="section-container">
-          <ChannelPanel/>
-          <AttachmentPanel/>
-        </div>
+    <div>
+      <div className="flex space-x-2">
+        <button
+          onClick={() => setSelected(Tabs.COMPOSITION)}
+          className={`panel2 ${selected === Tabs.COMPOSITION ? "buttonstyle3" : "buttonstyle2"}`}
+        >
+          Composition
+        </button>
+        <button
+          onClick={() => setSelected(Tabs.CONNECTION)}
+          className={`panel2 ${selected === Tabs.CONNECTION ? "buttonstyle3" : "buttonstyle2"}`}
+        >
+          Connection
+        </button>
+        <button
+          onClick={() => setSelected(Tabs.SETTINGS)}
+          className={`panel2 ${selected === Tabs.SETTINGS ? "buttonstyle3" : "buttonstyle2"}`}
+        >
+          Settings
+        </button>
       </div>
-      <TaskPanel/>
+
+      <div className="mt-4">
+        {selected === Tabs.COMPOSITION && <Composition />}
+        {selected === Tabs.CONNECTION && <div className="panel2">Placeholder One</div>}
+        {selected === Tabs.SETTINGS && <div className="panel2">Placeholder Two</div>}
+      </div>
     </div>
   );
 }
+

@@ -1,113 +1,88 @@
-﻿import { useState, useRef, useEffect } from "react";
-
-export default function AttachmentPanel() {
-  const [items, setItems] = useState([]);
+﻿import { useRef } from "react";
+import { FileText, X} from "lucide-react";
+export default function AttachmentPanel({items, setItems}) {
   const fileInputRef = useRef(null);
-
-
-  useEffect(() => {
-    async function fetchAll() {
-      setItems(await (await fetch("http://localhost:8000/attachment")).json());
-    }
-    fetchAll();
-  }, []);
 
   function upload(e) {
     const files = Array.from(e.target.files);
-    files.forEach(async (file) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("http://localhost:8000/attachment", {
-        method: "POST",
-        body: formData,
-      });
-      if (res.ok) {
-        const id = await res.json();
-        setItems(prev => [id, ...prev]);
-      }
-    });
+    const newItems = files.map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+      type: file.type,
+      size: file.size
+    }));
+    setItems(prev => [...newItems, ...prev]);
   }
 
-  async function remove(id) {
-    const res = await fetch("http://localhost:8000/attachment", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(id),
-    });
-    if (res.ok) {
-      setItems(prev => prev.filter(item => item !== id));
-    }
+  function remove(url) {
+    setItems(prev => prev.filter(item => item.url !== url));
+    URL.revokeObjectURL(url); // free memoryq
+  }
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + " GB";
   }
 
   return (
-    <div className="section">
-      <h3>Attachments</h3>
-      <div className="section-list">
-        <div className="section-item">
-          <button
-            onClick={() => fileInputRef.current.click()}
-            className="section-input section-input-attachment"
-          >
-            Upload
-          </button>
-          <input
-            type="file"
-            multiple
-            ref={fileInputRef}
-            onChange={upload}
-            style={{ display: "none" }}
-          />
-        </div>
+    <div className="space-y-4">
+      <div className="panel2 buttonstyle1 centered">
+        <button onClick={() => fileInputRef.current.click()}>
+          Upload
+        </button>
+        <input
+          type="file"
+          multiple
+          ref={fileInputRef}
+          onChange={upload}
+          style={{ display: "none" }}
+        />
+      </div>
 
-        <div className="attachment-list">
-          {items.map(url => {
-            // url format: uuid_filename.ext
-            const [, rest] = url.split("_");
-            const parts = rest.split(".");
-            const ext = parts.pop().toLowerCase();
-            const name = parts.join(".");
+      <div className="flex flex-wrap gap-3">
+        {items.map(item => {
+          const ext = item.name.split(".").pop().toLowerCase();
+          const isImage = [
+            "png","jpg","jpeg","gif","webp","jfif","bmp","tiff","tif",
+            "svg","heic","heif","ico","raw","psd"
+          ].includes(ext);
+          const isVideo = [
+            "mp4","mov","webm","avi","mkv","flv","wmv","mpeg","mpg",
+            "3gp","m4v","ts","vob"
+          ].includes(ext);
 
-            const isImage = [
-              "png","jpg","jpeg","gif","webp","jfif","bmp","tiff","tif",
-              "svg","heic","heif","ico","raw","psd"
-            ].includes(ext);
-            const isVideo = [
-              "mp4","mov","webm","avi","mkv","flv","wmv","mpeg","mpg",
-              "3gp","m4v","ts","vob"
-            ].includes(ext);
+          return (
+            <div key={item.url} className="relative h-40 w-40 aspect-square">
+              {isImage ? (
+                <img
+                  src={item.url}
+                  alt={item.name}
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : isVideo ? (
+                <video
+                  src={item.url}
+                  controls
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <div className="panel2 flex flex-col items-center justify-center space-y-2 rounded-lg w-full h-full">
+                  <FileText className="text-neutral-500 w-8 h-8" />
+                  <p className="text-xs break-all text-center">{item.name}</p>
+                  <p className="text-xs text-neutral-500">{formatSize(item.size)}</p>
+                </div>
+              )}
 
-            return (
-              <div key={url} className="section-item">
-                {isImage && (
-                  <img
-                    src={`http://localhost:8000/attachment/${url}`}
-                    alt={name}
-                    className="attachment-image"
-                  />
-                )}
-                {isVideo && (
-                  <video
-                    src={`http://localhost:8000/attachment/${url}`}
-                    controls
-                    className="attachment-image"
-                  />
-                )}
-                {!isImage && !isVideo && (
-                  <div>
-                    <img src="/document.png" alt={name} className="attachment-image" />
-                    <p style={{ top: "34%" }} className="file-name">
-                      {name.slice(0, 3) + "."}
-                    </p>
-                    <p style={{ top: "44%" }} className="file-name">
-                      {ext}
-                    </p>
-                  </div>
-                )}
-                <button onClick={() => remove(url)} className="absolute-btn">✖</button>
-              </div>
-            );
-          })}
-        </div>
+              <button
+                onClick={() => remove(item.url)}
+                className="absolute top-2 right-2 p-1 rounded bg-black/50 hover:bg-neutral-800"
+              >
+                <X className="w-4 h-4 text-neutral-300"/>
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

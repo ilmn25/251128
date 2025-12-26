@@ -1,80 +1,42 @@
-﻿import {useEffect, useState} from "react";
-import TextareaAutosize from "react-textarea-autosize";
+﻿import TextareaAutosize from "react-textarea-autosize";
+import {X} from "lucide-react";
 
-export default function MessagePanel() {
-  // eslint-disable-next-line react-hooks/purity
-  const [items, setItems] = useState([{ id: Date.now(), text: "" }]);
-
-  useEffect(() => {
-    async function fetchAll() {
-      const itemsPrev = await (await fetch("http://localhost:8000/message")).json()
-      if (itemsPrev.length > 0)
-        setItems(itemsPrev);
-    }
-    fetchAll();
-  }, []);
-
-  async function sync(data) {
-    await fetch("http://localhost:8000/message", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+export default function MessagePanel({ items, setItems }) {
+  function add() {
+    setItems(prevItems => [...prevItems, ""]);
   }
 
-  function add(i) {
-    const target = items[i];
-    if (!target.text.trim()) return;
-
-    setItems(prevItems => {
-      const newItem = { id: Date.now(), text: target.text.trim() };
-
-      const newItems = [
-        ...prevItems.slice(0, i + 1),
-        newItem,
-        ...prevItems.slice(i + 1)
-      ];
-
-      sync(newItems);
-      return newItems;
-    });
+  function update(index, newText) {
+    if (!newText.trim()) remove(index)
+    else setItems(prevItems => {return prevItems.map((msg, i) => (i === index ? newText : msg))});
   }
 
-  function update(id, newText) {
-    setItems(() => {
-      let newItems;
-      if (id !== items[0].id && !newText.trim())
-        // remove if empty
-        newItems = items.filter(i => i.id !== id);
-      else
-        newItems = items.map(i => i.id === id ? { ...i, text: newText } : i);
-      sync(newItems);
-      return newItems;
-    });
+  function remove(index) {
+    return setItems(prevItems => {return prevItems.filter((_, i) => i !== index)});
   }
 
   return (
-    <div className="section">
-      <h3>Messages</h3>
-      <div className="section-list">
-        {items.map((item, i) => (
-          <div key={item.id} className="section-item">
-            <TextareaAutosize
-              className="section-input section-input-message"
-              placeholder={i === 0 ? "Enter message" : ""}
-              value={item.text}
-              onChange={e => update(item.id, e.target.value)}
-              style={{ resize: "none", overflow: "hidden" }}
-              onKeyDown={e => {
-                if ( e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  add(i);
-                }
-              }}
-            />
-          </div>
-        ))}
-      </div>
+    <div className="space-y-2">
+      <button className="panel2 buttonstyle1 centered w-full" onClick={() => add()}>Add</button>
+
+      {items.map((text, i) => (
+        <div className="relative">
+          <TextareaAutosize
+            key={i}
+            className="panel2 input resize-none overflow-hidden"
+            placeholder={"Enter message"}
+            value={text}
+            onChange={e => update(i, e.target.value)}
+            spellCheck={false}
+          />
+          <button
+            onClick={() => remove(i)}
+            className="absolute top-2 right-2 p-1 rounded bg-black/50 hover:bg-neutral-800"
+          >
+            <X className="w-4 h-4 text-neutral-300"/>
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

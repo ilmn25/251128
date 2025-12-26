@@ -33,17 +33,18 @@ export default function TokenPanel() {
         body: JSON.stringify(token.trim())
       });
 
-      if (res.ok) {
-        setStatus('Logged in');
-        setToken("")
-        let data = await res.json();
+      let data = await res.json();
+      if (data.success === true) {
         setItems(() => {
-          const newItems = [data, ...items]
+          if (items.some(i => i.token === token)) return items;
+          const newItems = [{"token": token, "username": data.username}, ...items]
           sync(newItems);
           return newItems;
         });
+        setToken("")
+        setStatus("Selected: " + data.username);
       } else {
-        setStatus((await res.json()).error || 'Invalid token');
+        setStatus((data.error || 'Invalid token'));
       }
     } catch (err) {
       console.error(err);

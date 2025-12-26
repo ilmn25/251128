@@ -1,9 +1,47 @@
-:root {
-    margin: 0 3rem;
+@import "tailwindcss";
+@tailwind utilities;
 
+.panel1 {
+    @apply w-full h-full bg-neutral-900 rounded-2xl p-6 border border-neutral-700 shadow;
+}
+.panel1-header {
+    @apply w-full h-full pb-4 font-bold text-2xl
+}
+.panel1-subheader {
+    @apply w-full h-full pb-1 text-sm
+}
+.panel2 {
+    @apply px-5 py-4   bg-black border border-neutral-700 rounded-lg
+    text-white
+}
+.input {
+    @apply w-full placeholder-neutral-500 focus:outline-none focus:border-white;
+}
+.centered {
+    @apply flex items-center justify-center
+}
+.buttonstyle1 {
+    @apply border border-dashed border-neutral-700
+    transition-colors text-neutral-400 hover:border-white hover:text-white
+    cursor-pointer;
+}
+.buttonstyle2 {
+    @apply transition-colors text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300
+    cursor-pointer;
+}
+.buttonstyle3 {
+     @apply transition-colors bg-white text-black;
+ }
+.buttonstyle4 {
+    @apply transition-colors bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg
+    cursor-pointer;
+}
+
+
+:root {
     color-scheme: light dark;
     color: rgba(255, 255, 255, 0.87);
-    background-color: #1a1a1e;
+    background-color: #000000;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -13,7 +51,6 @@
 
 body {
     margin: 3em 2em;
-    display: flex;
 }
 h3 {
     margin: 0 0 0.7em 0;
@@ -30,7 +67,7 @@ h3 {
 
 .section-input {
     flex: 1;
-    background: #222327;
+    background: #171717;
     border: none;
     border-radius: 6px;
     font-weight: bold;
@@ -89,7 +126,7 @@ h3 {
 
 .section-item {
     flex: 1;
-    background: #222327;
+    background: #171717;
     border: none;
     border-radius: 6px;
     padding: 10px;
@@ -102,7 +139,7 @@ h3 {
 
 .section-subitem {
     margin: 0 0.8em;
-    background: #222327;
+    background: #171717;
     border: none;
     border-radius: 6px;
     min-width: 7em;
