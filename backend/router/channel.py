@@ -1,18 +1,14 @@
-﻿import os, json, discord
+﻿import discord
 from fastapi import APIRouter
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 import utility
 router = APIRouter()
 
-from utility import CHANNEL_FILE, write, read
-if not os.path.exists(CHANNEL_FILE):
-    with open(CHANNEL_FILE, "w") as f:
-        json.dump([], f)
-
 @router.get("/channel")
 async def read_channel():
     return await read(CHANNEL_FILE)
+
 @router.post("/channel")
 async def write_channel(request: Request):
     return await write(await request.json(), CHANNEL_FILE)

@@ -9,7 +9,7 @@ const Tabs = {
   REGISTER: "REGISTER",
 };
 
-export default function Landing() {
+export default function Landing({refresh}) {
   const [selected, setSelected] = useState(Tabs.LOGIN);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +23,7 @@ export default function Landing() {
     });
     const data = await res.json();
     console.log("Login response:", data);
+    refresh();
   }
 
   async function register() {
@@ -33,6 +34,7 @@ export default function Landing() {
     });
     const data = await res.json();
     console.log("Register response:", data);
+    refresh();
   }
 
   return (

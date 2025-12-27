@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
     mongo.client.close()
 
 # ==================== WEBPAGE ====================
-from router import token, channel, message, attachment, task, user
+from router import attachment, task, user, composition
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
@@ -28,12 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(token.router)
-app.include_router(channel.router)
-app.include_router(message.router)
 app.include_router(attachment.router)
-app.include_router(task.router)
 app.include_router(user.router)
+app.include_router(composition.router)
 
 # ==================== WEBPAGE ====================
 

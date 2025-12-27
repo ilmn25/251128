@@ -10,7 +10,7 @@ const Tabs = {
   SETTINGS: "SETTIINGS",
 };
 
-export default function Home() {
+export default function Dashboard() {
   const [selected, setSelected] = useState(Tabs.COMPOSITION);
 
   return (

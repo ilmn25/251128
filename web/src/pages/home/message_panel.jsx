@@ -20,9 +20,8 @@ export default function MessagePanel({ items, setItems }) {
       <button className="panel2 buttonstyle1 centered w-full" onClick={() => add()}>Add</button>
 
       {items.map((text, i) => (
-        <div className="relative">
+        <div key={i} className="relative">
           <TextareaAutosize
-            key={i}
             className="panel2 input resize-none overflow-hidden"
             placeholder={"Enter message"}
             value={text}

@@ -9,7 +9,8 @@ export default function AttachmentPanel({items, setItems}) {
       url: URL.createObjectURL(file),
       name: file.name,
       ext: file.name.split(".").pop().toLowerCase(),
-      size: formatSize(file.size)
+      size: formatSize(file.size),
+      file: file,
     }));
     setItems(prev => [...newItems, ...prev]);
   }

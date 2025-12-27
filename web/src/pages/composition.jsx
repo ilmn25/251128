@@ -13,17 +13,25 @@ export default function Composition() {
   const [count, setCount] = useState(1);
 
   async function submit() {
+    const processedAttachments = await Promise.all(
+      attachments.map(async ({ file, ...rest }) =>
+        file ? { ...rest, url: await upload(file) } : rest
+      )
+    );
+
     const res = await fetch("http://localhost:8000/composition/submit", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
-        "id": id,
-        "messages": messages,
-        "attachments": attachments,
-        "randomize": randomize,
-        "count": count,
+        id,
+        messages,
+        attachments : processedAttachments,
+        randomize,
+        count
       })
     });
+
     const data = await res.json();
     if (data.success) {
       setId("");
@@ -31,8 +39,25 @@ export default function Composition() {
       setAttachments([]);
       setRandomize(false);
       setCount(1);
-    } else console.error(data.error || "Failed to submit composition");
+    } else {
+      setAttachments(processedAttachments);
+      console.error(data.error || "Failed to submit composition");
+    }
+
+    async function upload(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("http://localhost:8000/attachment", {
+        method: "POST",
+        credentials: "include",
+        body: formData
+      });
+      const data = await res.json();
+      return data.url;
+    }
   }
+
 
   return (
     <div>
@@ -52,7 +77,7 @@ export default function Composition() {
         <AttachmentPanel items={attachments} setItems={setAttachments} />
       </div>
 
-      <button className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
+      <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
         <SaveIcon></SaveIcon> <p>Submit</p>
       </button>
     </div>
