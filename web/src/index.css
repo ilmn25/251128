@@ -2,13 +2,13 @@
 @tailwind utilities;
 
 .panel1 {
-    @apply w-full h-full bg-neutral-900 rounded-2xl p-6 border border-neutral-700 shadow;
+    @apply bg-neutral-900 rounded-2xl p-6 border border-neutral-700 shadow;
 }
 .panel1-header {
-    @apply w-full h-full pb-4 font-bold text-2xl
+    @apply w-full h-full font-bold text-2xl
 }
 .panel1-subheader {
-    @apply w-full h-full pb-1 text-sm
+    @apply w-full h-full text-sm
 }
 .panel2 {
     @apply px-5 py-4   bg-black border border-neutral-700 rounded-lg
