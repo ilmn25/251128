@@ -21,12 +21,7 @@ async def write_channel(request: Request):
 async def lookup_channel(request: Request):
     channel_id = await request.json()
     channels = await read(CHANNEL_FILE)
-    if any(str(c.get("id")) == str(channel_id) if isinstance(c, dict) else str(c) == str(channel_id) for c in channels):
-        return JSONResponse({"error": "Channel already exists"}, status_code=409)
-
     bot = utility.bots.get(utility.token)
-    if not bot:
-        return JSONResponse({"error": "Bot not active"}, status_code=403)
 
     channel = bot.get_channel(int(channel_id))
     if not channel:

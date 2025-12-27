@@ -14,7 +14,7 @@ export default function Home() {
   const [selected, setSelected] = useState(Tabs.COMPOSITION);
 
   return (
-    <div>
+    <div className="space-y-4">
       <div className="flex space-x-2">
         <button
           onClick={() => setSelected(Tabs.COMPOSITION)}
@@ -36,11 +36,9 @@ export default function Home() {
         </button>
       </div>
 
-      <div className="mt-4">
-        {selected === Tabs.COMPOSITION && <Composition />}
-        {selected === Tabs.CONNECTION && <Connection />}
-        {selected === Tabs.SETTINGS && <div className="panel2">Placeholder Two</div>}
-      </div>
+      {selected === Tabs.COMPOSITION && <Composition />}
+      {selected === Tabs.CONNECTION && <Connection />}
+      {selected === Tabs.SETTINGS && <div className="panel2">Placeholder Two</div>}
     </div>
   );
 }

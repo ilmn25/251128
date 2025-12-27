@@ -2,7 +2,7 @@
 
 import {SaveIcon} from "lucide-react";
 import {useState} from "react";
-import Toggle from "../components/Toggle.jsx";
+import Toggle from "../components/toggle.jsx";
 
 export default function Connection() {
   const [channelId, setChannelId] = useState("");
