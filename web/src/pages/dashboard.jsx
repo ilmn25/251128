@@ -1,12 +1,12 @@
 ﻿import '../index.css';
 
-import Composition from "./composition.jsx";
+import Composition from "./composition/composition.jsx";
 import React, {useEffect, useState} from "react";
-import Connection from "./connection.jsx";
-import Profile from "./profile.jsx";
+import Profile from "./profile/profile.jsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import Loading from "../components/loading.jsx";
 import {MessageCircle} from "lucide-react";
+import Channel from "./channel/channel.jsx";
 
 
 export default function Dashboard() {
@@ -35,7 +35,7 @@ export default function Dashboard() {
   if (!user) return <Loading/>
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full p-12 h-screen">
 
       <div className="flex items-center gap-5 pb-5">
         <div className="p-3 bg-white rounded-2xl aspect-square w-13 h-13">
@@ -52,24 +52,24 @@ export default function Dashboard() {
           onClick={() => navigate("/composition")}
           className={`panel1 ${location.pathname === "/composition" ? "buttonstyle3" : "buttonstyle2"}`}
         >
-          Composition
+          Compositions
         </button>
         <button
-          onClick={() => navigate("/connection")}
-          className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
+          onClick={() => navigate("/channel")}
+          className={`panel1 ${location.pathname === "/channel" ? "buttonstyle3" : "buttonstyle2"}`}
         >
-          Connection
+          Channels
         </button>
         <button
           onClick={() => navigate("/profile")}
           className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
         >
-          Settings
+          Profile Settings
         </button>
       </div>
 
-      {location.pathname === "/composition" && <Composition />}
-      {location.pathname === "/connection" && <Connection />}
+      {location.pathname.startsWith("/composition") && <Composition/>}
+      {location.pathname.startsWith("/channel") && <Channel/>}
       {location.pathname.startsWith("/profile") && <Profile/>}
     </div>
   );

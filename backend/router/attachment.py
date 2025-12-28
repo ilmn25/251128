@@ -3,7 +3,7 @@ from starlette.responses import JSONResponse, FileResponse
 import os, shutil, uuid
 router = APIRouter()
 
-from utility import ATTACHMENT_PATH
+from env import ATTACHMENT_PATH
 os.makedirs(ATTACHMENT_PATH, exist_ok=True)
 
 @router.post("/attachment")

@@ -1,6 +1,6 @@
 ﻿import { useRef } from "react";
 import { FileText, X} from "lucide-react";
-export default function AttachmentPanel({items, setItems}) {
+export default function Attachment({items, setItems}) {
   const fileInputRef = useRef(null);
 
   function add(e) {

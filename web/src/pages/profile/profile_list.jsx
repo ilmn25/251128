@@ -1,37 +1,9 @@
-﻿import '../index.css';
-import {PencilRuler, SaveIcon, Send} from 'lucide-react';
-import React, {useState, createContext, useContext, useEffect} from 'react';
-import ProfileEdit from "./profile_edit.jsx";
-import {Route, Routes, useNavigate} from "react-router-dom";
+﻿import React, {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {PencilRuler, UserPlus, Send} from "lucide-react";
 
-const ProfileContext = createContext();
-export function UseProfiles() {
-  return useContext(ProfileContext);
-}
-
-export default function Profile() {
-
-  function select(id) {
-    console.log('selected', id);
-  }
-
-  return (
-    <ProfileContext.Provider
-      value={{select }}
-    >
-      <div className="space-y-4">
-        <Routes>
-          <Route path="/profile" element={<ProfileList/>} />
-          <Route path="/profile/new" element={<ProfileEdit/>} />
-          <Route path="/profile/edit/:id" element={<ProfileEdit/>} />
-        </Routes>
-      </div>
-    </ProfileContext.Provider>
-  );
-}
-
-function ProfileList() {
-  const [items, setItems] = useState([]);
+export default function ProfileList() {
+  const [items, setItems] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,8 +20,11 @@ function ProfileList() {
         console.error("Error fetching profiles:", data.error);
       }
     }
+
     fetchProfiles();
   }, [navigate, setItems]);
+
+  if (!items) return <></>
 
   return (
     <>
@@ -61,28 +36,34 @@ function ProfileList() {
         onClick={() => navigate("/profile/new")}
         className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1"
       >
-        <SaveIcon /> <p>New Profile</p>
+        <UserPlus/> <p>New Profile</p>
       </button>
     </>
   );
 }
 
-function ProfileListItem({ id, username}) {
-  const { select } = UseProfiles();
+
+function ProfileListItem({ id, accountId, username}) {
   const navigate = useNavigate();
+
+  function select(){
+    let date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    document.cookie = "profile=" + id + "; expires=" + date.toUTCString() + "; path=/";
+  }
 
   return (
     <div>
       <div className="panel1 flex content-between centered gap-3 !py-0">
         <div className="w-full">
           <p className="panel1-header">@{username}</p>
-          <p className="comment">ID: {id}</p>
+          <p className="comment">ID: {accountId}</p>
         </div>
 
         <div className="my-5 space-y-3 max-w-50 w-full">
           <button
             type="button"
-            onClick={() => navigate("/profile/edit/" + id)}
+            onClick={() => navigate("/profile/edit/" + accountId)}
             className="panel2 buttonstyle2 w-full flex centered space-x-1"
           >
             <PencilRuler /> <p>Edit</p>
@@ -90,7 +71,7 @@ function ProfileListItem({ id, username}) {
 
           <button
             type="button"
-            onClick={() => select(id)}
+            onClick={() => select()}
             className="panel2 buttonstyle4 w-full flex centered space-x-1"
           >
             <Send /> <p>Select</p>

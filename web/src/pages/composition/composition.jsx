@@ -1,8 +1,8 @@
-﻿import '../index.css';
+﻿import '../../index.css';
 
 import {SaveIcon, Shuffle, Hash } from "lucide-react";
-import MessagePanel from './home/message_panel.jsx';
-import AttachmentPanel from "./home/attachment_panel.jsx";
+import Message from './message.jsx';
+import Attachment from "./attachment.jsx";
 import {useState} from "react";
 
 export default function Composition() {
@@ -64,7 +64,7 @@ export default function Composition() {
       <div className="panel1 space-y-3 space-x-3">
         <p className="panel1-header">Composition</p>
         <p className="panel1-subheader">Messages</p>
-        <MessagePanel items={messages} setItems={setMessages} />
+        <Message items={messages} setItems={setMessages} />
         <p className="panel1-subheader">Attachments</p>
         <div className="flex gap-3">
           <button onClick={() => setRandomize(!randomize)} className={`panel2 flex space-x-2 ${randomize? "buttonstyle4" : "buttonstyle2"}`}>
@@ -74,7 +74,7 @@ export default function Composition() {
             <Hash></Hash> <p>{count} Attachments</p>
           </button>
         </div>
-        <AttachmentPanel items={attachments} setItems={setAttachments} />
+        <Attachment items={attachments} setItems={setAttachments} />
       </div>
 
       <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >

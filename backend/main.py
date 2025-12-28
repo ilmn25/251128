@@ -6,7 +6,7 @@ from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-from utility import ROOT
+from env import ROOT
 os.makedirs(ROOT, exist_ok=True)
 
 # ==================== DATABASE ====================
@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
     mongo.client.close()
 
 # ==================== WEBPAGE ====================
-from router import attachment, task, user, composition, profile
+from router import attachment, user, composition, profile, channel
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +32,7 @@ app.include_router(attachment.router)
 app.include_router(user.router)
 app.include_router(composition.router)
 app.include_router(profile.router)
+app.include_router(channel.router)
 
 # ==================== WEBPAGE ====================
 

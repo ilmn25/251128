@@ -1,7 +1,7 @@
 ﻿import TextareaAutosize from "react-textarea-autosize";
 import {X} from "lucide-react";
 
-export default function MessagePanel({ items, setItems }) {
+export default function Message({ items, setItems }) {
   function add() {
     setItems(prevItems => [...prevItems, ""]);
   }

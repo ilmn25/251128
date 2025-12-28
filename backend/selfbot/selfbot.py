@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-from utility import ATTACHMENT_PATH, get_attachments, get_message, get_channel
+from env import ATTACHMENT_PATH
 
 class Main(commands.Bot):
     def __init__(self):
@@ -15,19 +15,6 @@ class Main(commands.Bot):
         self.selected_message = ""
         self.selected_images = []
 
-    async def get(self, attachment_count):
-        channel_info = await get_channel()
-        if not channel_info:
-            return {"channel": None}
-        self.channel_id = channel_info["id"]
-        self.selected_message = await get_message()
-        self.selected_images = await get_attachments(attachment_count)
-
-        return {
-            "channel": channel_info["name"],
-            "message": self.selected_message,
-            "attachments": self.selected_images
-        }
 
     async def post(self):
         try:

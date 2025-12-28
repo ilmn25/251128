@@ -1,11 +1,11 @@
-﻿import '../index.css';
+﻿import '../../index.css';
 
 import {SaveIcon, Shield} from "lucide-react";
 import {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 
 export default function ProfileEdit() {
-  const { id } = useParams();
+  const { accountId } = useParams();
   const [token, setToken] = useState("");
   const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ export default function ProfileEdit() {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
-      body: JSON.stringify({id, token}),
+      body: JSON.stringify({accountId, token}),
     });
 
     const data = await res.json();
@@ -32,7 +32,7 @@ export default function ProfileEdit() {
   return (
     <div>
       <div className="panel1 space-y-3 space-x-3">
-        <p className="panel1-header">New Profile</p>
+        <p className="panel1-header py-1">{accountId? "Update Profile Token" : "New Profile"}</p>
 
         <div className="panel2 flex space-x-4 !p-4">
           <Shield className="comment !size-6"></Shield>

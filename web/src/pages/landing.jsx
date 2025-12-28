@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import PasswordInput from "../components/password_panel.jsx";
-import {MessageCircle, Shield} from "lucide-react";
+import {MessageCircle, Github} from "lucide-react";
 import {useLocation, useNavigate} from "react-router-dom";
 
 export default function Landing() {
@@ -36,17 +36,16 @@ export default function Landing() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-1/2">
+    <div className="flex flex-col items-center justify-center h-screen ">
       <div className="p-4 bg-white rounded-2xl">
         <MessageCircle className="text-black size-13"></MessageCircle>
       </div>
-      <p className="text-3xl font-bold m-4 text-center">Discord Message Automation Tool</p>
-      <p className="text-1xl text-neutral-500 mb-7 text-center">
-        Automate sending hiring posts on commission boards, sharing new social media posts, and more!
-        <br/> <br/> Made by illu
-      </p>
-      <div className="panel1 min-2xl space-y-4">
-
+      <p className="text-3xl font-bold m-2 text-center">Discord Message Automation Tool</p>
+      <div className="text-1xl text-neutral-500 mb-7 text-center max-w-100 space-y-2">
+        <p>Automate sending hiring posts on commission boards, sharing new social media posts, and more!</p>
+        <p> Made by illu</p>
+      </div>
+      <div className="panel1 min-2xl space-y-4 max-w-120">
         <div className="flex space-x-2">
           <button
             onClick={() => navigate("/login")}
@@ -86,7 +85,7 @@ export default function Landing() {
         </button>
 
         <div className="panel2 flex space-x-2 !p-4">
-          <Shield className="comment !size-6"></Shield> <p className="comment">Created by illu for personal use and showcase, built with React, FastAPI, and MongoDB.</p>
+          <Github className="comment !size-6"></Github> <p className="comment">Created by illu for personal use and showcase, built with React, FastAPI, and MongoDB.</p>
         </div>
       </div>
     </div>
