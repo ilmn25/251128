@@ -2,7 +2,7 @@
 import {PencilRuler, SaveIcon, Send} from 'lucide-react';
 import React, {useState, createContext, useContext, useEffect} from 'react';
 import ProfileEdit from "./profile_edit.jsx";
-import {BrowserRouter, Route, Routes, useNavigate} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 
 const ProfileContext = createContext();
 export function UseProfiles() {
@@ -10,30 +10,21 @@ export function UseProfiles() {
 }
 
 export default function Profile() {
-  const [id, setId] = useState(null);
 
   function select(id) {
-    setId(id);
     console.log('selected', id);
-  }
-
-  function edit(id) {
-    setId(id);
-    console.log('edit', id);
   }
 
   return (
     <ProfileContext.Provider
-      value={{select, edit }}
+      value={{select }}
     >
       <div className="space-y-4">
-        <BrowserRouter>
-          <Routes>
-            <Route path="/profile" element={<ProfileList />} />
-            <Route path="/profile/new" element={<ProfileEdit/>} />
-            <Route path="/profile/edit/:id" element={<ProfileEdit/>} />
-          </Routes>
-        </BrowserRouter>
+        <Routes>
+          <Route path="/profile" element={<ProfileList/>} />
+          <Route path="/profile/new" element={<ProfileEdit/>} />
+          <Route path="/profile/edit/:id" element={<ProfileEdit/>} />
+        </Routes>
       </div>
     </ProfileContext.Provider>
   );
@@ -62,22 +53,23 @@ function ProfileList() {
 
   return (
     <>
+      {items.map((p) => (
+        <ProfileListItem key={p.id} {...p} />
+      ))}
+
       <button
         onClick={() => navigate("/profile/new")}
         className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1"
       >
         <SaveIcon /> <p>New Profile</p>
       </button>
-
-      {items.map((p) => (
-        <ProfileListItem key={p.id} {...p} />
-      ))}
     </>
   );
 }
 
 function ProfileListItem({ id, username}) {
-  const { edit, select } = UseProfiles();
+  const { select } = UseProfiles();
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -90,7 +82,7 @@ function ProfileListItem({ id, username}) {
         <div className="my-5 space-y-3 max-w-50 w-full">
           <button
             type="button"
-            onClick={() => edit(id)}
+            onClick={() => navigate("/profile/edit/" + id)}
             className="panel2 buttonstyle2 w-full flex centered space-x-1"
           >
             <PencilRuler /> <p>Edit</p>

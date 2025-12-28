@@ -53,8 +53,9 @@
 }
 
 body {
-    margin: 3em 2em;
+    @apply w-full p-12
 }
+
 h3 {
     margin: 0 0 0.7em 0;
 }

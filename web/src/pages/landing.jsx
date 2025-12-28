@@ -3,38 +3,36 @@
 import { useState } from "react";
 import PasswordInput from "../components/password_panel.jsx";
 import {MessageCircle, Shield} from "lucide-react";
+import {useLocation, useNavigate} from "react-router-dom";
 
-const Tabs = {
-  LOGIN: "LOGIN",
-  REGISTER: "REGISTER",
-};
-
-export default function Landing({refresh}) {
-  const [selected, setSelected] = useState(Tabs.LOGIN);
+export default function Landing() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   async function login() {
     const res = await fetch("http://localhost:8000/user/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-      credentials: "include" // important for cookies
+      credentials: "include"
     });
     const data = await res.json();
     console.log("Login response:", data);
-    refresh();
+    navigate("/");
   }
 
   async function register() {
     const res = await fetch("http://localhost:8000/user/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
+      credentials: "include"
     });
     const data = await res.json();
     console.log("Register response:", data);
-    refresh();
+    navigate("/");
   }
 
   return (
@@ -48,9 +46,24 @@ export default function Landing({refresh}) {
         <br/> <br/> Made by illu
       </p>
       <div className="panel1 min-2xl space-y-4">
+
         <div className="flex space-x-2">
-          <button onClick={() => setSelected(Tabs.LOGIN)} className={`panel2 w-full ${selected === Tabs.LOGIN ? "buttonstyle3" : "buttonstyle2"}`}>Login</button>
-          <button onClick={() => setSelected(Tabs.REGISTER)} className={`panel2 w-full ${selected === Tabs.REGISTER ? "buttonstyle3" : "buttonstyle2"}`}>Register</button>
+          <button
+            onClick={() => navigate("/login")}
+            className={`panel2 w-full ${
+              location.pathname === "/login" ? "buttonstyle3" : "buttonstyle2"
+            }`}
+          >
+            Login
+          </button>
+          <button
+            onClick={() => navigate("/register")}
+            className={`panel2 w-full ${
+              location.pathname === "/register" ? "buttonstyle3" : "buttonstyle2"
+            }`}
+          >
+            Register
+          </button>
         </div>
 
         <p className="panel2-header">Email Address</p>
@@ -68,7 +81,9 @@ export default function Landing({refresh}) {
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
-        <button onClick={() => {selected === Tabs.LOGIN? login() : register()}} className={`panel2 w-full centered buttonstyle4`}>{selected === Tabs.LOGIN? "Login" : "Register"}</button>
+        <button onClick={() => {location.pathname === "/login"? login() : register()}} className={`panel2 w-full centered buttonstyle4`}>
+          {location.pathname === "/login"? "Login" : "Register"}
+        </button>
 
         <div className="panel2 flex space-x-2 !p-4">
           <Shield className="comment !size-6"></Shield> <p className="comment">Created by illu for personal use and showcase, built with React, FastAPI, and MongoDB.</p>

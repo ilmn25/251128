@@ -13,14 +13,14 @@ class UserCredentials(BaseModel):
     password: str
 
 @router.post("/user/register")
-async def user_register(data: UserCredentials):
+async def user_register(data: UserCredentials, response: Response):
     if mongo.users.find_one({"email": data.email}):
         return {"success": False, "error": "User already exists"}
 
-    hashed = pwd_context.hash(data.password)
-    mongo.users.insert_one({"email": data.email, "password": hashed})
-    return {"success": True}
+    result = mongo.users.insert_one({"email": data.email, "password": pwd_context.hash(data.password)})
 
+    response.set_cookie("session", str(result.inserted_id), httponly=True, max_age=900)
+    return {"success": True}
 
 @router.post("/user/login")
 async def user_login(data: UserCredentials, response: Response):

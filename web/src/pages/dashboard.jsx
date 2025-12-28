@@ -1,46 +1,76 @@
 ﻿import '../index.css';
 
 import Composition from "./composition.jsx";
-import { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Connection from "./connection.jsx";
 import Profile from "./profile.jsx";
-
-const Tabs = {
-  COMPOSITION: "COMPOSITION",
-  CONNECTION: "CONNECTION",
-  SETTINGS: "SETTIINGS",
-};
+import {useLocation, useNavigate} from "react-router-dom";
+import Loading from "../components/loading.jsx";
+import {MessageCircle} from "lucide-react";
 
 
 export default function Dashboard() {
-  const [selected, setSelected] = useState(Tabs.COMPOSITION);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("http://localhost:8000/user/info", {
+        method: "GET",
+        credentials: "include"
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setUser(data);
+        if (location.pathname === "/") navigate("/composition");
+      } else {
+        console.error(data.error);
+        navigate("/login");
+      }
+    })();
+  }, [location.pathname, navigate]);
+
+  if (!user) return <Loading/>
 
   return (
     <div className="space-y-4">
+
+      <div className="flex items-center gap-5 pb-5">
+        <div className="p-3 bg-white rounded-2xl aspect-square w-13 h-13">
+          <MessageCircle className="text-black size-7"></MessageCircle>
+        </div>
+        <div className="space-y-1">
+          <p className="text-3xl font-bold">Discord Message Automation Tool</p>
+          <p className="comment">User ID: {user.id}</p>
+        </div>
+      </div>
+
       <div className="flex space-x-2">
         <button
-          onClick={() => setSelected(Tabs.COMPOSITION)}
-          className={`panel1 ${selected === Tabs.COMPOSITION ? "buttonstyle3" : "buttonstyle2"}`}
+          onClick={() => navigate("/composition")}
+          className={`panel1 ${location.pathname === "/composition" ? "buttonstyle3" : "buttonstyle2"}`}
         >
           Composition
         </button>
         <button
-          onClick={() => setSelected(Tabs.CONNECTION)}
-          className={`panel1 ${selected === Tabs.CONNECTION ? "buttonstyle3" : "buttonstyle2"}`}
+          onClick={() => navigate("/connection")}
+          className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
         >
           Connection
         </button>
         <button
-          onClick={() => setSelected(Tabs.SETTINGS)}
-          className={`panel1 ${selected === Tabs.SETTINGS ? "buttonstyle3" : "buttonstyle2"}`}
+          onClick={() => navigate("/profile")}
+          className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
         >
           Settings
         </button>
       </div>
 
-      {selected === Tabs.COMPOSITION && <Composition />}
-      {selected === Tabs.CONNECTION && <Connection />}
-      {selected === Tabs.SETTINGS && <Profile/>}
+      {location.pathname === "/composition" && <Composition />}
+      {location.pathname === "/connection" && <Connection />}
+      {location.pathname.startsWith("/profile") && <Profile/>}
     </div>
   );
 }
