@@ -60,7 +60,7 @@ export default function Connection() {
             }}
           />
         </div>
-        <div className="panel2 space-y-3">
+        <div className="panel2 space-y-3 !py-5">
           <p className="panel1-subheader">Role Restrictions</p>
 
           <div className="flex justify-between text-neutral-400">

@@ -13,7 +13,7 @@ export default function Composition() {
   const [count, setCount] = useState(1);
 
   async function submit() {
-    const processedAttachments = await Promise.all(
+    const attachmentsNew = await Promise.all(
       attachments.map(async ({ file, ...rest }) =>
         file ? { ...rest, url: await upload(file) } : rest
       )
@@ -26,7 +26,7 @@ export default function Composition() {
       body: JSON.stringify({
         id,
         messages,
-        attachments : processedAttachments,
+        attachments : attachmentsNew,
         randomize,
         count
       })
@@ -40,7 +40,7 @@ export default function Composition() {
       setRandomize(false);
       setCount(1);
     } else {
-      setAttachments(processedAttachments);
+      setAttachments(attachmentsNew);
       console.error(data.error || "Failed to submit composition");
     }
 

@@ -3,12 +3,14 @@
 import Composition from "./composition.jsx";
 import { useState } from "react";
 import Connection from "./connection.jsx";
+import Profile from "./profile.jsx";
 
 const Tabs = {
   COMPOSITION: "COMPOSITION",
   CONNECTION: "CONNECTION",
   SETTINGS: "SETTIINGS",
 };
+
 
 export default function Dashboard() {
   const [selected, setSelected] = useState(Tabs.COMPOSITION);
@@ -38,7 +40,7 @@ export default function Dashboard() {
 
       {selected === Tabs.COMPOSITION && <Composition />}
       {selected === Tabs.CONNECTION && <Connection />}
-      {selected === Tabs.SETTINGS && <div className="panel2">Placeholder Two</div>}
+      {selected === Tabs.SETTINGS && <Profile/>}
     </div>
   );
 }

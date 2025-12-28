@@ -11,7 +11,7 @@
     @apply w-full h-full text-sm
 }
 .comment {
-    @apply w-full h-full text-sm text-neutral-500
+    @apply w-full h-full text-sm text-neutral-400
 }
 .panel2 {
     @apply px-5 py-2 bg-black border border-neutral-700 rounded-lg

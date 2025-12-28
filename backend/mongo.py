@@ -6,10 +6,11 @@ client = None
 db = None
 users = None
 compositions = None
+profiles = None
 connections = None
 
 async def connect():
-    global client, db, users, compositions, connections
+    global client, db, users, compositions, connections, profiles
 
     print("MongoDB Connecting")
 
@@ -18,6 +19,7 @@ async def connect():
 
     users = db["users"]
     compositions = db["compositions"]
+    profiles = db["profiles"]
     connections = db["connections"]
 
     print("MongoDB Connected")
