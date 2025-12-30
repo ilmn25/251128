@@ -19,8 +19,8 @@ export default function Landing() {
       credentials: "include"
     });
     const data = await res.json();
-    console.log("Login response:", data);
-    navigate("/");
+    if (data.success) navigate("/");
+    else console.error(data.error);
   }
 
   async function register() {
@@ -31,8 +31,8 @@ export default function Landing() {
       credentials: "include"
     });
     const data = await res.json();
-    console.log("Register response:", data);
-    navigate("/");
+    if (data.success) navigate("/");
+    else console.error(data.error);
   }
 
   return (
@@ -78,7 +78,7 @@ export default function Landing() {
           className="panel2 input"
           placeholder="Password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          setValue={setPassword}
         />
         <button onClick={() => {location.pathname === "/login"? login() : register()}} className={`panel2 w-full centered buttonstyle4`}>
           {location.pathname === "/login"? "Login" : "Register"}

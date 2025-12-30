@@ -17,10 +17,9 @@ export default function ProfileList() {
         if (data.items.length === 0) navigate("/profile/new")
         else setItems(data.items);
       } else {
-        console.error("Error fetching profiles:", data.error);
+        console.error(data.error);
       }
     }
-
     fetchProfiles();
   }, [navigate, setItems]);
 

@@ -1,8 +1,7 @@
 ﻿import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function PasswordInput() {
-  const [password, setPassword] = useState("");
+export default function PasswordInput({value, setValue}) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -11,8 +10,8 @@ export default function PasswordInput() {
         type={visible ? "text" : "password"}
         className="input w-full pr-10 panel2"
         placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
+        value={value}
+        onChange={e => setValue(e.target.value)}
       />
       <button
         type="button"

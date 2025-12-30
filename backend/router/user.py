@@ -24,6 +24,8 @@ async def user_register(data: UserCredentials, response: Response):
 
 @router.post("/user/login")
 async def user_login(data: UserCredentials, response: Response):
+    if not data.password.strip():
+        return {"success": False, "error": "Empty password"}
     user = mongo.users.find_one({"email": data.email})
     if not user or not pwd_context.verify(data.password, user["password"]):
         return {"success": False, "error": "Invalid credentials"}
