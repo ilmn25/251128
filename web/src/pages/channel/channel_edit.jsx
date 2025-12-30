@@ -57,8 +57,8 @@ export function ChannelEdit() {
   return (
     <div>
       <div className="panel1 space-y-3 space-x-3">
-        <p className="panel1-header">Connection</p>
-        <p className="panel1-header">{name}</p>
+        <p className="panel1-header">Editing {name}</p>
+        <p className="comment">ID: {channelId}</p>
 
         <div className="panel2 space-y-3 !py-5">
           <p className="panel1-subheader">Role Restrictions</p>

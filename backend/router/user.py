@@ -19,7 +19,7 @@ async def user_register(data: UserCredentials, response: Response):
 
     result = mongo.users.insert_one({"email": data.email, "password": pwd_context.hash(data.password)})
 
-    response.set_cookie("session", str(result.inserted_id), httponly=True, max_age=900)
+    response.set_cookie("session", str(result.inserted_id), httponly=True, max_age=90000)
     return {"success": True}
 
 @router.post("/user/login")
@@ -30,9 +30,8 @@ async def user_login(data: UserCredentials, response: Response):
     if not user or not pwd_context.verify(data.password, user["password"]):
         return {"success": False, "error": "Invalid credentials"}
 
-    response.set_cookie("session", str(user["_id"]), httponly=True, max_age=900)
+    response.set_cookie("session", str(user["_id"]), httponly=True, max_age=90000)
     return {"success": True}
-
 
 @router.get("/user/info")
 async def user_info(request: Request):
@@ -45,7 +44,6 @@ async def user_info(request: Request):
         return {"success": False, "error": "Invalid session"}
 
     return {"success": True, "email": user["email"], "id": str(user["_id"])}
-
 
 @router.post("/user/logout")
 async def user_logout(response: Response):

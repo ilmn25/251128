@@ -7,6 +7,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import Loading from "../components/loading.jsx";
 import {MessageCircle} from "lucide-react";
 import Channel from "./channel/channel.jsx";
+import Connection from "./connection/connection.jsx";
 
 
 export default function Dashboard() {
@@ -55,22 +56,29 @@ export default function Dashboard() {
           Compositions
         </button>
         <button
+          onClick={() => navigate("/profile")}
+          className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
+        >
+          Profiles
+        </button>
+        <button
           onClick={() => navigate("/channel")}
           className={`panel1 ${location.pathname === "/channel" ? "buttonstyle3" : "buttonstyle2"}`}
         >
           Channels
         </button>
         <button
-          onClick={() => navigate("/profile")}
-          className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
+          onClick={() => navigate("/connection")}
+          className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
         >
-          Profile Settings
+          Connections
         </button>
       </div>
 
       {location.pathname.startsWith("/composition") && <Composition/>}
       {location.pathname.startsWith("/channel") && <Channel/>}
       {location.pathname.startsWith("/profile") && <Profile/>}
+      {location.pathname.startsWith("/connection") && <Connection/>}
     </div>
   );
 }

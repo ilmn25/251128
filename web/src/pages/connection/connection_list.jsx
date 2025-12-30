@@ -1,23 +1,23 @@
 ﻿import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {PencilRuler, BadgePlus} from "lucide-react";
+import {PencilRuler, Cable} from "lucide-react";
 
-export default function ChannelList() {
+export default function ConnectionList() {
   const [items, setItems] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
     async function get() {
-      const res = await fetch("http://localhost:8000/channel", {
+      const res = await fetch("http://localhost:8000/connection", {
         method: "GET",
         credentials: "include"
       });
       const data = await res.json();
       if (data.success) {
-        if (data.items.length === 0) navigate("/channel/new")
+        if (data.items.length === 0) navigate("/connection/new")
         else setItems(data.items);
       } else {
-        console.error("Error fetching profiles:", data.error);
+        console.error(data.error);
       }
     }
     get();
@@ -28,38 +28,38 @@ export default function ChannelList() {
   return (
     <>
       {items.map((p) => (
-        <ChannelListItem key={p.channelId} {...p} />
+        <ConnectionListItem key={p.channelId} {...p} />
       ))}
 
       <button
         onClick={() => navigate("/channel/new")}
         className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1"
       >
-        <BadgePlus/> <p>New Channel</p>
+        <Cable/> <p>New Connection</p>
       </button>
     </>
   );
 }
 
 
-function ChannelListItem({ channelId, name}) {
+function ConnectionListItem({ id, channelId, channel, messageId, message }) {
   const navigate = useNavigate();
 
   return (
     <div>
       <div className="panel1 flex content-between centered gap-3 !py-0">
         <div className="w-full">
-          <p className="panel1-header">{name}</p>
-          <p className="comment">ID: {channelId}</p>
+          <p className="panel1-header">{channel}</p>
+          <p className="comment">{message}</p>
         </div>
 
         <div className="my-5 space-y-3 max-w-50 w-full">
           <button
             type="button"
-            onClick={() => navigate("/channel/edit/" + channelId)}
+            onClick={() => navigate("/connection/edit/" + id)}
             className="panel2 buttonstyle2 w-full flex centered space-x-1"
           >
-            <PencilRuler/> <p>Edit</p>
+            <PencilRuler /> <p>Edit</p>
           </button>
         </div>
       </div>

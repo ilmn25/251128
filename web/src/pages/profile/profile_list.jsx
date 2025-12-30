@@ -1,13 +1,15 @@
 ﻿import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {PencilRuler, UserPlus, Send} from "lucide-react";
+import {PencilRuler, UserPlus, User, UserRoundCheck} from "lucide-react";
+import Cookies from "js-cookie";
 
 export default function ProfileList() {
   const [items, setItems] = useState();
+  const [currentId, setCurrentId] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchProfiles() {
+    async function get() {
       const res = await fetch("http://localhost:8000/profile", {
         method: "GET",
         credentials: "include"
@@ -15,12 +17,13 @@ export default function ProfileList() {
       const data = await res.json();
       if (data.success) {
         if (data.items.length === 0) navigate("/profile/new")
-        else setItems(data.items);
+        setItems(data.items);
+        setCurrentId(Cookies.get("profile"));
       } else {
         console.error(data.error);
       }
     }
-    fetchProfiles();
+    get();
   }, [navigate, setItems]);
 
   if (!items) return <></>
@@ -28,7 +31,7 @@ export default function ProfileList() {
   return (
     <>
       {items.map((p) => (
-        <ProfileListItem key={p.id} {...p} />
+        <ProfileListItem key={p.id} {...p} currentId={currentId} setCurrentId={setCurrentId} />
       ))}
 
       <button
@@ -42,14 +45,8 @@ export default function ProfileList() {
 }
 
 
-function ProfileListItem({ id, accountId, username}) {
+function ProfileListItem({ id, accountId, username, currentId, setCurrentId}) {
   const navigate = useNavigate();
-
-  function select(){
-    let date = new Date();
-    date.setFullYear(date.getFullYear() + 1);
-    document.cookie = "profile=" + id + "; expires=" + date.toUTCString() + "; path=/";
-  }
 
   return (
     <div>
@@ -68,13 +65,25 @@ function ProfileListItem({ id, accountId, username}) {
             <PencilRuler /> <p>Edit</p>
           </button>
 
-          <button
-            type="button"
-            onClick={() => select()}
-            className="panel2 buttonstyle4 w-full flex centered space-x-1"
-          >
-            <Send /> <p>Select</p>
-          </button>
+          {id === currentId ? (
+            <button
+              type="button"
+              className="panel2 buttonstyle3 w-full flex centered space-x-1"
+            >
+              <UserRoundCheck /> <p>Selected</p>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                Cookies.set("profile", id, { expires: 365, path: "/" });
+                setCurrentId(id);
+              }}
+              className="panel2 buttonstyle4 w-full flex centered space-x-1"
+            >
+              <User /> <p>Select</p>
+            </button>
+          )}
         </div>
       </div>
     </div>
