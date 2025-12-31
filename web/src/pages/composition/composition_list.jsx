@@ -14,7 +14,6 @@ export default function CompositionList() {
       });
       const data = await res.json();
       if (data.success) {
-        console.log(data.items)
         if (data.items.length === 0) navigate("/composition/new")
         else setItems(data.items);
       } else {

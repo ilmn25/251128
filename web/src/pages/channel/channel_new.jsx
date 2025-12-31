@@ -24,7 +24,7 @@ export function ChannelNew() {
   return (
     <div>
       <div className="panel1 space-y-3 space-x-3">
-        <p className="panel1-header">Connection</p>
+        <p className="panel1-header">Channel</p>
 
         <div className="panel2 flex space-x-4 !p-4">
           <Cable className="comment !size-6"></Cable>

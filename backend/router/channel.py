@@ -8,7 +8,7 @@ import utility
 router = APIRouter()
 
 class ChannelEditData(BaseModel):
-    channelId: str
+    id: str
     linkFilter: bool
     mediaFilter: bool
 
@@ -24,12 +24,11 @@ async def channel_edit(data: ChannelEditData, request: Request):
 
 
     # If id is provided and matches → update
-    channel = mongo.channels.find_one({"channelId": data.channelId, "profileId": ObjectId(profile_id)})
+    channel = mongo.channels.find_one({"_id": ObjectId(data.id), "profileId": ObjectId(profile_id)})
     if channel:
         mongo.channels.update_one(
             {"_id": channel["_id"]},
             {"$set": {
-                "channelId": data.channelId,
                 "linkFilter": data.linkFilter,
                 "mediaFilter": data.mediaFilter,
             }}
@@ -112,6 +111,7 @@ async def channel_get(request: Request):
     data = []
     for channel in channels:
         data.append({
+            "id": str(channel["_id"]),
             "channelId": channel["channelId"],
             "name": channel["name"]
         })
@@ -138,7 +138,7 @@ async def channel_get_one(request: Request, channel_id: str):
         return {"success": False, "error": "Channel not found"}
 
     data = {
-        "channelId": channel["channelId"],
+        "id": str(channel["_id"]),
         "name": channel["name"],
         "cooldown": channel["cooldown"],
         "attachmentPerm": channel["attachmentPerm"],

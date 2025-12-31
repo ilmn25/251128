@@ -1,7 +1,7 @@
 ﻿import '../../index.css';
 
 import {SaveIcon, Shield} from "lucide-react";
-import {useState} from "react";
+import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 
 export default function ProfileEdit() {
@@ -31,8 +31,11 @@ export default function ProfileEdit() {
 
   return (
     <div>
-      <div className="panel1 space-y-3 space-x-3">
-        <p className="panel1-header py-1">{accountId? "Update Profile Token" : "New Profile"}</p>
+      <div className="panel1 space-y-3">
+        <div>
+          <p className="panel1-header py-1">{accountId? "Update Profile Token" : "New Profile"}</p>
+          {accountId && <p className="comment">ID: {accountId}</p>}
+        </div>
 
         <div className="panel2 flex space-x-4 !p-4">
           <Shield className="comment !size-6"></Shield>

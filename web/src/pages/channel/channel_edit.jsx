@@ -6,6 +6,7 @@ import {SaveIcon} from "lucide-react";
 export function ChannelEdit() {
   const navigate = useNavigate();
   const {channelId} = useParams();
+  const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [cooldown, setCooldown] = useState(0);
   const [attachmentPerm, setAttachmentPerm] = useState(true);
@@ -26,6 +27,7 @@ export function ChannelEdit() {
 
       const data = await res.json();
       if (data.success) {
+        setId(data.item.id);
         setName(data.item.name);
         setCooldown(data.item.cooldown);
         setAttachmentPerm(data.item.attachmentPerm);
@@ -45,7 +47,7 @@ export function ChannelEdit() {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
-      body: JSON.stringify({channelId, linkFilter, mediaFilter})
+      body: JSON.stringify({id, linkFilter, mediaFilter})
     });
     const data = await res.json();
     if (data.success)
@@ -56,7 +58,7 @@ export function ChannelEdit() {
 
   return (
     <div>
-      <div className="panel1 space-y-3 space-x-3">
+      <div className="panel1 space-y-3">
         <p className="panel1-header">Editing {name}</p>
         <p className="comment">ID: {channelId}</p>
 

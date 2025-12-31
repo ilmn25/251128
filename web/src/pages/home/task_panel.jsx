@@ -18,14 +18,14 @@ export default function AttachmentPanel() {
       }),
     });
     const data = await res.json();
-    if (data.channel === null) {
+    if (data.item === null) {
       setChannel("");
       setMessage("");
       setAttachments([]);
       setAction("Start");
       return;
     }
-    setChannel(data.channel)
+    setChannel(data.item)
     setMessage(data.message)
     setAttachments(data.attachments)
     setAction("Send")

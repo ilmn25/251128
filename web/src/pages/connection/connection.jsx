@@ -10,7 +10,7 @@ export default function Connection() {
       <Routes>
         <Route path="/connection" element={<ConnectionList />} />
         <Route path="/connection/new" element={<ConnectionEdit />} />
-        <Route path="/connection/edit/:connectionId" element={<ConnectionEdit />} />
+        <Route path="/connection/edit/:connectionId/" element={<ConnectionEdit />} />
         <Route path="*" element={<Navigate to="/connection" replace />} />
       </Routes>
     </div>

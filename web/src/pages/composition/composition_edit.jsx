@@ -84,7 +84,7 @@ export default function CompositionEdit() {
 
   return (
     <div>
-      <div className="panel1 space-y-3 space-x-3">
+      <div className="panel1 space-y-3">
         <p className="panel1-header">Composition</p>
         <p className="panel1-subheader">Messages</p>
         <Message items={messages} setItems={setMessages} />

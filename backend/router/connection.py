@@ -66,6 +66,7 @@ async def connection_list(request: Request):
         })
 
     return {"success": True, "items": items}
+
 @router.get("/connection/{connection_id}")
 async def connection_get_one(request: Request, connection_id: str):
     session_id = request.cookies.get("session")
@@ -82,38 +83,11 @@ async def connection_get_one(request: Request, connection_id: str):
     })
     if not conn:
         return {"success": False, "error": "Connection not found"}
-
-    channel = mongo.channels.find_one({"_id": ObjectId(conn["channelId"])})
 
     return {
         "success": True,
         "item": {
             "id": str(conn["_id"]),
-            "channel": channel["name"] if channel else None,
-            "compositionId": str(conn["compositionId"]),
-        }
-    }
-
-@router.get("/connection/{connection_id}")
-async def connection_get_one(request: Request, connection_id: str):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
-        return {"success": False, "error": "Invalid Session"}
-
-    conn = mongo.connections.find_one({
-        "_id": ObjectId(connection_id),
-        "profileId": ObjectId(profile_id)
-    })
-    if not conn:
-        return {"success": False, "error": "Connection not found"}
-
-    return {
-        "success": True,
-        "item": {
             "channelId": str(conn["channelId"]),
             "compositionId": str(conn["compositionId"]),
         }

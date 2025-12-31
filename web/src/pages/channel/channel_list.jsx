@@ -46,22 +46,20 @@ function ChannelListItem({ channelId, name}) {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <div className="panel1 flex content-between centered gap-3 !py-0">
-        <div className="w-full">
-          <p className="panel1-header">{name}</p>
-          <p className="comment">ID: {channelId}</p>
-        </div>
+    <div className="panel1 flex content-between centered gap-3 !py-0">
+      <div className="w-full">
+        <p className="panel1-header">{name}</p>
+        <p className="comment">ID: {channelId}</p>
+      </div>
 
-        <div className="my-5 space-y-3 max-w-50 w-full">
-          <button
-            type="button"
-            onClick={() => navigate("/channel/edit/" + channelId)}
-            className="panel2 buttonstyle2 w-full flex centered space-x-1"
-          >
-            <PencilRuler/> <p>Edit</p>
-          </button>
-        </div>
+      <div className="my-5 space-y-3 max-w-50 w-full">
+        <button
+          type="button"
+          onClick={() => navigate("/channel/edit/" + channelId)}
+          className="panel2 buttonstyle2 w-full flex centered space-x-1"
+        >
+          <PencilRuler/> <p>Edit</p>
+        </button>
       </div>
     </div>
   );
