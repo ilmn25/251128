@@ -5,6 +5,7 @@ import Message from './message.jsx';
 import Attachment from "./attachment.jsx";
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import {toast} from "sonner";
 
 export default function CompositionEdit() {
   const navigate = useNavigate();
@@ -33,8 +34,8 @@ export default function CompositionEdit() {
         setRandomize(data.item.randomize);
         setCount(data.item.count);
       } else {
-        navigate("/composition/new");
-        console.error(data.error);
+        toast.error(data.error);
+        navigate("/composition");
       }
     }
     get();
@@ -62,10 +63,11 @@ export default function CompositionEdit() {
 
     const data = await res.json();
     if (data.success) {
+      toast.success("Composition saved successfully.");
       navigate("/composition");
     } else {
       setAttachments(attachmentsNew);
-      console.error(data.error || "Failed to submit composition");
+      toast.error(data.error || "Failed to submit composition");
     }
 
     async function upload(file) {

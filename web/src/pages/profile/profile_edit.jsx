@@ -3,6 +3,7 @@
 import {SaveIcon, Shield} from "lucide-react";
 import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import {toast} from "sonner";
 
 export default function ProfileEdit() {
   const { accountId } = useParams();
@@ -11,7 +12,7 @@ export default function ProfileEdit() {
 
   async function submit() {
     if (!token || !token.includes("."))
-      return console.error("Invalid token: must not be empty and must contain a dot");
+      return toast.error("Please enter a valid token");
 
     const res = await fetch("http://localhost:8000/profile", {
       method: "POST",
@@ -23,9 +24,10 @@ export default function ProfileEdit() {
     const data = await res.json();
     if (data.success) {
       setToken("")
+      toast.success("Changes saved sucessfully");
       navigate("/profile");
     } else {
-      console.error("Error saving profile:", data.error);
+      toast.error("Error saving profile:", data.error);
     }
   }
 

@@ -1,6 +1,7 @@
 ﻿import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, MessageCirclePlus, Shuffle, Repeat} from "lucide-react";
+import {toast} from "sonner";
 
 export default function CompositionList() {
   const [items, setItems] = useState();
@@ -16,9 +17,7 @@ export default function CompositionList() {
       if (data.success) {
         if (data.items.length === 0) navigate("/composition/new")
         else setItems(data.items);
-      } else {
-        console.error(data.error);
-      }
+      } else toast.error(data.error)
     }
     get();
    }, [navigate, setItems]);

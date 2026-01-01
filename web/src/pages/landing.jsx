@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import PasswordInput from "../components/password_panel.jsx";
-import {MessageCircle, Github} from "lucide-react";
+import {MessageCircle, GitCommit} from "lucide-react";
 import {useLocation, useNavigate} from "react-router-dom";
+import {toast} from "sonner";
 
 export default function Landing() {
   const [email, setEmail] = useState("");
@@ -19,8 +20,11 @@ export default function Landing() {
       credentials: "include"
     });
     const data = await res.json();
-    if (data.success) navigate("/");
-    else console.error(data.error);
+    if (data.success) {
+      toast.success("Account created successfully");
+      navigate("/");
+    }
+    else toast.error(data.error)
   }
 
   async function register() {
@@ -31,8 +35,11 @@ export default function Landing() {
       credentials: "include"
     });
     const data = await res.json();
-    if (data.success) navigate("/");
-    else console.error(data.error);
+    if (data.success) {
+      toast.success("Account created successfully");
+      navigate("/");
+    }
+    else toast.error(data.error)
   }
 
   return (
@@ -85,7 +92,7 @@ export default function Landing() {
         </button>
 
         <div className="panel2 flex space-x-2 !p-4">
-          <Github className="comment !size-6"></Github> <p className="comment">Created by illu for personal use and showcase, built with React, FastAPI, and MongoDB.</p>
+          <GitCommit className="comment !size-6"></GitCommit> <p className="comment">Created by illu for personal use and showcase, built with React, FastAPI, and MongoDB.</p>
         </div>
       </div>
     </div>

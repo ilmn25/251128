@@ -1,6 +1,7 @@
 ﻿import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {PencilRuler, Repeat, SaveIcon, Shuffle, ArrowBigRightDash} from "lucide-react";
+import {toast} from "sonner";
 
 const MODE = {
   DEFAULT: "DEFAULT",
@@ -64,7 +65,7 @@ export default function ConnectionEdit() {
         setComposition(compositions.find(comp => comp.compositionId === data.item.compositionId));
       } else {
         navigate("/connection/new");
-        console.error(data.error || "Failed to fetch connection info");
+        toast.error(data.error || "Failed to fetch connection info");
       }
     }
 
@@ -83,10 +84,12 @@ export default function ConnectionEdit() {
       body: JSON.stringify({id: connectionId, channelId: channel.id, compositionId: composition.compositionId}),
     });
     const data = await res.json();
-    if (data.success)
+    if (data.success){
+      toast.success("Changes saved successfully");
       navigate("/connection");
+    }
     else
-      console.error(data.error || "Failed to save connection");
+      toast.error(data.error || "Failed to save connection");
   }
 
   return (

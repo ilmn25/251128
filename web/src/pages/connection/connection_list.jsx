@@ -1,10 +1,12 @@
 ﻿import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, Cable, ArrowBigRightDash} from "lucide-react";
+import {toast} from "sonner";
 
 export default function ConnectionList() {
   const [items, setItems] = useState();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function get() {
@@ -16,19 +18,35 @@ export default function ConnectionList() {
       if (data.success) {
         if (data.items.length === 0) navigate("/connection/new")
         else setItems(data.items);
-      } else {
-        console.error(data.error);
-      }
+      } else toast.error(data.error)
     }
     get();
   }, [navigate, setItems]);
+
+  async function send(id) {
+    setLoading(true);
+    const res = await fetch("http://localhost:8000/send/" + id, {
+      method: "POST",
+      credentials: "include"
+    });
+    const data = await res.json();
+    if (data.success) toast.success("Message Sent");
+    else toast.error(data.error);
+    setLoading(false);
+  }
 
   if (!items) return <></>
 
   return (
     <>
+      {loading &&
+        <div className="overlay">
+          {/*<p className="panel1-header flex items-center justify-center">Sending, please wait...</p>*/}
+        </div>
+      }
+
       {items.map((p) => (
-        <ConnectionListItem key={p.id} {...p} />
+        <ConnectionListItem key={p.id} {...p} send={send}/>
       ))}
 
       <button
@@ -41,22 +59,8 @@ export default function ConnectionList() {
   );
 }
 
-
-function ConnectionListItem({ id, channel, message }) {
+function ConnectionListItem({ id, channel, message, send }) {
   const navigate = useNavigate();
-
-  async function send() {
-    const res = await fetch("http://localhost:8000/send/" + id, {
-      method: "POST",
-      credentials: "include"
-    });
-    const data = await res.json();
-    if (data.success) {
-      console.log("successfully sent " + id);
-    } else {
-      console.error(data.error);
-    }
-  }
 
   return (
     <div>
@@ -77,7 +81,7 @@ function ConnectionListItem({ id, channel, message }) {
           </button>
           <button
             type="button"
-            onClick={() => send()}
+            onClick={() => send(id)}
             className="panel2 buttonstyle4 w-full flex centered space-x-1"
           >
             <ArrowBigRightDash/> <p>Send</p>

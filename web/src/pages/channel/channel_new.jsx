@@ -1,6 +1,7 @@
 ﻿import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {Cable, TextSearch} from "lucide-react";
+import {toast} from "sonner";
 
 export function ChannelNew() {
   const [id, setId] = useState("");
@@ -17,8 +18,9 @@ export function ChannelNew() {
 
     const data = await res.json();
     if (data.success) {
+      toast.success("channel successfully created");
       navigate("/channel/edit/" + id)
-    } else console.error(data.error || "Failed to fetch channel info");
+    } else toast.error(data.error || "Failed to create channel");
   }
 
   return (

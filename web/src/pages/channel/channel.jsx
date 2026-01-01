@@ -5,6 +5,7 @@ import {ChannelNew} from "./channel_new.jsx";
 import {ChannelEdit} from "./channel_edit.jsx";
 import ChannelList from "./channel_list.jsx";
 import Cookies from "js-cookie";
+import {toast} from "sonner";
 
 export default function Channel() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function Channel() {
   useEffect(() => {
     const profile = Cookies.get("profile"); // get cookie by name
     if (!profile) {
-      console.error("No profile selected");
+      toast.error("No profile selected")
       navigate("/profile");
     }
   }, [navigate]);

@@ -2,6 +2,7 @@
 import React, {useEffect, useState} from "react";
 import Toggle from "../../components/toggle.jsx";
 import {SaveIcon} from "lucide-react";
+import {toast} from "sonner";
 
 export function ChannelEdit() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export function ChannelEdit() {
         setMediaFilter(data.item.mediaFilter);
       } else {
         navigate("/channel/new");
-        console.error(data.error || "Failed to fetch channel info");
+        toast.error(data.error || "Failed to fetch channel info");
       }
     }
 
@@ -50,10 +51,12 @@ export function ChannelEdit() {
       body: JSON.stringify({id, linkFilter, mediaFilter})
     });
     const data = await res.json();
-    if (data.success)
+    if (data.success) {
+      toast.success("Changes added successfully");
       navigate("/channel");
+    }
     else
-      console.error(data.error || "Failed to fetch channel info");
+      toast.error(data.error || "Failed to submit channel");
   }
 
   return (

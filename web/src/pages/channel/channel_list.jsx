@@ -1,6 +1,7 @@
 ﻿import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, BadgePlus} from "lucide-react";
+import {toast} from "sonner";
 
 export default function ChannelList() {
   const [items, setItems] = useState();
@@ -17,7 +18,7 @@ export default function ChannelList() {
         if (data.items.length === 0) navigate("/channel/new")
         else setItems(data.items);
       } else {
-        console.error("Error fetching profiles:", data.error);
+        toast.error(data.error);
       }
     }
     get();

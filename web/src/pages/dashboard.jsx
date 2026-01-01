@@ -8,6 +8,7 @@ import Loading from "../components/loading.jsx";
 import {MessageCircle} from "lucide-react";
 import Channel from "./channel/channel.jsx";
 import Connection from "./connection/connection.jsx";
+import {toast} from "sonner";
 
 
 export default function Dashboard() {
@@ -27,7 +28,7 @@ export default function Dashboard() {
         setUser(data);
         if (location.pathname === "/") navigate("/composition");
       } else {
-        console.error(data.error);
+        toast.error(data.error);
         navigate("/login");
       }
     })();

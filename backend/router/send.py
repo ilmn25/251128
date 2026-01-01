@@ -34,9 +34,8 @@ async def send(request: Request, connectionId: str):
 
     message = random.choice(composition["messages"])
 
-    await bot.post(
+    return await bot.post(
         channel_id=channel["channelId"],
         attachments=attachments,
         message=message
     )
-    return {"success": True}

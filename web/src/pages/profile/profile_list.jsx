@@ -2,6 +2,7 @@
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, UserPlus, User, UserRoundCheck} from "lucide-react";
 import Cookies from "js-cookie";
+import {toast} from "sonner";
 
 export default function ProfileList() {
   const [items, setItems] = useState();
@@ -20,7 +21,7 @@ export default function ProfileList() {
         setItems(data.items);
         setCurrentId(Cookies.get("profile"));
       } else {
-        console.error(data.error);
+        toast.error(data.error);
       }
     }
     get();
@@ -77,6 +78,7 @@ function ProfileListItem({ id, accountId, username, currentId, setCurrentId}) {
               type="button"
               onClick={() => {
                 Cookies.set("profile", id, { expires: 365, path: "/" });
+                toast.success("Profile Selected");
                 setCurrentId(id);
               }}
               className="panel2 buttonstyle4 w-full flex centered space-x-1"
