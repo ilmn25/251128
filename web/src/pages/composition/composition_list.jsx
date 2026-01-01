@@ -42,7 +42,7 @@ export default function CompositionList() {
 }
 
 
-function CompositionListItem({ compositionId, message, attachmentsCount, randomize, count }) {
+function CompositionListItem({ compositionId, message, attachmentCount, randomize, count }) {
   const navigate = useNavigate();
 
   return (
@@ -57,7 +57,7 @@ function CompositionListItem({ compositionId, message, attachmentsCount, randomi
               <Repeat className="size-4"/>
             )}
           </div>
-          <p className="comment">Select {count} Attachments from {attachmentsCount} Files to Send</p>
+          <p className="comment">Select {count} Attachments from {attachmentCount} Files to Send</p>
           <p className="comment">ID: {compositionId}</p>
         </div>
 

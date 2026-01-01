@@ -39,40 +39,42 @@ export default function Dashboard() {
     <div className="space-y-4 w-full p-12 h-screen">
 
       <div className="flex items-center gap-5 pb-5">
-        <div className="p-3 bg-white rounded-2xl aspect-square w-13 h-13">
-          <MessageCircle className="text-black size-7"></MessageCircle>
+        <div className="flex flex-wrap gap-2">
+          <div className="p-3 bg-white rounded-2xl aspect-square w-13 h-13">
+            <MessageCircle className="text-black size-7"></MessageCircle>
+          </div>
+          <div className="space-y-1">
+            <p className="text-3xl font-bold">Discord Message Automation Tool</p>
+            <p className="comment">User ID: {user.id}</p>
+          </div>
         </div>
-        <div className="space-y-1">
-          <p className="text-3xl font-bold">Discord Message Automation Tool</p>
-          <p className="comment">User ID: {user.id}</p>
-        </div>
-      </div>
 
-      <div className="flex space-x-2">
-        <button
-          onClick={() => navigate("/composition")}
-          className={`panel1 ${location.pathname === "/composition" ? "buttonstyle3" : "buttonstyle2"}`}
-        >
-          Compositions
-        </button>
-        <button
-          onClick={() => navigate("/profile")}
-          className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
-        >
-          Profiles
-        </button>
-        <button
-          onClick={() => navigate("/channel")}
-          className={`panel1 ${location.pathname === "/channel" ? "buttonstyle3" : "buttonstyle2"}`}
-        >
-          Channels
-        </button>
-        <button
-          onClick={() => navigate("/connection")}
-          className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
-        >
-          Connections
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => navigate("/composition")}
+            className={`panel1 ${location.pathname === "/composition" ? "buttonstyle3" : "buttonstyle2"}`}
+          >
+            Compositions
+          </button>
+          <button
+            onClick={() => navigate("/profile")}
+            className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
+          >
+            Profiles
+          </button>
+          <button
+            onClick={() => navigate("/channel")}
+            className={`panel1 ${location.pathname === "/channel" ? "buttonstyle3" : "buttonstyle2"}`}
+          >
+            Channels
+          </button>
+          <button
+            onClick={() => navigate("/connection")}
+            className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
+          >
+            Connections
+          </button>
+        </div>
       </div>
 
       {location.pathname.startsWith("/composition") && <Composition/>}

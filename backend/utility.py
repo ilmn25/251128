@@ -1,12 +1,9 @@
 ﻿import asyncio
-
 from bson import ObjectId
-
 import mongo
 from selfbot import selfbot
 
 bots = {}
-channel_index = 0
 
 async def get_bot(profileId):
     if profileId in bots:

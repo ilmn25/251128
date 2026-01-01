@@ -11,26 +11,19 @@ class Main(commands.Bot):
             self_bot=True,
             help_command=None
         )
-        self.channel_id = None
-        self.selected_message = ""
-        self.selected_images = []
 
-
-    async def post(self):
+    async def post(self, channel_id, attachments, message):
         try:
-            channel = await self.fetch_channel(int(self.channel_id))
-
-            files = [
-                discord.File(
-                    os.path.join(ATTACHMENT_PATH, image),
-                    filename=os.path.basename(image)
-                )
-                for image in self.selected_images
-            ]
-
+            channel = await self.fetch_channel(int(channel_id))
             await channel.send(
-                self.selected_message,
-                files=files
+                message,
+                files=[
+                    discord.File(
+                        os.path.join(ATTACHMENT_PATH, attachment["url"]),
+                        filename=os.path.basename(attachment["name"])
+                    )
+                    for attachment in attachments
+                ]
             )
 
             await asyncio.sleep(4)
@@ -39,24 +32,19 @@ class Main(commands.Bot):
         except discord.Forbidden:
             return {
                 "success": False,
-                "error": "forbidden",
-                "message": f"No permission in {self.channel_id}"
+                "error": "Permission denied",
             }
 
         except discord.HTTPException as e:
             return {
                 "success": False,
-                "error": "http_error",
-                "message": f"HTTP error in {self.channel_id}",
-                "details": str(e)
+                "error": "HTTP error occured",
             }
 
         except Exception as e:
             return {
                 "success": False,
-                "error": "unexpected",
-                "message": f"Unexpected error in {self.channel_id}",
-                "details": str(e)
+                "error": "Unexpected error occured",
             }
 
     async def validate_token(self, token):

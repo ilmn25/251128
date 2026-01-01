@@ -60,9 +60,9 @@ async def connection_list(request: Request):
         items.append({
             "id": str(conn["_id"]),
             "channelId": str(conn["channelId"]),
-            "channel": channel["name"] if channel else None,
+            "channel": channel["name"],
             "compositionId": str(conn["compositionId"]),
-            "message": composition["messages"][0] if composition and composition.get("messages") else None,
+            "message": composition["messages"][0],
         })
 
     return {"success": True, "items": items}

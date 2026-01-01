@@ -66,7 +66,7 @@ async def composition_list(request: Request):
         data.append({
             "compositionId": str(composition["_id"]),
             "message": composition["messages"][0],
-            "attachmentsCount": len(composition["attachments"]),
+            "attachmentCount": len(composition["attachments"]),
             "randomize": composition["randomize"],
             "count": composition["count"]
         })
