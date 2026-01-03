@@ -2,6 +2,7 @@
 import {useNavigate} from "react-router-dom";
 import {Cable, TextSearch} from "lucide-react";
 import {toast} from "sonner";
+import {SERVER_URL} from "../../main.jsx";
 
 export function ChannelNew() {
   const [id, setId] = useState("");
@@ -9,7 +10,7 @@ export function ChannelNew() {
 
   async function submit() {
     if (!id.trim()) return;
-    const res = await fetch("http://localhost:8000/channel/new", {
+    const res = await fetch(SERVER_URL + "/channel/new", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",

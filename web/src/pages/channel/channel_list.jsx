@@ -2,6 +2,7 @@
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, BadgePlus} from "lucide-react";
 import {toast} from "sonner";
+import {SERVER_URL} from "../../main.jsx";
 
 export default function ChannelList() {
   const [items, setItems] = useState();
@@ -9,7 +10,7 @@ export default function ChannelList() {
 
   useEffect(() => {
     async function get() {
-      const res = await fetch("http://localhost:8000/channel", {
+      const res = await fetch(SERVER_URL + "/channel", {
         method: "GET",
         credentials: "include"
       });

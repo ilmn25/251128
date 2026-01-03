@@ -2,6 +2,7 @@
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, MessageCirclePlus, Shuffle, Repeat} from "lucide-react";
 import {toast} from "sonner";
+import {SERVER_URL} from "../../main.jsx";
 
 export default function CompositionList() {
   const [items, setItems] = useState();
@@ -9,7 +10,7 @@ export default function CompositionList() {
 
   useEffect(() => {
     async function get() {
-      const res = await fetch("http://localhost:8000/composition", {
+      const res = await fetch(SERVER_URL + "/composition", {
         method: "GET",
         credentials: "include"
       });

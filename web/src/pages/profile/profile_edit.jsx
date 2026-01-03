@@ -4,6 +4,7 @@ import {SaveIcon, Shield} from "lucide-react";
 import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
+import {SERVER_URL} from "../../main.jsx";
 
 export default function ProfileEdit() {
   const { accountId } = useParams();
@@ -14,7 +15,7 @@ export default function ProfileEdit() {
     if (!token || !token.includes("."))
       return toast.error("Please enter a valid token");
 
-    const res = await fetch("http://localhost:8000/profile", {
+    const res = await fetch(SERVER_URL + "/profile", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",

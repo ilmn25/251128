@@ -44,6 +44,7 @@ class Main(commands.Bot):
             }
 
         except Exception as e:
+            print(e)
             return {
                 "success": False,
                 "error": "Unexpected error occured",

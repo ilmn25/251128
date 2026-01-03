@@ -2,6 +2,7 @@
 import React, {useEffect, useState} from "react";
 import {PencilRuler, Repeat, SaveIcon, Shuffle, ArrowBigRightDash} from "lucide-react";
 import {toast} from "sonner";
+import {SERVER_URL} from "../../main.jsx";
 
 const MODE = {
   DEFAULT: "DEFAULT",
@@ -21,7 +22,7 @@ export default function ConnectionEdit() {
   useEffect(() => {
     async function fetchChannelsAndCompositions() {
       // channels
-      let res = await fetch("http://localhost:8000/channel", {
+      let res = await fetch(SERVER_URL + "/channel", {
         method: "GET",
         credentials: "include"
       });
@@ -32,7 +33,7 @@ export default function ConnectionEdit() {
       }
 
       // compositions
-      res = await fetch("http://localhost:8000/composition", {
+      res = await fetch(SERVER_URL + "/composition", {
         method: "GET",
         credentials: "include"
       });
@@ -54,7 +55,7 @@ export default function ConnectionEdit() {
         return;
       }
 
-      const res = await fetch(`http://localhost:8000/connection/${connectionId}`, {
+      const res = await fetch(SERVER_URL + `/connection/${connectionId}`, {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +78,7 @@ export default function ConnectionEdit() {
   if (!composition || !channel) return null;
 
   async function submit() {
-    const res = await fetch("http://localhost:8000/connection", {
+    const res = await fetch(SERVER_URL + "/connection", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",

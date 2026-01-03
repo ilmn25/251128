@@ -5,6 +5,7 @@ import PasswordInput from "../components/password_panel.jsx";
 import {MessageCircle, GitCommit} from "lucide-react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {toast} from "sonner";
+import {SERVER_URL} from "../main.jsx";
 
 export default function Landing() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export default function Landing() {
   const location = useLocation();
 
   async function login() {
-    const res = await fetch("http://localhost:8000/user/login", {
+    const res = await fetch(SERVER_URL + "/user/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -28,7 +29,7 @@ export default function Landing() {
   }
 
   async function register() {
-    const res = await fetch("http://localhost:8000/user/register", {
+    const res = await fetch(SERVER_URL + "/user/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

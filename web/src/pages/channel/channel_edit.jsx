@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import Toggle from "../../components/toggle.jsx";
 import {SaveIcon} from "lucide-react";
 import {toast} from "sonner";
+import {SERVER_URL} from "../../main.jsx";
 
 export function ChannelEdit() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export function ChannelEdit() {
         navigate("/channel/new");
         return;
       }
-      const res = await fetch("http://localhost:8000/channel/" + channelId, {
+      const res = await fetch(SERVER_URL + "/channel/" + channelId, {
         method: "GET",
         credentials: "include",
         headers: {"Content-Type": "application/json"},
@@ -44,7 +45,7 @@ export function ChannelEdit() {
   }, [channelId, navigate]);
 
   async function submit() {
-    const res = await fetch("http://localhost:8000/channel/edit", {
+    const res = await fetch(SERVER_URL + "/channel/edit", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",

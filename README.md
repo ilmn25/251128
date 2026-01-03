@@ -3,17 +3,14 @@
 | Section   | Purpose                                         |
 |-----------|-------------------------------------------------| 
 | `/server` | Python FastAPI backend with MongoDB integration |
-| `/web`    | React JSX webpage client                        |
+| `/web`    | React Tailwind JSX webpage client               |
 
 ## Hosting
-1. Install Docker
-2. .env (wip)
-3. Run `docker build -t 251128 .`
-4. Run `docker run -p 8000:8000 251128`
+The Docker setup builds the frontend and serves it from the server host URL.
 
 ### Warning, This is Self-Botting!
 **This is against Discord Terms of Service**, BUT it's very hard for discord to detect or enforce (similar to how Vencord is also against TOS but never enforced). 
-Use only if you are fine with the risks involved~  
+Use only if you are fine with the risks involved~
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/61c6a4ab-8be2-466d-a6a3-ec864b006ce5" />
 <img width="789" height="672" alt="image" src="https://github.com/user-attachments/assets/16aa34f4-6cf3-4dfe-b471-0d920c1c7547" />

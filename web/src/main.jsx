@@ -5,6 +5,9 @@ import Dashboard from "./pages/dashboard.jsx";
 import Landing from "./pages/landing.jsx";
 import { Toaster } from 'sonner'
 
+// leave empty if server serves static frontend (in prod)
+export const SERVER_URL = "";
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
     <BrowserRouter>

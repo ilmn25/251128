@@ -9,6 +9,7 @@ import {MessageCircle} from "lucide-react";
 import Channel from "./channel/channel.jsx";
 import Connection from "./connection/connection.jsx";
 import {toast} from "sonner";
+import {SERVER_URL} from "../main.jsx";
 
 
 export default function Dashboard() {
@@ -18,7 +19,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("http://localhost:8000/user/info", {
+      const res = await fetch(SERVER_URL + "/user/info", {
         method: "GET",
         credentials: "include"
       });
