@@ -1,1 +1,9 @@
-﻿/backend/Data/ 
+﻿/server/Data/
+/.idea/.gitignore
+/.idea/251128.iml
+/.idea/encodings.xml
+/server/env.py
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml

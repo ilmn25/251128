@@ -1,9 +1,9 @@
 ﻿# Discord Message Automation Tool
 
-| Section    | Purpose                                                |
-|------------|--------------------------------------------------------| 
-| `/backend` | Python FastAPI server with MongoDB integration         |
-| `/web`     | React JSX webpage client                               |
+| Section   | Purpose                                         |
+|-----------|-------------------------------------------------| 
+| `/server` | Python FastAPI backend with MongoDB integration |
+| `/web`    | React JSX webpage client                        |
 
 ### Warning, This is Self-Botting!
 **This is against Discord Terms of Service**, BUT it's very hard for discord to detect or enforce (similar to how Vencord is also against TOS but never enforced). 
