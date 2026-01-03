@@ -1,0 +1,7 @@
+﻿node_modules
+web/node_modules
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env

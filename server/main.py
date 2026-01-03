@@ -37,9 +37,7 @@ app.include_router(connection.router)
 app.include_router(send.router)
 
 # ==================== WEBPAGE ====================
-
-BASE_DIR = Path(__file__).resolve().parent
-DIST_PATH = BASE_DIR.parent / "web" / "dist"
+DIST_PATH = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=DIST_PATH, html=True), name="frontend")
 @app.get("/")
 def serve_index():

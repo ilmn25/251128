@@ -5,6 +5,12 @@
 | `/server` | Python FastAPI backend with MongoDB integration |
 | `/web`    | React JSX webpage client                        |
 
+## Hosting
+1. Install Docker
+2. .env (wip)
+3. Run `docker build -t 251128 .`
+4. Run `docker run -p 8000:8000 251128`
+
 ### Warning, This is Self-Botting!
 **This is against Discord Terms of Service**, BUT it's very hard for discord to detect or enforce (similar to how Vencord is also against TOS but never enforced). 
 Use only if you are fine with the risks involved~  
