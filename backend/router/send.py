@@ -2,21 +2,19 @@
 from fastapi import APIRouter
 from starlette.requests import Request
 import random
-import mongo
-
+import mongo, selfbot
+from session import get_profile_from_request
 router = APIRouter()
-import utility
 
 @router.post("/send/{connectionId}")
 async def send(request: Request, connectionId: str):
-    session_id = request.cookies.get("session")
-    profile_id = request.cookies.get("profile")
-    if not session_id or not profile_id:
-        return {"success": False, "error": "Invalid Session"}
+    profile = get_profile_from_request(request)
+    if not profile:
+        return {"success": False, "error": "Invalid Profile"}
 
     connection = mongo.connections.find_one({
         "_id": ObjectId(connectionId),
-        "profileId": ObjectId(profile_id)
+        "profileId": ObjectId(profile["_id"])
     })
     if not connection:
         return {"success": False, "error": "Connection not found"}
@@ -24,7 +22,7 @@ async def send(request: Request, connectionId: str):
     channel = mongo.channels.find_one({"_id": ObjectId(connection["channelId"])})
     composition = mongo.compositions.find_one({"_id": ObjectId(connection["compositionId"])})
 
-    bot = await utility.get_bot(profile_id)
+    bot = await selfbot.get_bot(profile["_id"])
 
     count = min(composition["count"], len(composition["attachments"]))
     if composition["randomize"]:

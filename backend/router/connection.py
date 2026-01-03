@@ -2,6 +2,7 @@
 from bson.objectid import ObjectId
 from pydantic import BaseModel
 import mongo
+from session import get_profile_from_request
 
 router = APIRouter()
 
@@ -13,12 +14,8 @@ class ConnectionData(BaseModel):
 
 @router.post("/connection")
 async def connection_submit(data: ConnectionData, request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not Logged In"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
+    profile = get_profile_from_request(request)
+    if not profile:
         return {"success": False, "error": "Invalid Session"}
 
     # If id is provided and matches → update
@@ -36,7 +33,7 @@ async def connection_submit(data: ConnectionData, request: Request):
 
     # Otherwise → insert new
     mongo.connections.insert_one({
-        "profileId": ObjectId(profile_id),
+        "profileId": profile["_id"],
         "channelId": ObjectId(data.channelId),
         "compositionId": ObjectId(data.compositionId),
     })
@@ -45,16 +42,12 @@ async def connection_submit(data: ConnectionData, request: Request):
 
 @router.get("/connection")
 async def connection_list(request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
+    profile = get_profile_from_request(request)
+    if not profile:
         return {"success": False, "error": "Invalid Session"}
 
     items = []
-    for conn in mongo.connections.find({"profileId": ObjectId(profile_id)}):
+    for conn in mongo.connections.find({"profileId": profile["_id"]}):
         channel = mongo.channels.find_one({"_id": ObjectId(conn["channelId"])})
         composition = mongo.compositions.find_one({"_id": ObjectId(conn["compositionId"])})
         items.append({
@@ -69,17 +62,13 @@ async def connection_list(request: Request):
 
 @router.get("/connection/{connection_id}")
 async def connection_get_one(request: Request, connection_id: str):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
+    profile = get_profile_from_request(request)
+    if not profile:
         return {"success": False, "error": "Invalid Session"}
 
     conn = mongo.connections.find_one({
         "_id": ObjectId(connection_id),
-        "profileId": ObjectId(profile_id)
+        "profileId": profile["_id"]
     })
     if not conn:
         return {"success": False, "error": "Connection not found"}

@@ -2,9 +2,8 @@
 from fastapi import APIRouter, Request
 from bson.objectid import ObjectId
 from pydantic import BaseModel
-import mongo
-import utility
-
+import mongo, selfbot
+from session import get_profile_from_request
 router = APIRouter()
 
 class ChannelEditData(BaseModel):
@@ -14,17 +13,12 @@ class ChannelEditData(BaseModel):
 
 @router.post("/channel/edit")
 async def channel_edit(data: ChannelEditData, request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not Logged In"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
-        return {"success": False, "error": "Not Logged In"}
-
+    profile = get_profile_from_request(request)
+    if not profile:
+        return {"success": False, "error": "Invalid Session"}
 
     # If id is provided and matches → update
-    channel = mongo.channels.find_one({"_id": ObjectId(data.id), "profileId": ObjectId(profile_id)})
+    channel = mongo.channels.find_one({"_id": ObjectId(data.id), "profileId": profile["_id"]})
     if channel:
         mongo.channels.update_one(
             {"_id": channel["_id"]},
@@ -42,15 +36,11 @@ class ChannelNewData(BaseModel):
 
 @router.post("/channel/new")
 async def channel_new(data: ChannelNewData  , request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not Logged In"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
+    profile = get_profile_from_request(request)
+    if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    bot = await utility.get_bot(profile_id)
+    bot = await selfbot.get_bot(profile["_id"])
     if not bot:
         return {"success": False, "error": "Invalid Session"}
 
@@ -85,7 +75,7 @@ async def channel_new(data: ChannelNewData  , request: Request):
 
     mongo.channels.insert_one({
         "channelId": data.id,
-        "profileId": ObjectId(profile_id),
+        "profileId": profile["_id"],
         "name": name,
         "cooldown": cooldown,
         "attachmentPerm": attachment_perm,
@@ -99,15 +89,11 @@ async def channel_new(data: ChannelNewData  , request: Request):
 
 @router.get("/channel")
 async def channel_get(request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
+    profile = get_profile_from_request(request)
+    if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    channels = mongo.channels.find({"profileId": ObjectId(profile_id)})
+    channels = mongo.channels.find({"profileId": profile["_id"]})
     data = []
     for channel in channels:
         data.append({
@@ -122,16 +108,12 @@ async def channel_get(request: Request):
 
 @router.get("/channel/{channel_id}")
 async def channel_get_one(request: Request, channel_id: str):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    profile_id = request.cookies.get("profile")
-    if not profile_id:
+    profile = get_profile_from_request(request)
+    if not profile:
         return {"success": False, "error": "Invalid Session"}
 
     channel = mongo.channels.find_one({
-        "profileId": ObjectId(profile_id),
+        "profileId": profile["_id"],
         "channelId": channel_id
     })
     if not channel:

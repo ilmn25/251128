@@ -1,7 +1,9 @@
 ﻿import os
 import discord
+from bson import ObjectId
 from discord.ext import commands
 import asyncio
+import mongo
 from env import ATTACHMENT_PATH
 
 class Main(commands.Bot):
@@ -54,3 +56,21 @@ class Main(commands.Bot):
         except discord.errors.LoginFailure:
             return False
 
+
+bots = {}
+
+async def get_bot(profileId):
+    if profileId in bots:
+        return bots[profileId]
+    else:
+        profile = mongo.profiles.find_one({"_id": ObjectId(profileId)})
+        if not profile:
+            return None
+        bot = Main()
+        token = profile["token"]
+        if not await bot.validate_token(token):
+            return None
+            # remove profile from cookie and mark as expired
+        asyncio.create_task(bot.start(token, reconnect=True))
+        bots[profileId] = bot
+        return bot

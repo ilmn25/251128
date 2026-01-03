@@ -37,7 +37,7 @@ export default function Landing() {
     const data = await res.json();
     if (data.success) {
       toast.success("Account created successfully");
-      navigate("/");
+      navigate("/login");
     }
     else toast.error(data.error)
   }

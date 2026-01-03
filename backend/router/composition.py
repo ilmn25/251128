@@ -2,6 +2,7 @@
 from bson.objectid import ObjectId
 from pydantic import BaseModel
 import mongo
+from session import get_user_from_request
 
 router = APIRouter()
 
@@ -15,11 +16,7 @@ class CompositionData(BaseModel):
 
 @router.post("/composition")
 async def composition_submit(data: CompositionData, request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not Logged In"}
-
-    user = mongo.users.find_one({"_id": ObjectId(session_id)})
+    user = get_user_from_request(request)
     if not user:
         return {"success": False, "error": "Invalid session"}
 
@@ -52,11 +49,7 @@ async def composition_submit(data: CompositionData, request: Request):
 
 @router.get("/composition")
 async def composition_list(request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    user = mongo.users.find_one({"_id": ObjectId(session_id)})
+    user = get_user_from_request(request)
     if not user:
         return {"success": False, "error": "Invalid session"}
 
@@ -77,11 +70,7 @@ async def composition_list(request: Request):
 
 @router.get("/composition/{composition_id}")
 async def get_composition(request: Request, composition_id: str):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    user = mongo.users.find_one({"_id": ObjectId(session_id)})
+    user = get_user_from_request(request)
     if not user:
         return {"success": False, "error": "Invalid session"}
 

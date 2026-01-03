@@ -1,10 +1,9 @@
-﻿import asyncio
+﻿from session import get_user_from_request
 from fastapi import APIRouter, Request
-from bson.objectid import ObjectId
 from pydantic import BaseModel
 
 import mongo
-from selfbot import selfbot
+import selfbot
 
 router = APIRouter()
 
@@ -14,10 +13,9 @@ class ProfileData(BaseModel):
 
 @router.post("/profile")
 async def profile_post(data: ProfileData, request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not Logged In"}
-    user_id = session_id
+    user = get_user_from_request(request)
+    if not user:
+        return {"success": False, "error": "Invalid session"}
 
     bot = selfbot.Main()
     if not await bot.validate_token(data.token):
@@ -25,7 +23,7 @@ async def profile_post(data: ProfileData, request: Request):
 
     # If id is provided and matches → update
     if data.id:
-        profile = mongo.profiles.find_one({"accountId": data.id, "userId": ObjectId(user_id)})
+        profile = mongo.profiles.find_one({"accountId": data.id, "userId": user["_id"]})
         if profile:
             mongo.profiles.update_one(
                 {"_id": profile["_id"]},
@@ -39,7 +37,7 @@ async def profile_post(data: ProfileData, request: Request):
     # Otherwise → insert new
     mongo.profiles.insert_one({
         "accountId": str(bot.user.id),
-        "userId": ObjectId(user_id),
+        "userId": user["_id"],
         "token": data.token,
         "username": bot.user.name,
     })
@@ -48,11 +46,7 @@ async def profile_post(data: ProfileData, request: Request):
 
 @router.get("/profile")
 async def profiles_get(request: Request):
-    session_id = request.cookies.get("session")
-    if not session_id:
-        return {"success": False, "error": "Not logged in"}
-
-    user = mongo.users.find_one({"_id": ObjectId(session_id)})
+    user = get_user_from_request(request)
     if not user:
         return {"success": False, "error": "Invalid session"}
 
