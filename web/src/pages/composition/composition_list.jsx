@@ -44,7 +44,6 @@ export default function CompositionList() {
 
 function CompositionListItem({ compositionId, message, attachmentCount, randomize, count }) {
   const navigate = useNavigate();
-
   return (
     <div>
       <div className="panel1 flex content-between centered gap-3">

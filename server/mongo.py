@@ -1,6 +1,7 @@
-﻿from pymongo.mongo_client import MongoClient
+﻿import os
+
+from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-import env
 
 client = None
 db = None
@@ -16,7 +17,7 @@ async def connect():
 
     print("MongoDB Connecting")
 
-    client = MongoClient(env.MONGO_URI, server_api=ServerApi("1"))
+    client = MongoClient(os.getenv("MONGO_URI"), server_api=ServerApi("1"))
     db = client["dev"]
 
     users = db["users"]

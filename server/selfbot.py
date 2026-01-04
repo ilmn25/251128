@@ -4,7 +4,9 @@ from bson import ObjectId
 from discord.ext import commands
 import asyncio
 import mongo
-from env import ATTACHMENT_PATH
+import session
+
+DATA_PATH = os.getenv("DATA_PATH")
 
 class Main(commands.Bot):
     def __init__(self):
@@ -21,7 +23,7 @@ class Main(commands.Bot):
                 message,
                 files=[
                     discord.File(
-                        os.path.join(ATTACHMENT_PATH, attachment["url"]),
+                        os.path.join(DATA_PATH, attachment["url"]),
                         filename=os.path.basename(attachment["name"])
                     )
                     for attachment in attachments
@@ -68,7 +70,7 @@ async def get_bot(profileId):
         if not profile:
             return None
         bot = Main()
-        token = profile["token"]
+        token = session.cipher.decrypt(profile["token"].encode()).decode()
         if not await bot.validate_token(token):
             return None
             # remove profile from cookie and mark as expired

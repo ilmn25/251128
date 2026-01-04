@@ -1,19 +1,21 @@
 ﻿import os, uvicorn
+from cryptography.fernet import Fernet
 from fastapi import FastAPI
-from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-from env import ROOT
-os.makedirs(ROOT, exist_ok=True)
+os.makedirs(os.getenv("DATA_PATH"), exist_ok=True)
 
-# ==================== DATABASE ====================
-import mongo
+# ==================== DATABASE & ENCRYPTION ====================
+import mongo, session
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await mongo.connect()
+    if not os.getenv("FERNET_KEY"):
+        os.environ["FERNET_KEY"] = Fernet.generate_key().decode()
+    session.cipher = Fernet(os.getenv("FERNET_KEY").encode())
     yield
     mongo.client.close()
 

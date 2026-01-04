@@ -6,7 +6,6 @@ import mongo, secrets
 from datetime import datetime, timedelta, timezone
 
 router = APIRouter()
-
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 class UserCredentials(BaseModel):

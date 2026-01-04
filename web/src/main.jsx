@@ -6,7 +6,7 @@ import Landing from "./pages/landing.jsx";
 import { Toaster } from 'sonner'
 
 // leave empty if server serves static frontend (in prod)
-export const SERVER_URL = "";
+export const SERVER_URL = "http://localhost:8000";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>

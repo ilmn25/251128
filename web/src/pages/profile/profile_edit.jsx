@@ -5,6 +5,7 @@ import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
 import {SERVER_URL} from "../../main.jsx";
+import Cookies from "js-cookie";
 
 export default function ProfileEdit() {
   const { accountId } = useParams();
@@ -24,11 +25,11 @@ export default function ProfileEdit() {
 
     const data = await res.json();
     if (data.success) {
-      setToken("")
+      Cookies.set("profile", accountId, { expires: 365, path: "/" });
       toast.success("Changes saved sucessfully");
       navigate("/profile");
     } else {
-      toast.error("Error saving profile:", data.error);
+      toast.error(data.error);
     }
   }
 

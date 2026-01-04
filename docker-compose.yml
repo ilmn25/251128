@@ -1,0 +1,9 @@
+﻿services:
+  webapp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      DATA_PATH: ${DATA_PATH}
+

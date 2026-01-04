@@ -1,9 +1,9 @@
 ﻿import '../../index.css';
 
-import {SaveIcon, Shuffle, Hash, CopyPlus } from "lucide-react";
+import {SaveIcon, Shuffle, Hash, CopyPlus, Trash} from "lucide-react";
 import Message from './message.jsx';
 import Attachment from "./attachment.jsx";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
 import {SERVER_URL} from "../../main.jsx";
@@ -85,6 +85,8 @@ export default function CompositionEdit() {
     }
   }
 
+  async function Delete() {}
+
   return (
     <div>
       <div className="panel1 space-y-3">
@@ -109,6 +111,9 @@ export default function CompositionEdit() {
         </button>
         <button onClick={() => submit(true)} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
           <CopyPlus></CopyPlus> <p>Save As New</p>
+        </button>
+        <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+          <Trash></Trash> <p>Delete</p>
         </button>
       </div>
     </div>

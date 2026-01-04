@@ -2,13 +2,11 @@
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-import mongo
-import selfbot
-
+import mongo, selfbot, session
 router = APIRouter()
 
 class ProfileData(BaseModel):
-    id: str | None = None
+    accountId: str | None = None
     token: str
 
 @router.post("/profile")
@@ -22,13 +20,14 @@ async def profile_post(data: ProfileData, request: Request):
         return {"success": False, "error": "Invalid token"}
 
     # If id is provided and matches → update
-    if data.id:
-        profile = mongo.profiles.find_one({"accountId": data.id, "userId": user["_id"]})
+    if data.accountId:
+        print(data.accountId)
+        profile = mongo.profiles.find_one({"accountId": data.accountId, "userId": user["_id"]})
         if profile:
             mongo.profiles.update_one(
                 {"_id": profile["_id"]},
                 {"$set": {
-                    "token": data.token,
+                    "token": session.cipher.encrypt(data.token.encode()).decode(),
                     "username": bot.user.name,
                 }}
             )
@@ -38,7 +37,7 @@ async def profile_post(data: ProfileData, request: Request):
     mongo.profiles.insert_one({
         "accountId": str(bot.user.id),
         "userId": user["_id"],
-        "token": data.token,
+        "token": session.cipher.encrypt(data.token.encode()).decode(),
         "username": bot.user.name,
     })
     return {"success": True}

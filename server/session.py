@@ -3,6 +3,8 @@ from bson import ObjectId
 from fastapi import Request
 import mongo
 
+cipher = None
+
 def get_user_from_request(request: Request):
     session_token = request.cookies.get("session")
     if not session_token:
