@@ -1,8 +1,9 @@
 ﻿import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {PencilRuler, Repeat, SaveIcon, Shuffle, ArrowBigRightDash} from "lucide-react";
+import {PencilRuler, Repeat, SaveIcon, Shuffle, ArrowBigRightDash, Trash} from "lucide-react";
 import {toast} from "sonner";
 import {SERVER_URL} from "../../main.jsx";
+import Cookies from "js-cookie";
 
 const MODE = {
   DEFAULT: "DEFAULT",
@@ -93,6 +94,22 @@ export default function ConnectionEdit() {
       toast.error(data.error || "Failed to save connection");
   }
 
+  async function Delete() {
+    const res = await fetch(SERVER_URL + "/connection/" + connectionId, {
+      method: "DELETE",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      toast.success("Changes saved sucessfully");
+      navigate("/connection");
+    } else {
+      toast.error(data.error);
+    }
+  }
+
   return (
     <div>
       <div className="panel1 space-y-3 ">
@@ -162,9 +179,14 @@ export default function ConnectionEdit() {
         )}
       </div>
 
-      <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
-        <SaveIcon/> <p>Save</p>
-      </button>
+      <div className="flex gap-3">
+        <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
+          <SaveIcon/> <p>Save</p>
+        </button>
+        {connectionId === null && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+          <Trash></Trash> <p>Delete</p>
+        </button>}
+      </div>
     </div>
   );
 }

@@ -81,3 +81,20 @@ async def connection_get_one(request: Request, connection_id: str):
             "compositionId": str(conn["compositionId"]),
         }
     }
+
+@router.delete("/connection/{connection_id}")
+async def connection_delete(request: Request, connection_id: str):
+    profile = get_profile_from_request(request)
+    if not profile:
+        return {"success": False, "error": "Invalid Session"}
+
+    conn = mongo.connections.find_one({
+        "_id": ObjectId(connection_id),
+        "profileId": profile["_id"]
+    })
+    if not conn:
+        return {"success": False, "error": "Connection not found"}
+
+    mongo.connections.delete_one({"_id": conn["_id"]})
+
+    return {"success": True}

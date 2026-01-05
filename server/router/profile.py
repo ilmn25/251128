@@ -1,4 +1,5 @@
-﻿from session import get_user_from_request
+﻿from bson import ObjectId
+from session import get_user_from_request
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
@@ -59,3 +60,22 @@ async def profiles_get(request: Request):
         })
 
     return {"success": True, "items": data}
+
+@router.delete("/profile/{profile_id}")
+async def profile_delete(request: Request, profile_id: str):
+    user = get_user_from_request(request)
+    if not user:
+        return {"success": False, "error": "Invalid session"}
+
+    # Find the profile belonging to this user
+    profile = mongo.profiles.find_one({
+        "_id": ObjectId(profile_id),
+        "userId": user["_id"]
+    })
+    if not profile:
+        return {"success": False, "error": "Profile not found"}
+
+    # Delete it
+    mongo.profiles.delete_one({"_id": profile["_id"]})
+
+    return {"success": True}

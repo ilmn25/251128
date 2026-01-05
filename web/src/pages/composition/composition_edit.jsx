@@ -85,7 +85,21 @@ export default function CompositionEdit() {
     }
   }
 
-  async function Delete() {}
+  async function Delete() {
+    const res = await fetch(SERVER_URL + "/composition/" + compositionId, {
+      method: "DELETE",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      toast.success("Changes saved sucessfully");
+      navigate("/composition");
+    } else {
+      toast.error(data.error);
+    }
+  }
 
   return (
     <div>
@@ -109,12 +123,15 @@ export default function CompositionEdit() {
         <button onClick={() => submit(false)} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
           <SaveIcon></SaveIcon> <p>Save</p>
         </button>
-        <button onClick={() => submit(true)} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
-          <CopyPlus></CopyPlus> <p>Save As New</p>
-        </button>
-        <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
-          <Trash></Trash> <p>Delete</p>
-        </button>
+
+        {compositionId === null && <>
+          <button onClick={() => submit(true)} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
+            <CopyPlus></CopyPlus> <p>Save As New</p>
+          </button>
+          <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+            <Trash></Trash> <p>Delete</p>
+          </button>
+        </>}
       </div>
     </div>
   );

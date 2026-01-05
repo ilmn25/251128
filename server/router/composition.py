@@ -90,3 +90,20 @@ async def get_composition(request: Request, composition_id: str):
     }
 
     return {"success": True, "item": data}
+
+@router.delete("/composition/{composition_id}")
+async def delete_composition(request: Request, composition_id: str):
+    user = get_user_from_request(request)
+    if not user:
+        return {"success": False, "error": "Invalid session"}
+
+    composition = mongo.compositions.find_one({
+        "_id": ObjectId(composition_id),
+        "userId": user["_id"]
+    })
+    if not composition:
+        return {"success": False, "error": "Composition not found"}
+
+    mongo.compositions.delete_one({"_id": composition["_id"]})
+
+    return {"success": True}

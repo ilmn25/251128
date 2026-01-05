@@ -1,7 +1,7 @@
 ﻿import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import Toggle from "../../components/toggle.jsx";
-import {SaveIcon} from "lucide-react";
+import {SaveIcon, Trash} from "lucide-react";
 import {toast} from "sonner";
 import {SERVER_URL} from "../../main.jsx";
 
@@ -60,6 +60,22 @@ export function ChannelEdit() {
       toast.error(data.error || "Failed to submit channel");
   }
 
+  async function Delete() {
+    const res = await fetch(SERVER_URL + "/channel/" + id, {
+      method: "DELETE",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      toast.success("Changes saved sucessfully");
+      navigate("/channel");
+    } else {
+      toast.error(data.error);
+    }
+  }
+
   return (
     <div>
       <div className="panel1 space-y-3">
@@ -93,9 +109,14 @@ export function ChannelEdit() {
         </div>
       </div>
 
-      <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
-        <SaveIcon></SaveIcon> <p>Submit</p>
-      </button>
+      <div className="flex gap-3">
+        <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
+          <SaveIcon></SaveIcon> <p>Submit</p>
+        </button>
+        <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+          <Trash></Trash> <p>Delete</p>
+        </button>
+      </div>
     </div>
   );
 }

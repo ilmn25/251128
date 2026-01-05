@@ -1,6 +1,6 @@
 ﻿import '../../index.css';
 
-import {SaveIcon, Shield} from "lucide-react";
+import {SaveIcon, Shield, Trash} from "lucide-react";
 import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
@@ -26,6 +26,22 @@ export default function ProfileEdit() {
     const data = await res.json();
     if (data.success) {
       Cookies.set("profile", accountId, { expires: 365, path: "/" });
+      toast.success("Changes saved sucessfully");
+      navigate("/profile");
+    } else {
+      toast.error(data.error);
+    }
+  }
+
+  async function Delete() {
+    const res = await fetch(SERVER_URL + "/profile/" + accountId, {
+      method: "DELETE",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (data.success) {
       toast.success("Changes saved sucessfully");
       navigate("/profile");
     } else {
@@ -65,9 +81,14 @@ export default function ProfileEdit() {
         </div>
       </div>
 
-      <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
-        <SaveIcon></SaveIcon> <p>Submit</p>
-      </button>
+      <div className="flex gap-3">
+        <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
+          <SaveIcon></SaveIcon> <p>Save</p>
+        </button>
+        {accountId === null && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+          <Trash></Trash> <p>Delete</p>
+        </button>}
+      </div>
     </div>
   );
 }

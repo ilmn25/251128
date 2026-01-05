@@ -130,3 +130,18 @@ async def channel_get_one(request: Request, channel_id: str):
 
     return {"success": True, "item": data}
 
+@router.delete("/channel/{channel_id}")
+async def channel_delete(request: Request, channel_id: str):
+    profile = get_profile_from_request(request)
+    if not profile:
+        return {"success": False, "error": "Invalid Session"}
+
+    channel = mongo.channels.find_one({
+        "_id": ObjectId(channel_id),
+        "profileId": profile["_id"]
+    })
+    if not channel:
+        return {"success": False, "error": "Channel not found"}
+
+    mongo.channels.delete_one({"_id": channel["_id"]})
+    return {"success": True}
