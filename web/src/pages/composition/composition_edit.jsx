@@ -6,7 +6,7 @@ import Attachment from "./attachment.jsx";
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
-import {SERVER_URL} from "../../main.jsx";
+import {API_URL} from "../../main.jsx";
 
 export default function CompositionEdit() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function CompositionEdit() {
         navigate("/composition/new");
         return;
       }
-      const res = await fetch(SERVER_URL + "/composition/" + compositionId, {
+      const res = await fetch(API_URL + "/composition/" + compositionId, {
         method: "GET",
         credentials: "include",
         headers: {"Content-Type": "application/json"},
@@ -49,7 +49,7 @@ export default function CompositionEdit() {
       )
     );
 
-    const res = await fetch(SERVER_URL + "/composition", {
+    const res = await fetch(API_URL + "/composition", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -75,7 +75,7 @@ export default function CompositionEdit() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch(SERVER_URL + "/attachment", {
+      const res = await fetch(API_URL + "/attachment", {
         method: "POST",
         credentials: "include",
         body: formData
@@ -86,7 +86,7 @@ export default function CompositionEdit() {
   }
 
   async function Delete() {
-    const res = await fetch(SERVER_URL + "/composition/" + compositionId, {
+    const res = await fetch(API_URL + "/composition/" + compositionId, {
       method: "DELETE",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
@@ -124,7 +124,7 @@ export default function CompositionEdit() {
           <SaveIcon></SaveIcon> <p>Save</p>
         </button>
 
-        {compositionId === null && <>
+        {compositionId && <>
           <button onClick={() => submit(true)} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
             <CopyPlus></CopyPlus> <p>Save As New</p>
           </button>

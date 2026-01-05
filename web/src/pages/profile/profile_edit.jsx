@@ -4,7 +4,7 @@ import {SaveIcon, Shield, Trash} from "lucide-react";
 import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
-import {SERVER_URL} from "../../main.jsx";
+import {API_URL} from "../../main.jsx";
 import Cookies from "js-cookie";
 
 export default function ProfileEdit() {
@@ -16,7 +16,7 @@ export default function ProfileEdit() {
     if (!token || !token.includes("."))
       return toast.error("Please enter a valid token");
 
-    const res = await fetch(SERVER_URL + "/profile", {
+    const res = await fetch(API_URL + "/profile", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
@@ -34,7 +34,7 @@ export default function ProfileEdit() {
   }
 
   async function Delete() {
-    const res = await fetch(SERVER_URL + "/profile/" + accountId, {
+    const res = await fetch(API_URL + "/profile/" + accountId, {
       method: "DELETE",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
@@ -85,7 +85,7 @@ export default function ProfileEdit() {
         <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
           <SaveIcon></SaveIcon> <p>Save</p>
         </button>
-        {accountId === null && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+        {accountId && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
           <Trash></Trash> <p>Delete</p>
         </button>}
       </div>

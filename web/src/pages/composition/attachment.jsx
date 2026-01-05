@@ -1,6 +1,6 @@
 ﻿import { useRef } from "react";
 import { FileText, X} from "lucide-react";
-import {SERVER_URL} from "../../main.jsx";
+import {API_URL} from "../../main.jsx";
 
 export default function Attachment({items, setItems}) {
   const fileInputRef = useRef(null);
@@ -59,13 +59,13 @@ export default function Attachment({items, setItems}) {
             <div key={item.url} className="relative h-40 w-40 aspect-square">
               {isImage ? (
                 <img
-                  src={item.url.startsWith("blob:") ? item.url : SERVER_URL + `/attachment/${item.url}`}
+                  src={item.url.startsWith("blob:") ? item.url : API_URL + `/attachment/${item.url}`}
                   alt={item.name}
                   className="w-full h-full object-cover rounded-lg"
                 />
               ) : isVideo ? (
                 <video
-                  src={item.url.startsWith("blob:") ? item.url : SERVER_URL + `/attachment/${item.url}`}
+                  src={item.url.startsWith("blob:") ? item.url : API_URL + `/attachment/${item.url}`}
                   controls
                   className="w-full h-full object-cover rounded-lg"
                 />

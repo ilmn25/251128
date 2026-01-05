@@ -2,7 +2,7 @@
 import {useNavigate} from "react-router-dom";
 import {PencilRuler, Cable, ArrowBigRightDash} from "lucide-react";
 import {toast} from "sonner";
-import {SERVER_URL} from "../../main.jsx";
+import {API_URL} from "../../main.jsx";
 
 export default function ConnectionList() {
   const [items, setItems] = useState();
@@ -11,7 +11,7 @@ export default function ConnectionList() {
 
   useEffect(() => {
     async function get() {
-      const res = await fetch(SERVER_URL + "/connection", {
+      const res = await fetch(API_URL + "/connection", {
         method: "GET",
         credentials: "include"
       });
@@ -26,7 +26,7 @@ export default function ConnectionList() {
 
   async function send(id) {
     setLoading(true);
-    const res = await fetch(SERVER_URL + "/send/" + id, {
+    const res = await fetch(API_URL + "/send/" + id, {
       method: "POST",
       credentials: "include"
     });

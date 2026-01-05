@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {PencilRuler, UserPlus, User, UserRoundCheck} from "lucide-react";
 import Cookies from "js-cookie";
 import {toast} from "sonner";
-import {SERVER_URL} from "../../main.jsx";
+import {API_URL} from "../../main.jsx";
 
 export default function ProfileList() {
   const [items, setItems] = useState();
@@ -12,7 +12,7 @@ export default function ProfileList() {
 
   useEffect(() => {
     async function get() {
-      const res = await fetch(SERVER_URL + "/profile", {
+      const res = await fetch(API_URL + "/profile", {
         method: "GET",
         credentials: "include"
       });

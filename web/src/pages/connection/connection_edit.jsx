@@ -2,8 +2,7 @@
 import React, {useEffect, useState} from "react";
 import {PencilRuler, Repeat, SaveIcon, Shuffle, ArrowBigRightDash, Trash} from "lucide-react";
 import {toast} from "sonner";
-import {SERVER_URL} from "../../main.jsx";
-import Cookies from "js-cookie";
+import {API_URL} from "../../main.jsx";
 
 const MODE = {
   DEFAULT: "DEFAULT",
@@ -23,7 +22,7 @@ export default function ConnectionEdit() {
   useEffect(() => {
     async function fetchChannelsAndCompositions() {
       // channels
-      let res = await fetch(SERVER_URL + "/channel", {
+      let res = await fetch(API_URL + "/channel", {
         method: "GET",
         credentials: "include"
       });
@@ -34,7 +33,7 @@ export default function ConnectionEdit() {
       }
 
       // compositions
-      res = await fetch(SERVER_URL + "/composition", {
+      res = await fetch(API_URL + "/composition", {
         method: "GET",
         credentials: "include"
       });
@@ -56,7 +55,7 @@ export default function ConnectionEdit() {
         return;
       }
 
-      const res = await fetch(SERVER_URL + `/connection/${connectionId}`, {
+      const res = await fetch(API_URL + `/connection/${connectionId}`, {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -79,7 +78,7 @@ export default function ConnectionEdit() {
   if (!composition || !channel) return null;
 
   async function submit() {
-    const res = await fetch(SERVER_URL + "/connection", {
+    const res = await fetch(API_URL + "/connection", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
@@ -95,7 +94,7 @@ export default function ConnectionEdit() {
   }
 
   async function Delete() {
-    const res = await fetch(SERVER_URL + "/connection/" + connectionId, {
+    const res = await fetch(API_URL + "/connection/" + connectionId, {
       method: "DELETE",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
@@ -183,7 +182,7 @@ export default function ConnectionEdit() {
         <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
           <SaveIcon/> <p>Save</p>
         </button>
-        {connectionId === null && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
+        {connectionId && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
           <Trash></Trash> <p>Delete</p>
         </button>}
       </div>

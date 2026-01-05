@@ -3,8 +3,9 @@ from starlette.responses import JSONResponse, FileResponse
 import os, shutil, uuid
 from session import get_user_from_request
 
-DATA_PATH = os.getenv("DATA_PATH")
 router = APIRouter()
+
+DATA_PATH = os.getenv("DATA_PATH")
 os.makedirs(DATA_PATH, exist_ok=True)
 
 @router.post("/attachment")

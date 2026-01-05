@@ -6,8 +6,6 @@ from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-os.makedirs(os.getenv("DATA_PATH"), exist_ok=True)
-
 # ==================== DATABASE & ENCRYPTION ====================
 import mongo, session
 @asynccontextmanager
@@ -30,13 +28,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(attachment.router)
-app.include_router(user.router)
-app.include_router(composition.router)
-app.include_router(profile.router)
-app.include_router(channel.router)
-app.include_router(connection.router)
-app.include_router(send.router)
+app.include_router(attachment.router, prefix="/api")
+app.include_router(user.router, prefix="/api")
+app.include_router(composition.router, prefix="/api")
+app.include_router(profile.router, prefix="/api")
+app.include_router(channel.router, prefix="/api")
+app.include_router(connection.router, prefix="/api")
+app.include_router(send.router, prefix="/api")
 
 # ==================== WEBPAGE ====================
 DIST_PATH = os.path.join(os.path.dirname(__file__), "static")
