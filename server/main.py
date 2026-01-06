@@ -2,8 +2,6 @@
 from cryptography.fernet import Fernet
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse
-from starlette.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 # ==================== DATABASE & ENCRYPTION ====================
@@ -19,6 +17,8 @@ async def lifespan(app: FastAPI):
 
 # ==================== API ====================
 from router import attachment, user, composition, profile, channel, connection, send
+import static
+
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
@@ -35,13 +35,7 @@ app.include_router(profile.router, prefix="/api")
 app.include_router(channel.router, prefix="/api")
 app.include_router(connection.router, prefix="/api")
 app.include_router(send.router, prefix="/api")
-
-# ==================== WEBPAGE ====================
-DIST_PATH = os.path.join(os.path.dirname(__file__), "static")
-app.mount("/", StaticFiles(directory=DIST_PATH, html=True), name="frontend")
-@app.get("/")
-def serve_index():
-    return FileResponse(DIST_PATH / "index.html")
+app.include_router(static.router)
 
 # ==================== MAIN ====================
 if __name__ == "__main__":
