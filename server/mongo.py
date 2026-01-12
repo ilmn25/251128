@@ -1,5 +1,6 @@
 ﻿import os
 
+import boto3
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -17,7 +18,8 @@ async def connect():
 
     print("MongoDB Connecting")
 
-    client = MongoClient(os.getenv("MONGO_URI"), server_api=ServerApi("1"))
+    mongo_uri = boto3.client("secretsmanager", region_name="ap-southeast-2").get_secret_value( SecretId="discord-tool/mongo-uri" )["SecretString"]
+    client = MongoClient(mongo_uri, server_api=ServerApi("1"))
     db = client["dev"]
 
     users = db["users"]

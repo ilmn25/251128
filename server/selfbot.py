@@ -1,12 +1,9 @@
-﻿import os
-import discord
-from bson import ObjectId
+﻿import io, os, discord, aiohttp ,asyncio
 from discord.ext import commands
-import asyncio
-import mongo
-import session
+from bson import ObjectId
+import mongo, session
 
-DATA_PATH = os.getenv("DATA_PATH")
+S3_BUCKET_URL = os.getenv("S3_BUCKET_URL")
 
 class Main(commands.Bot):
     def __init__(self):
@@ -19,38 +16,34 @@ class Main(commands.Bot):
     async def post(self, channel_id, attachments, message):
         try:
             channel = await self.fetch_channel(int(channel_id))
-            await channel.send(
-                message,
-                files=[
-                    discord.File(
-                        os.path.join(DATA_PATH, attachment["url"]),
-                        filename=os.path.basename(attachment["name"])
-                    )
-                    for attachment in attachments
-                ]
-            )
 
-            await asyncio.sleep(4)
+            files = []
+            async with aiohttp.ClientSession() as session_http:
+                for attachment in attachments:
+                    url = f"{S3_BUCKET_URL}{attachment['url']}"
+                    async with session_http.get(url) as resp:
+                        if resp.status != 200:
+                            raise Exception(f"Failed to fetch {url}")
+                        data = await resp.read()
+                        files.append(
+                            discord.File(
+                                fp=discord.File(io.BytesIO(data), filename=attachment["name"]).fp,
+                                filename=attachment["name"]
+                            )
+                        )
+
+            await channel.send(message, files=files)
+            await asyncio.sleep(2)
             return {"success": True}
 
         except discord.Forbidden:
-            return {
-                "success": False,
-                "error": "Permission denied",
-            }
-
-        except discord.HTTPException as e:
-            return {
-                "success": False,
-                "error": "HTTP error occured",
-            }
-
+            return {"success": False, "error": "Permission denied"}
+        except discord.HTTPException:
+            return {"success": False, "error": "HTTP error occurred"}
         except Exception as e:
             print(e)
-            return {
-                "success": False,
-                "error": "Unexpected error occured",
-            }
+            return {"success": False, "error": "Unexpected error occurred"}
+
 
     async def validate_token(self, token):
         try:
