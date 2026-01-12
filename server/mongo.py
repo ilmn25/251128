@@ -18,7 +18,7 @@ async def connect():
 
     print("MongoDB Connecting")
 
-    mongo_uri = boto3.client("secretsmanager", region_name="ap-southeast-2").get_secret_value( SecretId="discord-tool/mongo-uri" )["SecretString"]
+    mongo_uri = boto3.client("secretsmanager", region_name=os.getenv("AWS_REGION_ID")).get_secret_value(SecretId=os.getenv("MONGO_SECRET_ID") )["SecretString"]
     client = MongoClient(mongo_uri, server_api=ServerApi("1"))
     db = client["dev"]
 

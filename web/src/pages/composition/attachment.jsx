@@ -1,6 +1,5 @@
 ﻿import { useRef } from "react";
 import { FileText, X} from "lucide-react";
-import {API_URL} from "../../main.jsx";
 
 export default function Attachment({items, setItems}) {
   const fileInputRef = useRef(null);

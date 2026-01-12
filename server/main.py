@@ -1,4 +1,6 @@
 ﻿import os, uvicorn
+
+import boto3
 from cryptography.fernet import Fernet
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,9 +11,15 @@ import mongo, session
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await mongo.connect()
-    if not os.getenv("FERNET_KEY"):
-        os.environ["FERNET_KEY"] = Fernet.generate_key().decode()
-    session.cipher = Fernet(os.getenv("FERNET_KEY").encode())
+
+    client = boto3.client("secretsmanager", region_name=os.getenv("AWS_REGION_ID"))
+    try:
+        fernet_key = client.get_secret_value(SecretId=os.getenv("FERNET_SECRET_ID"))["SecretString"]
+    except client.exceptions.ResourceNotFoundException:
+        fernet_key = Fernet.generate_key().decode()
+        client.create_secret(Name=os.getenv("FERNET_SECRET_ID"), SecretString=fernet_key)
+
+    session.cipher = Fernet(fernet_key.encode())
     yield
     mongo.client.close()
 

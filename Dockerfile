@@ -24,8 +24,9 @@ RUN pip install -r requirements.txt
 COPY server .
 COPY --from=frontend /web/dist ./static
 
-ENV S3_BUCKET=discord-tool-bucket
-ENV S3_BUCKET_URL=https://discord-tool-bucket.s3.ap-southeast-2.amazonaws.com/
-
+ENV AWS_S3_BUCKET_ID=discord-tool-bucket
+ENV AWS_REGION_ID=ap-southeast-2
+ENV MONGO_SECRET_ID=discord-tool/mongo-uri
+ENV FERNET_SECRET_ID=discord-tool/fernet-key
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
