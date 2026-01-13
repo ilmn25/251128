@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from starlette.staticfiles import StaticFiles
+
 # ==================== DATABASE & ENCRYPTION ====================
 import mongo, session
 @asynccontextmanager
@@ -43,6 +45,8 @@ app.include_router(profile.router, prefix="/api")
 app.include_router(channel.router, prefix="/api")
 app.include_router(connection.router, prefix="/api")
 app.include_router(send.router, prefix="/api")
+
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 app.include_router(static.router)
 
 # ==================== MAIN ====================
