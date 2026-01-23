@@ -1,8 +1,10 @@
 ﻿import { useRef } from "react";
 import { FileText, X} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 export default function Attachment({items, setItems}) {
   const fileInputRef = useRef(null);
+  const { t } = useTranslation();
 
   function add(e) {
     const files = Array.from(e.target.files);
@@ -32,7 +34,7 @@ export default function Attachment({items, setItems}) {
     <div className="space-y-4">
       <div className="panel2 buttonstyle1 centered">
         <button onClick={() => fileInputRef.current.click()}>
-          Upload
+          {t("upload")}
         </button>
         <input
           type="file"

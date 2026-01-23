@@ -3,10 +3,12 @@ import {useNavigate} from "react-router-dom";
 import {PencilRuler, MessageCirclePlus, Shuffle, Repeat} from "lucide-react";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
+import { useTranslation } from "react-i18next";
 
 export default function CompositionList() {
   const [items, setItems] = useState();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function get() {
@@ -16,14 +18,16 @@ export default function CompositionList() {
       });
       const data = await res.json();
       if (data.success) {
-        if (data.items.length === 0) navigate("/composition/new")
+        if (data.items.length === 0) navigate("/composition/new");
         else setItems(data.items);
-      } else toast.error(data.error)
+      } else {
+        toast.error(data.error || t("toastFetchError"));
+      }
     }
     get();
-   }, [navigate, setItems]);
+  }, [navigate, setItems, t]);
 
-  if (!items) return <></>
+  if (!items) return <></>;
 
   return (
     <>
@@ -35,7 +39,7 @@ export default function CompositionList() {
         onClick={() => navigate("/composition/new")}
         className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1"
       >
-        <MessageCirclePlus/> <p>New Composition</p>
+        <MessageCirclePlus/> <p>{t("newComposition")}</p>
       </button>
     </>
   );
@@ -44,6 +48,8 @@ export default function CompositionList() {
 
 function CompositionListItem({ compositionId, message, attachmentCount, randomize, count }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   return (
     <div>
       <div className="panel1 flex content-between centered gap-3">
@@ -56,7 +62,9 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
               <Repeat className="size-4"/>
             )}
           </div>
-          <p className="comment">Select {count} Attachments from {attachmentCount} Files to Send</p>
+          <p className="comment">
+            {t("selectAttachments", { count, attachmentCount })}
+          </p>
           <p className="comment">ID: {compositionId}</p>
         </div>
 
@@ -66,7 +74,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
             onClick={() => navigate("/composition/edit/" + compositionId)}
             className="panel2 buttonstyle2 w-full flex centered space-x-1"
           >
-            <PencilRuler/> <p>Edit</p>
+            <PencilRuler/> <p>{t("edit")}</p>
           </button>
         </div>
       </div>

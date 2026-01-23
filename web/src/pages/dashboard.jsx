@@ -10,12 +10,13 @@ import Channel from "./channel/channel.jsx";
 import Connection from "./connection/connection.jsx";
 import {toast} from "sonner";
 import {API_URL} from "../main.jsx";
-
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     (async () => {
@@ -29,13 +30,13 @@ export default function Dashboard() {
         setUser(data);
         if (location.pathname === "/") navigate("/composition");
       } else {
-        toast.error(data.error);
+        toast.error(data.error || t("toastFetchError"));
         navigate("/login");
       }
     })();
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, t]);
 
-  if (!user) return <Loading/>
+  if (!user) return <Loading/>;
 
   return (
     <div className="space-y-4 w-full p-12 h-screen">
@@ -43,11 +44,11 @@ export default function Dashboard() {
       <div className="flex items-center gap-5 pb-5">
         <div className="flex flex-wrap gap-2">
           <div className="p-3 bg-white rounded-2xl aspect-square w-13 h-13">
-            <MessageCircle className="text-black size-7"></MessageCircle>
+            <MessageCircle className="text-black size-7" />
           </div>
           <div className="space-y-1">
-            <p className="text-3xl font-bold">Discord Message Automation Tool</p>
-            <p className="comment">User ID: {user.id}</p>
+            <p className="text-3xl font-bold">{t("title")}</p>
+            <p className="comment">{t("userId")}: {user.id}</p>
           </div>
         </div>
 
@@ -56,25 +57,25 @@ export default function Dashboard() {
             onClick={() => navigate("/composition")}
             className={`panel1 ${location.pathname === "/composition" ? "buttonstyle3" : "buttonstyle2"}`}
           >
-            Compositions
+            {t("composition")}
           </button>
           <button
             onClick={() => navigate("/profile")}
             className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
           >
-            Profiles
+            {t("profile")}
           </button>
           <button
             onClick={() => navigate("/channel")}
             className={`panel1 ${location.pathname === "/channel" ? "buttonstyle3" : "buttonstyle2"}`}
           >
-            Channels
+            {t("channel")}
           </button>
           <button
             onClick={() => navigate("/connection")}
             className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
           >
-            Connections
+            {t("connection")}
           </button>
         </div>
       </div>
@@ -86,4 +87,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

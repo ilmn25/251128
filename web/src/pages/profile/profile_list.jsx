@@ -4,11 +4,13 @@ import {PencilRuler, UserPlus, User, UserRoundCheck} from "lucide-react";
 import Cookies from "js-cookie";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileList() {
   const [items, setItems] = useState();
   const [currentId, setCurrentId] = useState();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function get() {
@@ -18,37 +20,42 @@ export default function ProfileList() {
       });
       const data = await res.json();
       if (data.success) {
-        if (data.items.length === 0) navigate("/profile/new")
+        if (data.items.length === 0) navigate("/profile/new");
         setItems(data.items);
         setCurrentId(Cookies.get("profile"));
       } else {
-        toast.error(data.error);
+        toast.error(data.error || t("toastFetchError"));
       }
     }
     get();
-  }, [navigate, setItems]);
+  }, [navigate, setItems, t]);
 
-  if (!items) return <></>
+  if (!items) return <></>;
 
   return (
     <>
       {items.map((p) => (
-        <ProfileListItem key={p.id} {...p} currentId={currentId} setCurrentId={setCurrentId} />
+        <ProfileListItem
+          key={p.id}
+          {...p}
+          currentId={currentId}
+          setCurrentId={setCurrentId}
+        />
       ))}
 
       <button
         onClick={() => navigate("/profile/new")}
         className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1"
       >
-        <UserPlus/> <p>New Profile</p>
+        <UserPlus/> <p>{t("newProfile")}</p>
       </button>
     </>
   );
 }
 
-
 function ProfileListItem({ id, accountId, username, currentId, setCurrentId}) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -64,7 +71,7 @@ function ProfileListItem({ id, accountId, username, currentId, setCurrentId}) {
             onClick={() => navigate("/profile/edit/" + accountId)}
             className="panel2 buttonstyle2 w-full flex centered space-x-1"
           >
-            <PencilRuler /> <p>Edit</p>
+            <PencilRuler /> <p>{t("edit")}</p>
           </button>
 
           {id === currentId ? (
@@ -72,19 +79,19 @@ function ProfileListItem({ id, accountId, username, currentId, setCurrentId}) {
               type="button"
               className="panel2 buttonstyle3 w-full flex centered space-x-1"
             >
-              <UserRoundCheck /> <p>Selected</p>
+              <UserRoundCheck /> <p>{t("selected")}</p>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => {
                 Cookies.set("profile", id, { expires: 365, path: "/" });
-                toast.success("Profile Selected");
+                toast.success(t("toastProfileSelected"));
                 setCurrentId(id);
               }}
               className="panel2 buttonstyle4 w-full flex centered space-x-1"
             >
-              <User /> <p>Select</p>
+              <User /> <p>{t("select")}</p>
             </button>
           )}
         </div>

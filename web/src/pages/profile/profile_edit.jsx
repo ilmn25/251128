@@ -6,15 +6,17 @@ import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
 import Cookies from "js-cookie";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileEdit() {
   const { accountId } = useParams();
   const [token, setToken] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   async function submit() {
     if (!token || !token.includes("."))
-      return toast.error("Please enter a valid token");
+      return toast.error(t("toastInvalidToken"));
 
     const res = await fetch(API_URL + "/profile", {
       method: "POST",
@@ -26,10 +28,10 @@ export default function ProfileEdit() {
     const data = await res.json();
     if (data.success) {
       Cookies.set("profile", accountId, { expires: 365, path: "/" });
-      toast.success("Changes saved sucessfully");
+      toast.success(t("toastSaveSuccess"));
       navigate("/profile");
     } else {
-      toast.error(data.error);
+      toast.error(data.error || t("toastSaveError"));
     }
   }
 
@@ -42,10 +44,10 @@ export default function ProfileEdit() {
 
     const data = await res.json();
     if (data.success) {
-      toast.success("Changes saved sucessfully");
+      toast.success(t("toastDeleteSuccess"));
       navigate("/profile");
     } else {
-      toast.error(data.error);
+      toast.error(data.error || t("toastDeleteError"));
     }
   }
 
@@ -53,19 +55,21 @@ export default function ProfileEdit() {
     <div>
       <div className="panel1 space-y-3">
         <div>
-          <p className="panel1-header py-1">{accountId? "Update Profile Token" : "New Profile"}</p>
+          <p className="panel1-header py-1">
+            {accountId ? t("updateProfileToken") : t("newProfile")}
+          </p>
           {accountId && <p className="comment">ID: {accountId}</p>}
         </div>
 
         <div className="panel2 flex space-x-4 !p-4">
-          <Shield className="comment !size-6"></Shield>
-          <div className="space-y-2" >
-            <p>Security Warning</p>
+          <Shield className="comment !size-6" />
+          <div className="space-y-2">
+            <p>{t("securityWarning")}</p>
             <ul className="comment list-disc pl-5 space-y-1">
-              <li>Your Discord token allows communicating with the Discord API to send messages, read messages, and more.</li>
-              <li>Tokens are encrypted before being stored in the cloud</li>
-              <li>Automated messaging (Self-Bots) may violate Discord's Terms of Service</li>
-              <li>Never share your token with anyone you don't trust</li>
+              <li>{t("securityLine1")}</li>
+              <li>{t("securityLine2")}</li>
+              <li>{t("securityLine3")}</li>
+              <li>{t("securityLine4")}</li>
             </ul>
           </div>
         </div>
@@ -76,18 +80,20 @@ export default function ProfileEdit() {
             type="password"
             value={token}
             onChange={(e) => setToken(e.target.value.trim())}
-            placeholder="Enter Discord Session Token and press Submit..."
+            placeholder={t("tokenPlaceholder")}
           />
         </div>
       </div>
 
       <div className="flex gap-3">
-        <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`} >
-          <SaveIcon></SaveIcon> <p>Save</p>
+        <button onClick={submit} className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1">
+          <SaveIcon /> <p>{t("save")}</p>
         </button>
-        {accountId && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
-          <Trash></Trash> <p>Delete</p>
-        </button>}
+        {accountId && (
+          <button onClick={Delete} className="panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1">
+            <Trash /> <p>{t("delete")}</p>
+          </button>
+        )}
       </div>
     </div>
   );

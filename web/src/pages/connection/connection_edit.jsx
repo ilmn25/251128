@@ -3,12 +3,14 @@ import React, {useEffect, useState} from "react";
 import {PencilRuler, Repeat, SaveIcon, Shuffle, ArrowBigRightDash, Trash} from "lucide-react";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
+import { useTranslation } from "react-i18next";
 
 const MODE = {
   DEFAULT: "DEFAULT",
   CHANNEL: "CHANNEL",
   COMPOSITION: "COMPOSITION",
-}
+};
+
 export default function ConnectionEdit() {
   const navigate = useNavigate();
   const {connectionId} = useParams();
@@ -18,6 +20,7 @@ export default function ConnectionEdit() {
   const [compositions, setCompositions] = useState([]);
   const [channels, setChannels] = useState([]);
   const [mode, setMode] = useState(MODE.DEFAULT);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function fetchChannelsAndCompositions() {
@@ -66,14 +69,14 @@ export default function ConnectionEdit() {
         setComposition(compositions.find(comp => comp.compositionId === data.item.compositionId));
       } else {
         navigate("/connection/new");
-        toast.error(data.error || "Failed to fetch connection info");
+        toast.error(data.error || t("toastFetchError"));
       }
     }
 
     if (channels.length > 0 && compositions.length > 0) {
       fetchConnection();
     }
-  }, [channels, compositions, connectionId, navigate]);
+  }, [channels, compositions, connectionId, navigate, t]);
 
   if (!composition || !channel) return null;
 
@@ -86,11 +89,11 @@ export default function ConnectionEdit() {
     });
     const data = await res.json();
     if (data.success){
-      toast.success("Changes saved successfully");
+      toast.success(t("toastSaveSuccess"));
       navigate("/connection");
     }
     else
-      toast.error(data.error || "Failed to save connection");
+      toast.error(data.error || t("toastSaveError"));
   }
 
   async function Delete() {
@@ -102,7 +105,7 @@ export default function ConnectionEdit() {
 
     const data = await res.json();
     if (data.success) {
-      toast.success("Changes saved sucessfully");
+      toast.success(t("toastDeleteSuccess"));
       navigate("/connection");
     } else {
       toast.error(data.error);
@@ -113,7 +116,7 @@ export default function ConnectionEdit() {
     <div>
       <div className="panel1 space-y-3 ">
         <div>
-          <p className="panel1-header">Connection</p>
+          <p className="panel1-header">{t("connection")}</p>
           {connectionId && <p className="comment">ID: {connectionId}</p>}
         </div>
 
@@ -143,7 +146,7 @@ export default function ConnectionEdit() {
                   onClick={() => setMode(MODE.CHANNEL)}
                   className="panel2 buttonstyle2 w-full flex centered space-x-1"
                 >
-                  <PencilRuler/> <p>Change</p>
+                  <PencilRuler/> <p>{t("change")}</p>
                 </button>
               </div>
             </div>
@@ -159,7 +162,7 @@ export default function ConnectionEdit() {
                   )}
                 </div>
                 <p className="comment">
-                  Select {composition.count} Attachments from {composition.attachmentsCount} Files to Send
+                  {t("selectAttachments", { count: composition.count, attachmentCount: composition.attachmentsCount })}
                 </p>
                 <p className="comment">ID: {composition.compositionId}</p>
               </div>
@@ -170,7 +173,7 @@ export default function ConnectionEdit() {
                   onClick={() => setMode(MODE.COMPOSITION)}
                   className="panel2 buttonstyle2 w-full flex centered space-x-1"
                 >
-                  <PencilRuler/> <p>Change</p>
+                  <PencilRuler/> <p>{t("change")}</p>
                 </button>
               </div>
             </div>
@@ -179,11 +182,11 @@ export default function ConnectionEdit() {
       </div>
 
       <div className="flex gap-3">
-        <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
-          <SaveIcon/> <p>Save</p>
+        <button onClick={submit} className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1">
+          <SaveIcon/> <p>{t("save")}</p>
         </button>
-        {connectionId && <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
-          <Trash></Trash> <p>Delete</p>
+        {connectionId && <button onClick={Delete} className="panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1">
+          <Trash/> <p>{t("delete")}</p>
         </button>}
       </div>
     </div>
@@ -191,6 +194,7 @@ export default function ConnectionEdit() {
 }
 
 function ChannelListItem({ item, setChannel, setMode }) {
+  const { t } = useTranslation();
   return (
     <div className="panel2 flex content-between centered gap-3 !py-0">
       <div className="w-full">
@@ -207,7 +211,7 @@ function ChannelListItem({ item, setChannel, setMode }) {
           }}
           className="panel2 buttonstyle4 w-full flex centered space-x-1"
         >
-          <ArrowBigRightDash/> <p>Select</p>
+          <ArrowBigRightDash/> <p>{t("select")}</p>
         </button>
       </div>
     </div>
@@ -215,6 +219,7 @@ function ChannelListItem({ item, setChannel, setMode }) {
 }
 
 function CompositionListItem({ item, setComposition, setMode }) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="panel2 flex content-between centered gap-3">
@@ -227,7 +232,9 @@ function CompositionListItem({ item, setComposition, setMode }) {
               <Repeat className="size-4"/>
             )}
           </div>
-          <p className="comment">Select {item.count} Attachments from {item.attachmentsCount} Files to Send</p>
+          <p className="comment">
+            {t("selectAttachments", { count: item.count, attachmentCount: item.attachmentsCount })}
+          </p>
           <p className="comment">ID: {item.compositionId}</p>
         </div>
 
@@ -240,7 +247,7 @@ function CompositionListItem({ item, setComposition, setMode }) {
             }}
             className="panel2 buttonstyle4 w-full flex centered space-x-1"
           >
-            <ArrowBigRightDash/> <p>Select</p>
+            <ArrowBigRightDash/> <p>{t("select")}</p>
           </button>
         </div>
       </div>

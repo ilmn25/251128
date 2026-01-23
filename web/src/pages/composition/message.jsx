@@ -1,29 +1,34 @@
 ﻿import TextareaAutosize from "react-textarea-autosize";
 import {X} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Message({ items, setItems }) {
+  const { t } = useTranslation();
+
   function add() {
     setItems(prevItems => [...prevItems, ""]);
   }
 
   function update(index, newText) {
-    if (!newText.trim()) remove(index)
-    else setItems(prevItems => {return prevItems.map((msg, i) => (i === index ? newText : msg))});
+    if (!newText.trim()) remove(index);
+    else setItems(prevItems => prevItems.map((msg, i) => (i === index ? newText : msg)));
   }
 
   function remove(index) {
-    return setItems(prevItems => {return prevItems.filter((_, i) => i !== index)});
+    return setItems(prevItems => prevItems.filter((_, i) => i !== index));
   }
 
   return (
     <div className="space-y-2">
-      <button className="panel2 buttonstyle1 centered w-full" onClick={() => add()}>Add</button>
+      <button className="panel2 buttonstyle1 centered w-full" onClick={add}>
+        {t("addMessage")}
+      </button>
 
       {items.map((text, i) => (
         <div key={i} className="relative">
           <TextareaAutosize
             className="panel2 input resize-none overflow-hidden"
-            placeholder={"Enter message"}
+            placeholder={t("enterMessage")}
             value={text}
             onChange={e => update(i, e.target.value)}
             spellCheck={false}

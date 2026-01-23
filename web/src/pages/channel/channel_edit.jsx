@@ -4,6 +4,7 @@ import Toggle from "../../components/toggle.jsx";
 import {SaveIcon, Trash} from "lucide-react";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
+import { useTranslation } from "react-i18next";
 
 export function ChannelEdit() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export function ChannelEdit() {
   const [attachmentPerm, setAttachmentPerm] = useState(true);
   const [linkFilter, setLinkFilter] = useState(false);
   const [mediaFilter, setMediaFilter] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function fetchData() {
@@ -25,7 +27,7 @@ export function ChannelEdit() {
         method: "GET",
         credentials: "include",
         headers: {"Content-Type": "application/json"},
-      })
+      });
 
       const data = await res.json();
       if (data.success) {
@@ -37,12 +39,12 @@ export function ChannelEdit() {
         setMediaFilter(data.item.mediaFilter);
       } else {
         navigate("/channel/new");
-        toast.error(data.error || "Failed to fetch channel info");
+        toast.error(data.error || t("toastFetchError"));
       }
     }
 
     fetchData();
-  }, [channelId, navigate]);
+  }, [channelId, navigate, t]);
 
   async function submit() {
     const res = await fetch(API_URL + "/channel/edit", {
@@ -53,11 +55,11 @@ export function ChannelEdit() {
     });
     const data = await res.json();
     if (data.success) {
-      toast.success("Changes added successfully");
+      toast.success(t("toastSubmitSuccess"));
       navigate("/channel");
+    } else {
+      toast.error(data.error || t("toastSubmitError"));
     }
-    else
-      toast.error(data.error || "Failed to submit channel");
   }
 
   async function Delete() {
@@ -69,7 +71,7 @@ export function ChannelEdit() {
 
     const data = await res.json();
     if (data.success) {
-      toast.success("Changes saved sucessfully");
+      toast.success(t("toastDeleteSuccess"));
       navigate("/channel");
     } else {
       toast.error(data.error);
@@ -79,42 +81,41 @@ export function ChannelEdit() {
   return (
     <div>
       <div className="panel1 space-y-3">
-        <p className="panel1-header">Editing {name}</p>
+        <p className="panel1-header">{t("editing")} {name}</p>
         <p className="comment">ID: {channelId}</p>
 
         <div className="panel2 space-y-3 !py-5">
-          <p className="panel1-subheader">Role Restrictions</p>
+          <p className="panel1-subheader">{t("roleRestrictions")}</p>
 
           <div className="flex justify-between text-neutral-400">
-            <span>Message cooldown</span>
+            <span>{t("messageCooldown")}</span>
             <span>{cooldown}s</span>
           </div>
 
           <div className="flex justify-between text-neutral-400">
-            <span>Has permissions to send attachments</span>
-            <span>{attachmentPerm ? "Yes" : "No"}</span>
+            <span>{t("attachmentPerm")}</span>
+            <span>{attachmentPerm ? t("yes") : t("no")}</span>
           </div>
 
-          <p className="panel1-subheader">Server Bot Filters</p>
+          <p className="panel1-subheader">{t("serverBotFilters")}</p>
           <div className="flex justify-between text-neutral-400">
-            <span>Has permissions to send attachments</span>
+            <span>{t("mediaPerm")}</span>
             <Toggle item={mediaFilter} setItem={setMediaFilter}/>
           </div>
 
           <div className="flex justify-between text-neutral-400">
-            <span>Has permissions to send links</span>
+            <span>{t("linkPerm")}</span>
             <Toggle item={linkFilter} setItem={setLinkFilter}/>
           </div>
-
         </div>
       </div>
 
       <div className="flex gap-3">
-        <button onClick={() => submit()} className={`panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1`}>
-          <SaveIcon></SaveIcon> <p>Submit</p>
+        <button onClick={submit} className="panel2 buttonstyle4 w-50 !my-5 flex centered space-x-1">
+          <SaveIcon /> <p>{t("submit")}</p>
         </button>
-        <button onClick={() => Delete()} className={`panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1`} >
-          <Trash></Trash> <p>Delete</p>
+        <button onClick={Delete} className="panel2 buttonstyle5 w-50 !my-5 flex centered space-x-1">
+          <Trash /> <p>{t("delete")}</p>
         </button>
       </div>
     </div>

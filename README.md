@@ -1,5 +1,6 @@
 ﻿# Discord Message Automation Tool
-Automate sending hiring posts on commission boards, sharing new social media posts, and more.
+- Automate sending hiring posts on commission boards, sharing new social media posts, and more!
+- Chinese and English localization
 
 ### Warning, This is Self-Botting!
 **This is against Discord Terms of Service**, BUT it's very hard for discord to detect or enforce (similar to how Vencord is also against TOS but never enforced).
