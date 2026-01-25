@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request
 from bson.objectid import ObjectId
 from pydantic import BaseModel
-import mongo, selfbot
+import services, selfbot
 from session import get_profile_from_request
 router = APIRouter()
 
@@ -18,9 +18,9 @@ async def channel_edit(data: ChannelEditData, request: Request):
         return {"success": False, "error": "Invalid Session"}
 
     # If id is provided and matches → update
-    channel = mongo.channels.find_one({"_id": ObjectId(data.id), "profileId": profile["_id"]})
+    channel = services.channels.find_one({"_id": ObjectId(data.id), "profileId": profile["_id"]})
     if channel:
-        mongo.channels.update_one(
+        services.channels.update_one(
             {"_id": channel["_id"]},
             {"$set": {
                 "linkFilter": data.linkFilter,
@@ -73,7 +73,7 @@ async def channel_new(data: ChannelNewData  , request: Request):
     else:
         return {"success": False, "error": "Channel invalid"}
 
-    mongo.channels.insert_one({
+    services.channels.insert_one({
         "channelId": data.id,
         "profileId": profile["_id"],
         "name": name,
@@ -93,7 +93,7 @@ async def channel_get(request: Request):
     if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    channels = mongo.channels.find({"profileId": profile["_id"]})
+    channels = services.channels.find({"profileId": profile["_id"]})
     data = []
     for channel in channels:
         data.append({
@@ -112,7 +112,7 @@ async def channel_get_one(request: Request, channel_id: str):
     if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    channel = mongo.channels.find_one({
+    channel = services.channels.find_one({
         "profileId": profile["_id"],
         "channelId": channel_id
     })
@@ -136,12 +136,12 @@ async def channel_delete(request: Request, channel_id: str):
     if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    channel = mongo.channels.find_one({
+    channel = services.channels.find_one({
         "_id": ObjectId(channel_id),
         "profileId": profile["_id"]
     })
     if not channel:
         return {"success": False, "error": "Channel not found"}
 
-    mongo.channels.delete_one({"_id": channel["_id"]})
+    services.channels.delete_one({"_id": channel["_id"]})
     return {"success": True}

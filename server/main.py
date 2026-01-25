@@ -9,10 +9,10 @@ from contextlib import asynccontextmanager
 from starlette.staticfiles import StaticFiles
 
 # ==================== DATABASE & ENCRYPTION ====================
-import mongo, session
+import services, session
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await mongo.connect()
+    await services.connect()
 
     client = boto3.client("secretsmanager", region_name=os.getenv("AWS_REGION_ID"))
     try:
@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
 
     session.cipher = Fernet(fernet_key.encode())
     yield
-    mongo.client.close()
+    services.client.close()
 
 # ==================== API ====================
 from router import attachment, user, composition, profile, channel, connection, send

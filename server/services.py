@@ -13,6 +13,10 @@ channels = None
 connections = None
 sessions = None
 
+AWS_S3_BUCKET_ID = os.getenv("AWS_S3_BUCKET_ID")
+AWS_REGION_ID = os.getenv("AWS_REGION_ID")
+AWS_S3_BUCKET_URL = f"https://{AWS_S3_BUCKET_ID}.s3.{AWS_REGION_ID}.amazonaws.com/"
+
 async def connect():
     global client, db, users, compositions, connections, channels, profiles, sessions
 

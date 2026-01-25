@@ -1,7 +1,7 @@
 ﻿from fastapi import APIRouter, Request
 from bson.objectid import ObjectId
 from pydantic import BaseModel
-import mongo
+import services
 from session import get_profile_from_request
 
 router = APIRouter()
@@ -20,9 +20,9 @@ async def connection_submit(data: ConnectionData, request: Request):
 
     # If id is provided and matches → update
     if data.id:
-        connection = mongo.connections.find_one({"_id": ObjectId(data.id)})
+        connection = services.connections.find_one({"_id": ObjectId(data.id)})
         if connection:
-            mongo.connections.update_one(
+            services.connections.update_one(
                 {"_id": connection["_id"]},
                 {"$set": {
                     "channelId": ObjectId(data.channelId),
@@ -32,7 +32,7 @@ async def connection_submit(data: ConnectionData, request: Request):
             return {"success": True}
 
     # Otherwise → insert new
-    mongo.connections.insert_one({
+    services.connections.insert_one({
         "profileId": profile["_id"],
         "channelId": ObjectId(data.channelId),
         "compositionId": ObjectId(data.compositionId),
@@ -47,9 +47,9 @@ async def connection_list(request: Request):
         return {"success": False, "error": "Invalid Session"}
 
     items = []
-    for conn in mongo.connections.find({"profileId": profile["_id"]}):
-        channel = mongo.channels.find_one({"_id": ObjectId(conn["channelId"])})
-        composition = mongo.compositions.find_one({"_id": ObjectId(conn["compositionId"])})
+    for conn in services.connections.find({"profileId": profile["_id"]}):
+        channel = services.channels.find_one({"_id": ObjectId(conn["channelId"])})
+        composition = services.compositions.find_one({"_id": ObjectId(conn["compositionId"])})
         items.append({
             "id": str(conn["_id"]),
             "channelId": str(conn["channelId"]),
@@ -66,7 +66,7 @@ async def connection_get_one(request: Request, connection_id: str):
     if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    conn = mongo.connections.find_one({
+    conn = services.connections.find_one({
         "_id": ObjectId(connection_id),
         "profileId": profile["_id"]
     })
@@ -88,13 +88,13 @@ async def connection_delete(request: Request, connection_id: str):
     if not profile:
         return {"success": False, "error": "Invalid Session"}
 
-    conn = mongo.connections.find_one({
+    conn = services.connections.find_one({
         "_id": ObjectId(connection_id),
         "profileId": profile["_id"]
     })
     if not conn:
         return {"success": False, "error": "Connection not found"}
 
-    mongo.connections.delete_one({"_id": conn["_id"]})
+    services.connections.delete_one({"_id": conn["_id"]})
 
     return {"success": True}

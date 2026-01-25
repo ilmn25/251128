@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from starlette.requests import Request
 import random
-import mongo, selfbot
+import services, selfbot
 from session import get_profile_from_request
 router = APIRouter()
 
@@ -12,15 +12,15 @@ async def send(request: Request, connectionId: str):
     if not profile:
         return {"success": False, "error": "Invalid Profile"}
 
-    connection = mongo.connections.find_one({
+    connection = services.connections.find_one({
         "_id": ObjectId(connectionId),
         "profileId": ObjectId(profile["_id"])
     })
     if not connection:
         return {"success": False, "error": "Connection not found"}
 
-    channel = mongo.channels.find_one({"_id": ObjectId(connection["channelId"])})
-    composition = mongo.compositions.find_one({"_id": ObjectId(connection["compositionId"])})
+    channel = services.channels.find_one({"_id": ObjectId(connection["channelId"])})
+    composition = services.compositions.find_one({"_id": ObjectId(connection["compositionId"])})
 
     bot = await selfbot.get_bot(profile["_id"])
 

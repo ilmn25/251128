@@ -1,7 +1,7 @@
 ﻿from fastapi import APIRouter, Request
 from bson.objectid import ObjectId
 from pydantic import BaseModel
-import mongo
+import services
 from session import get_user_from_request
 
 router = APIRouter()
@@ -22,9 +22,9 @@ async def composition_submit(data: CompositionData, request: Request):
 
     # If id is provided and matches → update
     if data.compositionId:
-        composition = mongo.compositions.find_one({"_id": ObjectId(data.compositionId), "userId": user["_id"]})
+        composition = services.compositions.find_one({"_id": ObjectId(data.compositionId), "userId": user["_id"]})
         if composition:
-            mongo.compositions.update_one(
+            services.compositions.update_one(
                 {"_id": composition["_id"]},
                 {"$set": {
                     "messages": data.messages,
@@ -36,7 +36,7 @@ async def composition_submit(data: CompositionData, request: Request):
             return {"success": True}
 
     # Otherwise → insert new
-    mongo.compositions.insert_one({
+    services.compositions.insert_one({
         "userId": user["_id"],
         "messages": data.messages,
         "attachments": data.attachments,
@@ -53,7 +53,7 @@ async def composition_list(request: Request):
     if not user:
         return {"success": False, "error": "Invalid session"}
 
-    compositions = mongo.compositions.find({"userId": user["_id"]})
+    compositions = services.compositions.find({"userId": user["_id"]})
     data = []
     for composition in compositions:
         data.append({
@@ -74,7 +74,7 @@ async def get_composition(request: Request, composition_id: str):
     if not user:
         return {"success": False, "error": "Invalid session"}
 
-    composition = mongo.compositions.find_one({
+    composition = services.compositions.find_one({
         "_id": ObjectId(composition_id),
         "userId": user["_id"]
     })
@@ -97,13 +97,13 @@ async def delete_composition(request: Request, composition_id: str):
     if not user:
         return {"success": False, "error": "Invalid session"}
 
-    composition = mongo.compositions.find_one({
+    composition = services.compositions.find_one({
         "_id": ObjectId(composition_id),
         "userId": user["_id"]
     })
     if not composition:
         return {"success": False, "error": "Composition not found"}
 
-    mongo.compositions.delete_one({"_id": composition["_id"]})
+    services.compositions.delete_one({"_id": composition["_id"]})
 
     return {"success": True}

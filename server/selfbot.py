@@ -1,9 +1,8 @@
 ﻿import io, os, discord, aiohttp ,asyncio
 from discord.ext import commands
 from bson import ObjectId
-import mongo, session
+import services, session
 
-S3_BUCKET_URL = os.getenv("S3_BUCKET_URL")
 
 class Main(commands.Bot):
     def __init__(self):
@@ -20,17 +19,12 @@ class Main(commands.Bot):
             files = []
             async with aiohttp.ClientSession() as session_http:
                 for attachment in attachments:
-                    url = f"{S3_BUCKET_URL}{attachment['url']}"
+                    url = f"{attachment['url']}"
                     async with session_http.get(url) as resp:
                         if resp.status != 200:
                             raise Exception(f"Failed to fetch {url}")
                         data = await resp.read()
-                        files.append(
-                            discord.File(
-                                fp=discord.File(io.BytesIO(data), filename=attachment["name"]).fp,
-                                filename=attachment["name"]
-                            )
-                        )
+                        files.append(discord.File(io.BytesIO(data), filename=attachment["name"]))
 
             await channel.send(message, files=files)
             await asyncio.sleep(2)
@@ -59,7 +53,7 @@ async def get_bot(profileId):
     if profileId in bots:
         return bots[profileId]
     else:
-        profile = mongo.profiles.find_one({"_id": ObjectId(profileId)})
+        profile = services.profiles.find_one({"_id": ObjectId(profileId)})
         if not profile:
             return None
         bot = Main()

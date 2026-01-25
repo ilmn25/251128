@@ -3,7 +3,7 @@ from session import get_user_from_request
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-import mongo, selfbot, session
+import services, selfbot, session
 router = APIRouter()
 
 class ProfileData(BaseModel):
@@ -23,9 +23,9 @@ async def profile_post(data: ProfileData, request: Request):
     # If id is provided and matches → update
     if data.accountId:
         print(data.accountId)
-        profile = mongo.profiles.find_one({"accountId": data.accountId, "userId": user["_id"]})
+        profile = services.profiles.find_one({"accountId": data.accountId, "userId": user["_id"]})
         if profile:
-            mongo.profiles.update_one(
+            services.profiles.update_one(
                 {"_id": profile["_id"]},
                 {"$set": {
                     "token": session.cipher.encrypt(data.token.encode()).decode(),
@@ -35,7 +35,7 @@ async def profile_post(data: ProfileData, request: Request):
             return {"success": True}
 
     # Otherwise → insert new
-    mongo.profiles.insert_one({
+    services.profiles.insert_one({
         "accountId": str(bot.user.id),
         "userId": user["_id"],
         "token": session.cipher.encrypt(data.token.encode()).decode(),
@@ -50,7 +50,7 @@ async def profiles_get(request: Request):
     if not user:
         return {"success": False, "error": "Invalid session"}
 
-    profiles = mongo.profiles.find({"userId": user["_id"]})
+    profiles = services.profiles.find({"userId": user["_id"]})
     data = []
     for profile in profiles:
         data.append({
@@ -68,7 +68,7 @@ async def profile_delete(request: Request, profile_id: str):
         return {"success": False, "error": "Invalid session"}
 
     # Find the profile belonging to this user
-    profile = mongo.profiles.find_one({
+    profile = services.profiles.find_one({
         "_id": ObjectId(profile_id),
         "userId": user["_id"]
     })
@@ -76,6 +76,6 @@ async def profile_delete(request: Request, profile_id: str):
         return {"success": False, "error": "Profile not found"}
 
     # Delete it
-    mongo.profiles.delete_one({"_id": profile["_id"]})
+    services.profiles.delete_one({"_id": profile["_id"]})
 
     return {"success": True}
