@@ -5,8 +5,8 @@
 ### Warning, This is Self-Botting!
 **This is against Discord Terms of Service**, BUT it's very hard for discord to detect or enforce (similar to how Vencord is also against TOS but never enforced).
 Use only if you are fine with the risks involved~
-## Stack
 
+## Stack
 | Section    | Purpose                                                               |
 |------------|-----------------------------------------------------------------------| 
 | `/server`  | FastAPI, Python                                                       |
@@ -19,10 +19,12 @@ Use only if you are fine with the risks involved~
 
 ## Hosting
 - Hosted on AWS ECS Fargate, with Docker images pushed to and from ECR 
-- Static SPA frontend is served directly from ECS. 
+- Static SPA frontend is served directly from ECS.
 
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ca281e98-75c2-46c5-8e29-122819a46c88" />
-<img width="780" height="717" alt="image" src="https://github.com/user-attachments/assets/42b51422-1d7b-42f2-8015-574e1afdf790" />
+[![Demo](https://github.com/user-attachments/assets/8a491894-6bf5-447b-9360-4fb38e315e24)](https://youtu.be/F0IlZSnug6Q)  
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9334ed3a-f8c1-46d4-8f9a-6805f5cad087" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/42b51422-1d7b-42f2-8015-574e1afdf790" />
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/1bcc52cd-016e-48f2-a989-bf0323dc3b82" />
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/78829219-57c2-4503-8fee-f9748c8abf30" />
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8bfa174b-441d-4a5b-8fdf-00ddcb526c5d" />
