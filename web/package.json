@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "i18next-browser-languagedetector": "^8.2.0",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",

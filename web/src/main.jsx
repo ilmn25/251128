@@ -42,12 +42,35 @@ function LanguageToggle() {
         EN
       </button>
       <button
-        onClick={() => changeLanguage("zh")}
+        onClick={() => changeLanguage("ja")}
         className={`panel2 px-3 py-1 rounded ${
-          i18n.language === "zh" ? "buttonstyle3" : "buttonstyle2"
+          i18n.language === "ja" ? "buttonstyle3" : "buttonstyle2"
         }`}
       >
-        中
+        日
+      </button>
+      <button
+        onClick={() => changeLanguage("zh-TW")}
+        className={`panel2 px-3 py-1 rounded ${
+          i18n.language === "zh-TW" ? "buttonstyle3" : "buttonstyle2"
+        }`}
+      >
+        繁中
+      </button>
+      <button
+        onClick={() => changeLanguage("zh-CN")}
+        className={`panel2 px-3 py-1 rounded ${
+          i18n.language === "zh-CN" ? "buttonstyle3" : "buttonstyle2"
+        }`}
+      >
+        简中
+      </button>
+      <button onClick={() => changeLanguage("ko")}
+              className={`panel2 px-3 py-1 rounded ${
+                i18n.language === "ko" ? "buttonstyle3" : "buttonstyle2"
+              }`}
+      >
+        한
       </button>
     </div>
   );
