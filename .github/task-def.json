@@ -1,0 +1,26 @@
+﻿{
+  "family": "discord-tool-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "discord-tool",
+      "image": "826396702998.dkr.ecr.ap-southeast-2.amazonaws.com/discord-tool:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "AWS_S3_BUCKET_ID", "value": "discord-tool-bucket" },
+        { "name": "AWS_REGION_ID", "value": "ap-southeast-2" },
+        { "name": "MONGO_SECRET_ID", "value": "discord-tool/mongo-uri" },
+        { "name": "FERNET_SECRET_ID", "value": "discord-tool/fernet-key" }
+      ]
+    }
+  ]
+}
