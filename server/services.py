@@ -11,6 +11,7 @@ profiles = None
 channels = None
 connections = None
 sessions = None
+media = None
 
 BASE_DIR = os.path.dirname(__file__)
 UPLOADS_DIR = os.getenv("UPLOADS_DIR", os.path.join(BASE_DIR, "static", "uploads"))
@@ -20,7 +21,7 @@ MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "dev")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 async def connect():
-    global client, db, users, compositions, connections, channels, profiles, sessions
+    global client, db, users, compositions, connections, channels, profiles, sessions, media
 
     print("MongoDB Connecting")
 
@@ -42,5 +43,6 @@ async def connect():
     profiles = db["profiles"]
     connections = db["connections"]
     sessions = db["sessions"]
+    media = db["media"]
 
     print("MongoDB Connected")

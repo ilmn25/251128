@@ -3,6 +3,7 @@
 import {SaveIcon, Shuffle, Hash, CopyPlus, Trash} from "lucide-react";
 import Message from './message.jsx';
 import Attachment from "./attachment.jsx";
+import Media from "./media.jsx";
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner";
@@ -14,16 +15,17 @@ export default function CompositionEdit() {
   const {compositionId} = useParams();
   const [messages, setMessages] = useState([]);
   const [attachments, setAttachments] = useState([]);
+  const [media, setMedia] = useState([]);
   const [randomize, setRandomize] = useState(false);
   const [count, setCount] = useState(1);
   const { t } = useTranslation();
 
   useEffect(() => {
-    async function get() {
+    async function loadComposition() {
       if (!compositionId) {
-        navigate("/composition/new");
         return;
       }
+
       const res = await fetch(API_URL + "/composition/" + compositionId, {
         method: "GET",
         credentials: "include",
@@ -31,23 +33,39 @@ export default function CompositionEdit() {
       });
 
       const data = await res.json();
-      if (data.success) {
-        setMessages(data.item.messages);
-        setAttachments(data.item.attachments);
-        setRandomize(data.item.randomize);
-        setCount(data.item.count);
-      } else {
+      if (!data.success) {
         toast.error(data.error || t("toastFetchError"));
         navigate("/composition");
+        return;
+      }
+
+      setMessages(data.item.messages);
+      setAttachments(data.item.attachments);
+      setRandomize(data.item.randomize);
+      setCount(data.item.count);
+    }
+
+    async function loadMedia() {
+      const res = await fetch(API_URL + "/attachment/media", {
+        method: "GET",
+        credentials: "include",
+        headers: {"Content-Type": "application/json"},
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMedia(data.items);
       }
     }
-    get();
+
+    loadComposition();
+    loadMedia();
   }, [compositionId, navigate, t]);
 
   async function submit(saveAs) {
     const attachmentsNew = await Promise.all(
       attachments.map(async ({ file, ...rest }) =>
-        file ? { ...rest, url: await upload(file) } : rest
+        file ? { ...rest, ...(await upload(file)) } : rest
       )
     );
 
@@ -83,8 +101,48 @@ export default function CompositionEdit() {
         body: formData
       });
       const data = await res.json();
-      return data.url;
+      return data.item;
     }
+  }
+
+  async function uploadMedia(files) {
+    const uploadedItems = [];
+
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(API_URL + "/attachment", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.item) {
+        uploadedItems.push(data.item);
+      }
+    }
+
+    if (uploadedItems.length > 0) {
+      setMedia(prev => [...uploadedItems, ...prev]);
+      setAttachments(prev => [...uploadedItems, ...prev]);
+    }
+  }
+
+  async function deleteMedia(item) {
+    const res = await fetch(API_URL + "/attachment/media/" + item.mediaId, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      setMedia(prev => prev.filter(mediaItem => mediaItem.mediaId !== item.mediaId));
+      setAttachments(prev => prev.filter(attachment => (attachment.mediaId || attachment.url) !== (item.mediaId || item.url)));
+      return;
+    }
+
+    toast.error(data.error || t("toastDeleteError"));
   }
 
   async function Delete() {
@@ -119,6 +177,14 @@ export default function CompositionEdit() {
           </button>
         </div>
         <Attachment items={attachments} setItems={setAttachments} />
+        <p className="panel1-subheader">{t("media")}</p>
+        <Media
+          items={media}
+          selectedItems={attachments}
+          setSelectedItems={setAttachments}
+          onUpload={uploadMedia}
+          onDelete={deleteMedia}
+        />
       </div>
 
       <div className="flex gap-3">

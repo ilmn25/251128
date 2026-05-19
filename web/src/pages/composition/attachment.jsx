@@ -1,26 +1,15 @@
-﻿import { useRef } from "react";
-import { FileText, X} from "lucide-react";
+﻿import { FileText, X } from "lucide-react";
 import {useTranslation} from "react-i18next";
 
 export default function Attachment({items, setItems}) {
-  const fileInputRef = useRef(null);
   const { t } = useTranslation();
 
-  function add(e) {
-    const files = Array.from(e.target.files);
-    const newItems = files.map(file => ({
-      url: URL.createObjectURL(file),
-      name: file.name,
-      ext: file.name.split(".").pop().toLowerCase(),
-      size: formatSize(file.size),
-      file: file,
-    }));
-    setItems(prev => [...newItems, ...prev]);
+  function getItemKey(item) {
+    return item.mediaId || item.id || item.url;
   }
 
-  function remove(url) {
-    setItems(prev => prev.filter(item => item.url !== url));
-    URL.revokeObjectURL(url); // free memoryq
+  function remove(item) {
+    setItems(prev => prev.filter(current => getItemKey(current) !== getItemKey(item)));
   }
 
   function formatSize(bytes) {
@@ -32,32 +21,14 @@ export default function Attachment({items, setItems}) {
 
   return (
     <div className="space-y-4">
-      <div className="panel2 buttonstyle1 centered">
-        <button onClick={() => fileInputRef.current.click()}>
-          {t("upload")}
-        </button>
-        <input
-          type="file"
-          multiple
-          ref={fileInputRef}
-          onChange={add}
-          style={{ display: "none" }}
-        />
-      </div>
-
       <div className="flex flex-wrap gap-3">
         {items.map(item => {
-          const isImage = [
-            "png","jpg","jpeg","gif","webp","jfif","bmp","tiff","tif",
-            "svg","heic","heif","ico","raw","psd"
-          ].includes(item.ext);
-          const isVideo = [
-            "mp4","mov","webm","avi","mkv","flv","wmv","mpeg","mpg",
-            "3gp","m4v","ts","vob"
-          ].includes(item.ext);
+          const ext = (item.ext || item.name?.split(".").pop() || "").toLowerCase();
+          const isImage = ["png","jpg","jpeg","gif","webp","jfif","bmp","tiff","tif","svg","heic","heif","ico","raw","psd"].includes(ext);
+          const isVideo = ["mp4","mov","webm","avi","mkv","flv","wmv","mpeg","mpg","3gp","m4v","ts","vob"].includes(ext);
 
           return (
-            <div key={item.url} className="relative h-40 w-40 aspect-square">
+            <div key={getItemKey(item)} className="relative h-40 w-40 aspect-square">
               {isImage ? (
                 <img
                   src={item.url}
@@ -74,12 +45,12 @@ export default function Attachment({items, setItems}) {
                 <div className="panel2 flex flex-col items-center justify-center space-y-2 rounded-lg w-full h-full">
                   <FileText className="text-neutral-500 w-8 h-8" />
                   <p className="text-xs break-all text-center">{item.name}</p>
-                  <p className="text-xs text-neutral-500">{item.size}</p>
+                  <p className="text-xs text-neutral-500">{item.sizeBytes ? formatSize(item.sizeBytes) : ""}</p>
                 </div>
               )}
 
               <button
-                onClick={() => remove(item.url)}
+                onClick={() => remove(item)}
                 className="absolute top-2 right-2 p-1 rounded bg-black/50 hover:bg-neutral-800"
               >
                 <X className="w-4 h-4 text-neutral-300"/>
