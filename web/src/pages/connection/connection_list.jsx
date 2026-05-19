@@ -59,15 +59,12 @@ export default function ConnectionList() {
   }, [filteredItems]);
 
   async function send(id) {
-    setLoading(true);
-    const res = await fetch(API_URL + "/send/" + id, {
-      method: "POST",
-      credentials: "include"
+    navigate("/connection/status", { 
+      state: { 
+        connectionIds: [id],
+        connections: items.filter(item => item.id === id)
+      } 
     });
-    const data = await res.json();
-    if (data.success) toast.success(t("toastMessageSent"));
-    else toast.error(data.error || t("toastSendError"));
-    setLoading(false);
   }
 
   function toggleSelected(id) {
@@ -88,23 +85,12 @@ export default function ConnectionList() {
       return;
     }
 
-    setBatchLoading(true);
-    const res = await fetch(API_URL + "/send/batch", {
-      method: "POST",
-      credentials: "include",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({connectionIds: selectedIds}),
+    navigate("/connection/status", { 
+      state: { 
+        connectionIds: selectedIds,
+        connections: filteredItems.filter(item => selectedIds.includes(item.id))
+      } 
     });
-
-    const data = await res.json();
-    if (data.success) {
-      toast.success(t("toastBatchSendSuccess", {count: data.successCount}));
-    } else if (data.successCount > 0) {
-      toast.success(t("toastBatchSendPartial", {success: data.successCount, fail: data.failCount}));
-    } else {
-      toast.error(data.error || t("toastBatchSendError"));
-    }
-    setBatchLoading(false);
   }
 
   if (!items) return <></>;

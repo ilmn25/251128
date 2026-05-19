@@ -48,7 +48,7 @@ async def create_attachment(request: Request, file: UploadFile = File(...)):
     return {"success": True, "item": build_media_item(request, record)}
 
 
-@router.get("/media")
+@router.get("/attachment/media")
 async def list_media(request: Request):
     user = get_user_from_request(request)
     if not user:
@@ -61,7 +61,7 @@ async def list_media(request: Request):
     return {"success": True, "items": items}
 
 
-@router.delete("/media/{media_id}")
+@router.delete("/attachment/media/{media_id}")
 async def delete_media(request: Request, media_id: str):
     user = get_user_from_request(request)
     if not user:

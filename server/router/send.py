@@ -43,6 +43,12 @@ async def send_connection(profile, connection_id: str):
 
     message = random.choice(composition["messages"])
 
+    if not channel.get("linkFilter"):
+        message = message.replace("https://", "").replace("http://", "")
+
+    if not channel.get("mediaFilter") or not channel.get("attachmentPerm"):
+        attachments = []
+
     return await bot.post(
         channel_id=channel["channelId"],
         attachments=attachments,
