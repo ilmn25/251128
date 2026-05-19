@@ -12,14 +12,17 @@ Use only if you are fine with the risks involved~
 | `/server`  | FastAPI, Python                                                       |
 | `/web`     | React, Tailwind, JSX                                                  |
 | `Database` | MongoDB                                                               |
-| `Storage`  | AWS S3                                                                |
-| `Keys`     | AWS Secrets Manager                                                   |
-| `Hosting`  | AWS ECS Fargate, AWS ECR, Docker                                      |
+| `Storage`  | Local filesystem                                                      |
+| `Keys`     | Local file or `FERNET_KEY` environment variable                       |
+| `Hosting`  | Docker, Docker Compose                                                |
 | `Discord`  | [dolfies/discord.py-self](https://github.com/dolfies/discord.py-self) |
 
-## Hosting
-- Hosted on AWS ECS Fargate, with Docker images pushed to and from ECR 
-- Static SPA frontend is served directly from ECS.
+## Local Run
+1. Install Docker and Docker Compose.
+2. Start the stack with `docker compose up --build`.
+3. Open `http://localhost:8000` in your browser.
+
+Uploads are stored under `server/static/uploads` and the Fernet key is persisted in `server/data/fernet.key` when you run locally without Docker. If you prefer environment variables, set `MONGO_URI` and `FERNET_KEY` before starting the server.
 
 [![Demo](https://github.com/user-attachments/assets/8a491894-6bf5-447b-9360-4fb38e315e24)](https://youtu.be/F0IlZSnug6Q)  
 

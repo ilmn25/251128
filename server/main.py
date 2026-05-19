@@ -1,6 +1,5 @@
 ﻿import os, uvicorn
 
-import boto3
 from cryptography.fernet import Fernet
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,17 +9,33 @@ from starlette.staticfiles import StaticFiles
 
 # ==================== DATABASE & ENCRYPTION ====================
 import services, session
+
+
+def load_fernet_key() -> str:
+    key = os.getenv("FERNET_KEY")
+    if key:
+        return key
+
+    key_path = os.getenv("FERNET_KEY_PATH", os.path.join(os.path.dirname(__file__), "data", "fernet.key"))
+    key_dir = os.path.dirname(key_path)
+    if key_dir:
+        os.makedirs(key_dir, exist_ok=True)
+
+    if os.path.exists(key_path):
+        with open(key_path, "r", encoding="utf-8") as file:
+            return file.read().strip()
+
+    key = Fernet.generate_key().decode()
+    with open(key_path, "w", encoding="utf-8") as file:
+        file.write(key)
+    return key
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await services.connect()
 
-    client = boto3.client("secretsmanager", region_name=os.getenv("AWS_REGION_ID"))
-    try:
-        fernet_key = client.get_secret_value(SecretId=os.getenv("FERNET_SECRET_ID"))["SecretString"]
-    except client.exceptions.ResourceNotFoundException:
-        fernet_key = Fernet.generate_key().decode()
-        client.create_secret(Name=os.getenv("FERNET_SECRET_ID"), SecretString=fernet_key)
-
+    fernet_key = load_fernet_key()
     session.cipher = Fernet(fernet_key.encode())
     yield
     services.client.close()

@@ -14,8 +14,6 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
 # run pip freeze > requirements.txt first
 COPY server/requirements.txt .
 RUN pip install -r requirements.txt
@@ -24,9 +22,9 @@ RUN pip install -r requirements.txt
 COPY server .
 COPY --from=frontend /web/dist ./static
 
-ENV AWS_S3_BUCKET_ID=discord-tool-bucket
-ENV AWS_REGION_ID=ap-southeast-2
-ENV MONGO_SECRET_ID=discord-tool/mongo-uri
-ENV FERNET_SECRET_ID=discord-tool/fernet-key
+ENV MONGO_URI=mongodb://mongo:27017/dev
+ENV MONGO_DB_NAME=dev
+ENV UPLOADS_DIR=/app/static/uploads
+ENV FERNET_KEY_PATH=/app/data/fernet.key
 EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,32 +1,28 @@
-﻿networks:
-  credentials_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: "169.254.170.0/24"
-
-services:
-  ecs-local-endpoints:
-    image: amazon/amazon-ecs-local-container-endpoints
+﻿services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
     volumes:
-      - /var/run:/var/run
-      - /c/Users/user/.aws:/home/.aws:ro
-    environment:
-      AWS_PROFILE: "ilmn25"
-    networks:
-      credentials_network:
-        ipv4_address: 169.254.170.2
+      - mongo_data:/data/db
 
   app:
     build: .
     ports:
-      - "80:80"
+      - "8000:8000"
     depends_on:
-      - ecs-local-endpoints
-    networks:
-      credentials_network:
-        ipv4_address: 169.254.170.3
+      - mongo
     environment:
-      AWS_DEFAULT_REGION: "ap-southeast-2"
-      AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: "/creds"
-      ECS_CONTAINER_METADATA_URI_V4: "http://169.254.170.2/v4"
+      MONGO_URI: "mongodb://mongo:27017/dev"
+      MONGO_DB_NAME: "dev"
+      UPLOADS_DIR: "/app/static/uploads"
+      FERNET_KEY_PATH: "/app/data/fernet.key"
+    volumes:
+      - app_data:/app/data
+      - app_uploads:/app/static/uploads
+
+volumes:
+  mongo_data:
+  app_data:
+  app_uploads:

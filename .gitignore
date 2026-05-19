@@ -8,3 +8,5 @@
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
 /.env
+/.idea/awsToolkit.xml
+/.idea/copilot.data.migration.agent.xml
