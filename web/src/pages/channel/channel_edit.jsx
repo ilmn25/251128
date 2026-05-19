@@ -56,7 +56,7 @@ export function ChannelEdit() {
     const data = await res.json();
     if (data.success) {
       toast.success(t("toastSubmitSuccess"));
-      navigate("/channel");
+      navigate("/profile");
     } else {
       toast.error(data.error || t("toastSubmitError"));
     }
@@ -72,7 +72,7 @@ export function ChannelEdit() {
     const data = await res.json();
     if (data.success) {
       toast.success(t("toastDeleteSuccess"));
-      navigate("/channel");
+      navigate("/profile");
     } else {
       toast.error(data.error);
     }

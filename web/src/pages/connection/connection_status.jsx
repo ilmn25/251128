@@ -259,7 +259,7 @@ export default function ConnectionStatus() {
       <div className="flex items-center justify-between">
         <button 
           disabled={isSending}
-          onClick={() => navigate("/connection")} 
+          onClick={() => navigate("/composition")} 
           className="panel2 buttonstyle2 flex items-center gap-2 px-4 py-2 disabled:opacity-50"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -398,7 +398,7 @@ export default function ConnectionStatus() {
       {currentIndex >= results.length && results.length > 0 && (
         <div className="flex justify-center pt-4">
           <button 
-            onClick={() => navigate("/connection")} 
+            onClick={() => navigate("/composition")} 
             className="panel2 buttonstyle4 flex items-center gap-2 px-8 py-3"
           >
             {t("finish")}

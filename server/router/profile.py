@@ -49,13 +49,29 @@ async def profiles_get(request: Request):
     if not user:
         return {"success": False, "error": "Invalid session"}
 
-    profiles = services.profiles.find({"userId": user["_id"]})
+    profiles = list(services.profiles.find({"userId": user["_id"]}))
+    profile_ids = [p["_id"] for p in profiles]
+    
+    # Fetch all channels for all these profiles in one query
+    all_channels = list(services.channels.find({"profileId": {"$in": profile_ids}}))
+    
     data = []
     for profile in profiles:
+        # Filter channels belonging to this profile
+        profile_channels = [
+            {
+                "id": str(ch["_id"]),
+                "channelId": ch["channelId"],
+                "name": ch["name"]
+            }
+            for ch in all_channels if ch["profileId"] == profile["_id"]
+        ]
+        
         data.append({
             "id": str(profile["_id"]),
             "accountId": profile["accountId"],
             "username": profile["username"],
+            "channels": profile_channels
         })
 
     return {"success": True, "items": data}

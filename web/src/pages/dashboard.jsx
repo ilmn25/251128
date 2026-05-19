@@ -65,18 +65,6 @@ export default function Dashboard() {
           >
             {t("profile")}
           </button>
-          <button
-            onClick={() => navigate("/channel")}
-            className={`panel1 ${location.pathname === "/channel" ? "buttonstyle3" : "buttonstyle2"}`}
-          >
-            {t("channel")}
-          </button>
-          <button
-            onClick={() => navigate("/connection")}
-            className={`panel1 ${location.pathname === "/connection" ? "buttonstyle3" : "buttonstyle2"}`}
-          >
-            {t("connection")}
-          </button>
         </div>
       </div>
 

@@ -114,7 +114,7 @@ async def channel_get_one(request: Request, channel_id: str):
 
     channel = services.channels.find_one({
         "profileId": profile["_id"],
-        "channelId": channel_id
+        "_id": ObjectId(channel_id)
     })
     if not channel:
         return {"success": False, "error": "Channel not found"}
