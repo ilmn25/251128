@@ -59,12 +59,13 @@ export default function ConnectionList() {
   }, [filteredItems]);
 
   async function send(id) {
+    const connection = items.find(item => item.id === id);
     navigate("/connection/status", { 
       state: { 
         connectionIds: [id],
-        connections: items.filter(item => item.id === id),
+        connections: [connection],
         compositions: compositions,
-        profileName: items.find(item => item.id === id)?.profileName // We might need this from somewhere
+        profileName: connection?.profileName
       } 
     });
   }
@@ -87,11 +88,13 @@ export default function ConnectionList() {
       return;
     }
 
+    const selectedConnections = filteredItems.filter(item => selectedIds.includes(item.id));
     navigate("/connection/status", { 
       state: { 
         connectionIds: selectedIds,
-        connections: filteredItems.filter(item => selectedIds.includes(item.id)),
-        compositions: compositions
+        connections: selectedConnections,
+        compositions: compositions,
+        profileName: selectedConnections[0]?.profileName
       } 
     });
   }

@@ -1,6 +1,6 @@
 ﻿import '../../index.css';
 
-import {SaveIcon, Shuffle, Hash, CopyPlus, Trash, Eye} from "lucide-react";
+import {SaveIcon, Shuffle, Hash, CopyPlus, Trash, Eye, RefreshCw} from "lucide-react";
 import Message from './message.jsx';
 import Attachment from "./attachment.jsx";
 import Media from "./media.jsx";
@@ -158,7 +158,47 @@ export default function CompositionEdit() {
   const [randomize, setRandomize] = useState(false);
   const [count, setCount] = useState(1);
   const [profile, setProfile] = useState(null);
+  const [previewData, setPreviewData] = useState({ message: "", attachments: [] });
   const { t } = useTranslation();
+
+  useEffect(() => {
+    function updatePreview() {
+      if (messages.length === 0) {
+        setPreviewData({ message: "", attachments: [] });
+        return;
+      }
+
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      let atts = [];
+      if (attachments.length > 0) {
+        const selectedCount = Math.min(count, attachments.length);
+        if (randomize) {
+          atts = [...attachments].sort(() => 0.5 - Math.random()).slice(0, selectedCount);
+        } else {
+          atts = attachments.slice(0, selectedCount);
+        }
+      }
+      setPreviewData({ message: msg, attachments: atts });
+    }
+
+    updatePreview();
+    // We only want to update automatically when the base data changes meaningfully
+  }, [messages.length, attachments.length, count, randomize]);
+
+  const regeneratePreview = () => {
+    if (messages.length === 0) return;
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    let atts = [];
+    if (attachments.length > 0) {
+      const selectedCount = Math.min(count, attachments.length);
+      if (randomize) {
+        atts = [...attachments].sort(() => 0.5 - Math.random()).slice(0, selectedCount);
+      } else {
+        atts = attachments.slice(0, selectedCount);
+      }
+    }
+    setPreviewData({ message: msg, attachments: atts });
+  };
 
   useEffect(() => {
     async function loadComposition() {
@@ -342,9 +382,18 @@ export default function CompositionEdit() {
         
         <p className="panel1-subheader mt-6">{t("preview")}</p>
         <div className="panel2 bg-neutral-900/50 space-y-4 max-w-2xl">
-          <div className="flex items-center gap-2 text-neutral-400 mb-2">
-            <Eye className="w-4 h-4" />
-            <span className="text-xs uppercase tracking-wider font-semibold">{t("discordPreview")}</span>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-neutral-400">
+              <Eye className="w-4 h-4" />
+              <span className="text-xs uppercase tracking-wider font-semibold">{t("discordPreview")}</span>
+            </div>
+            <button 
+              onClick={regeneratePreview}
+              className="p-1 hover:bg-neutral-800 rounded transition-colors text-neutral-400 hover:text-white"
+              title={t("regenerate")}
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
           </div>
           
           <div className="flex gap-4">
@@ -359,9 +408,9 @@ export default function CompositionEdit() {
                 <span className="text-xs text-neutral-500">Today at 12:00 PM</span>
               </div>
               <div className="text-sm whitespace-pre-wrap break-all">
-                {messages.length > 0 ? messages[0] : <span className="text-neutral-600 italic">{t("noMessageContent")}</span>}
+                {previewData.message ? previewData.message : <span className="text-neutral-600 italic">{t("noMessageContent")}</span>}
               </div>
-              <DiscordAttachmentGrid attachments={attachments.slice(0, count)} />
+              <DiscordAttachmentGrid attachments={previewData.attachments} />
             </div>
           </div>
         </div>

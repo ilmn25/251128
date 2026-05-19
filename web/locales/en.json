@@ -44,6 +44,7 @@
   "sendingLog": "Sending Log",
   "preparingBatch": "Preparing batch...",
   "preview": "Preview",
+  "regenerate": "Regenerate Preview",
   "discordPreview": "Discord Message Preview",
   "noMessageContent": "No message content added yet",
   "finish": "Finish",

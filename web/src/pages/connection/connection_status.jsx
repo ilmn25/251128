@@ -174,6 +174,7 @@ export default function ConnectionStatus() {
           id,
           name: connectionInfo ? `${connectionInfo.channel}` : id,
           composition: connectionInfo ? location.state?.compositions?.find(c => c.compositionId === connectionInfo.compositionId) : null,
+          connection: connectionInfo, // Store full connection info for preview logic
           status: 'pending'
         };
         
@@ -270,7 +271,7 @@ export default function ConnectionStatus() {
                       {result.error && <p className="text-xs text-rose-400 mt-1">{result.error}</p>}
                       
                       {/* Discord-like Preview */}
-                      {result.composition && (
+                      {result.composition && result.connection && (
                         <div className="mt-3 p-4 bg-[#2b2d31] rounded-lg border border-neutral-700 max-w-md">
                           <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0">
@@ -281,20 +282,28 @@ export default function ConnectionStatus() {
                             <div className="flex-grow space-y-1 overflow-hidden">
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-white text-sm">
-                                  {location.state?.profileName || t("profile")}
+                                  {result.connection.profileName || t("profile")}
                                 </span>
                                 <span className="text-[10px] text-neutral-400">
                                   {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                               </div>
                               <p className="text-sm text-[#dbdee1] break-words whitespace-pre-wrap">
-                                {result.composition.messages[Math.floor(Math.random() * result.composition.messages.length)]}
+                                {(() => {
+                                  let msg = result.composition.messages[Math.floor(Math.random() * result.composition.messages.length)];
+                                  if (!result.connection.linkFilter) {
+                                    msg = msg.replace(/https?:\/\//g, "");
+                                  }
+                                  return msg;
+                                })()}
                               </p>
                               <DiscordAttachmentGrid 
                                 attachments={
-                                  result.composition.randomize 
-                                    ? [...result.composition.attachments].sort(() => 0.5 - Math.random()).slice(0, result.composition.count)
-                                    : result.composition.attachments.slice(0, result.composition.count)
+                                  (!result.connection.mediaFilter || !result.connection.attachmentPerm)
+                                    ? []
+                                    : result.composition.randomize 
+                                      ? [...result.composition.attachments].sort(() => 0.5 - Math.random()).slice(0, result.composition.count)
+                                      : result.composition.attachments.slice(0, result.composition.count)
                                 } 
                               />
                             </div>

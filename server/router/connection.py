@@ -54,8 +54,12 @@ async def connection_list(request: Request):
             "id": str(conn["_id"]),
             "channelId": str(conn["channelId"]),
             "channel": channel["name"],
+            "linkFilter": channel.get("linkFilter", True),
+            "mediaFilter": channel.get("mediaFilter", True),
+            "attachmentPerm": channel.get("attachmentPerm", True),
             "compositionId": str(conn["compositionId"]),
             "message": composition["messages"][0],
+            "profileName": profile.get("username", "User")
         })
 
     return {"success": True, "items": items}
