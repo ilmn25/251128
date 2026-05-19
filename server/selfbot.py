@@ -1,4 +1,4 @@
-﻿import io, os, discord, aiohttp ,asyncio
+﻿import io, discord, aiohttp ,asyncio
 from discord.ext import commands
 from bson import ObjectId
 import services, session

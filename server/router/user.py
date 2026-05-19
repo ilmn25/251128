@@ -17,9 +17,18 @@ async def user_register(data: UserCredentials, response: Response):
     if services.users.find_one({"email": data.email}):
         return {"success": False, "error": "User already exists"}
 
-    result = services.users.insert_one({"email": data.email, "password": pwd_context.hash(data.password)})
+    user_result = services.users.insert_one({"email": data.email, "password": pwd_context.hash(data.password)})
 
-    response.set_cookie("session", str(result.inserted_id), httponly=True, max_age=90000)
+    session_token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=30)
+
+    services.sessions.insert_one({
+        "token": session_token,
+        "user_id": user_result.inserted_id,
+        "expires_at": expires_at
+    })
+
+    response.set_cookie("session", session_token, httponly=True, max_age=2592000)
     return {"success": True}
 
 

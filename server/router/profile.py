@@ -22,7 +22,6 @@ async def profile_post(data: ProfileData, request: Request):
 
     # If id is provided and matches → update
     if data.accountId:
-        print(data.accountId)
         profile = services.profiles.find_one({"accountId": data.accountId, "userId": user["_id"]})
         if profile:
             services.profiles.update_one(
