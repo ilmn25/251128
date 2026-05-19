@@ -14,7 +14,7 @@ const MODE = {
 export default function ConnectionEdit() {
   const navigate = useNavigate();
   const {connectionId} = useParams();
-  const [channel, setChannel] = useState(null);
+  const [selectedChannelIds, setSelectedChannelIds] = useState([]);
   const [composition, setComposition] = useState(null);
 
   const [compositions, setCompositions] = useState([]);
@@ -53,7 +53,7 @@ export default function ConnectionEdit() {
   useEffect(() => {
     async function fetchConnection() {
       if (!connectionId) {
-        setChannel(channels[0]);
+        if (channels.length > 0) setSelectedChannelIds([]);
         setComposition(compositions[0]);
         return;
       }
@@ -65,7 +65,7 @@ export default function ConnectionEdit() {
       });
       const data = await res.json();
       if (data.success) {
-        setChannel(channels.find(c => c.id === data.item.channelId));
+        setSelectedChannelIds([data.item.channelId]);
         setComposition(compositions.find(comp => comp.compositionId === data.item.compositionId));
       } else {
         navigate("/connection/new");
@@ -78,22 +78,67 @@ export default function ConnectionEdit() {
     }
   }, [channels, compositions, connectionId, navigate, t]);
 
-  if (!composition || !channel) return null;
+  const selectedChannels = channels.filter(c => selectedChannelIds.includes(c.id));
+
+  if (!composition || (connectionId && selectedChannels.length === 0)) return null;
 
   async function submit() {
-    const res = await fetch(API_URL + "/connection", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      credentials: "include",
-      body: JSON.stringify({id: connectionId, channelId: channel.id, compositionId: composition.compositionId}),
-    });
-    const data = await res.json();
-    if (data.success){
-      toast.success(t("toastSaveSuccess"));
-      navigate("/connection");
+    if (selectedChannelIds.length === 0) {
+      toast.error(t("selectAtLeastOneChannel"));
+      return;
     }
-    else
-      toast.error(data.error || t("toastSaveError"));
+
+    setMode(MODE.DEFAULT); // Close modes if open
+    
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const channelId of selectedChannelIds) {
+      try {
+        const res = await fetch(API_URL + "/connection", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          credentials: "include",
+          body: JSON.stringify({
+            id: connectionId, // will be null if batch
+            channelId: channelId, 
+            compositionId: composition.compositionId
+          }),
+        });
+        const data = await res.json();
+        if (data.success) successCount++;
+        else failCount++;
+      } catch (e) {
+        failCount++;
+      }
+    }
+
+    if (successCount > 0) {
+      toast.success(t("toastSubmitSuccess"));
+      navigate("/connection");
+    } else {
+      toast.error(t("toastSubmitError"));
+    }
+  }
+
+  function toggleChannel(id) {
+    if (connectionId) {
+      // In edit mode, we can only have one
+      setSelectedChannelIds([id]);
+      setMode(MODE.DEFAULT);
+    } else {
+      setSelectedChannelIds(prev => 
+        prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+      );
+    }
+  }
+
+  function selectAllChannels() {
+    setSelectedChannelIds(channels.map(c => c.id));
+  }
+
+  function clearChannels() {
+    setSelectedChannelIds([]);
   }
 
   async function Delete() {
@@ -115,16 +160,40 @@ export default function ConnectionEdit() {
   return (
     <div>
       <div className="panel1 space-y-3 ">
-        <div>
+        <div className="flex justify-between items-center">
           <p className="panel1-header">{t("connection")}</p>
+          {mode === MODE.CHANNEL && !connectionId && (
+            <div className="flex gap-2">
+              <button onClick={selectAllChannels} className="text-xs text-sky-400 hover:text-sky-300 transition-colors uppercase font-bold tracking-widest">{t("selectAll")}</button>
+              <span className="text-neutral-700">|</span>
+              <button onClick={clearChannels} className="text-xs text-rose-400 hover:text-rose-300 transition-colors uppercase font-bold tracking-widest">{t("clearSelection")}</button>
+            </div>
+          )}
         </div>
 
         {mode === MODE.CHANNEL ? (
-          <>
-            {channels.map((p) => (
-              <ChannelListItem key={p.channelId} item={p} setChannel={setChannel} setMode={setMode}/>
-            ))}
-          </>
+          <div className="space-y-2">
+            <div className="max-h-[500px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+              {channels.map((p) => (
+                <ChannelListItem 
+                  key={p.id} 
+                  item={p} 
+                  isSelected={selectedChannelIds.includes(p.id)} 
+                  toggleChannel={() => toggleChannel(p.id)}
+                />
+              ))}
+            </div>
+            {!connectionId && (
+               <div className="pt-4 flex justify-end">
+                 <button
+                   onClick={() => setMode(MODE.DEFAULT)}
+                   className="panel2 buttonstyle4 px-8 py-2"
+                 >
+                   {t("done")} ({selectedChannelIds.length})
+                 </button>
+               </div>
+            )}
+          </div>
         ) : mode === MODE.COMPOSITION ? (
           <>
             {compositions.map((c) => (
@@ -133,9 +202,30 @@ export default function ConnectionEdit() {
           </>
         ) : (
           <>
-            <div className="panel2 flex content-between centered gap-3 !py-0">
+            <div className="panel2 flex content-between centered gap-3">
               <div className="w-full">
-                <p className="panel1-header">{channel.name}</p>
+                <p className="panel1-header">
+                  {connectionId 
+                    ? (selectedChannels[0]?.name || t("selectChannel"))
+                    : selectedChannels.length > 0 
+                      ? `${selectedChannels.length} ${t("channelsSelected")}`
+                      : t("noChannelsSelected")
+                  }
+                </p>
+                {selectedChannels.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {selectedChannels.slice(0, 5).map(c => (
+                      <span key={c.id} className="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded border border-neutral-700">
+                        {c.name}
+                      </span>
+                    ))}
+                    {selectedChannels.length > 5 && (
+                      <span className="text-[10px] text-neutral-500 flex items-center px-1">
+                        + {selectedChannels.length - 5} {t("more")}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="my-5 space-y-3 max-w-50 w-full">
@@ -152,7 +242,7 @@ export default function ConnectionEdit() {
             <div className="panel2 flex content-between centered gap-3">
               <div className="w-full">
                 <div className="panel1-header flex justify-start gap-2 items-center">
-                  <p>{composition.message}</p>
+                  <p>{composition.messages[0]}</p>
                   {composition.randomize ? (
                     <Shuffle className="size-4"/>
                   ) : (
@@ -160,7 +250,7 @@ export default function ConnectionEdit() {
                   )}
                 </div>
                 <p className="comment">
-                  {t("selectAttachments", { count: composition.count, attachmentCount: composition.attachmentsCount })}
+                  {t("selectAttachments", { count: composition.count, attachmentCount: composition.attachmentCount || composition.attachments?.length || 0 })}
                 </p>
               </div>
 
@@ -190,26 +280,26 @@ export default function ConnectionEdit() {
   );
 }
 
-function ChannelListItem({ item, setChannel, setMode }) {
+function ChannelListItem({ item, isSelected, toggleChannel }) {
   const { t } = useTranslation();
   return (
-    <div className="panel2 flex content-between centered gap-3 !py-0">
-      <div className="w-full">
-        <p className="panel1-header">{item.name}</p>
-        <p className="comment">ID: {item.channelId}</p>
+    <div 
+      onClick={toggleChannel}
+      className={`panel2 flex content-between centered gap-3 !py-0 cursor-pointer transition-all ${
+        isSelected ? "border-sky-500 bg-sky-500/5 shadow-[0_0_10px_rgba(14,165,233,0.1)]" : "hover:bg-neutral-800"
+      }`}
+    >
+      <div className="w-full py-4">
+        <p className={`panel1-header transition-colors ${isSelected ? "text-sky-400" : ""}`}>{item.name}</p>
+        <p className="comment text-[10px] opacity-50">ID: {item.id || item.channelId}</p>
       </div>
 
-      <div className="my-5 space-y-3 max-w-50 w-full">
-        <button
-          type="button"
-          onClick={() => {
-            setMode(MODE.DEFAULT);
-            setChannel(item);
-          }}
-          className="panel2 buttonstyle4 w-full flex centered space-x-1"
-        >
-          <ArrowBigRightDash/> <p>{t("select")}</p>
-        </button>
+      <div className="my-5 flex items-center justify-end pr-4">
+        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+          isSelected ? "bg-sky-500 border-sky-500" : "border-neutral-700"
+        }`}>
+          {isSelected && <ArrowBigRightDash className="w-4 h-4 text-white" />}
+        </div>
       </div>
     </div>
   );
@@ -222,7 +312,7 @@ function CompositionListItem({ item, setComposition, setMode }) {
       <div className="panel2 flex content-between centered gap-3">
         <div className="w-full">
           <div className="panel1-header flex justify-start gap-2 items-center">
-            <p className="">{item.message}</p>
+            <p className="">{item.message || item.messages?.[0]}</p>
             {item.randomize ? (
               <Shuffle className="size-4"/>
             ) : (
@@ -230,9 +320,9 @@ function CompositionListItem({ item, setComposition, setMode }) {
             )}
           </div>
           <p className="comment">
-            {t("selectAttachments", { count: item.count, attachmentCount: item.attachmentsCount })}
+            {t("selectAttachments", { count: item.count, attachmentCount: item.attachmentCount || item.attachments?.length || 0 })}
           </p>
-          <p className="comment">ID: {item.compositionId}</p>
+          <p className="comment text-[10px] opacity-50">ID: {item.compositionId}</p>
         </div>
 
         <div className="my-5 space-y-3 max-w-50 w-full">
