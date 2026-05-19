@@ -65,7 +65,6 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
           <p className="comment">
             {t("selectAttachments", { count, attachmentCount })}
           </p>
-          <p className="comment">ID: {compositionId}</p>
         </div>
 
         <div className="my-5 space-y-3 max-w-50 w-full">

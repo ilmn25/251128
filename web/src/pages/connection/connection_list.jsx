@@ -62,7 +62,9 @@ export default function ConnectionList() {
     navigate("/connection/status", { 
       state: { 
         connectionIds: [id],
-        connections: items.filter(item => item.id === id)
+        connections: items.filter(item => item.id === id),
+        compositions: compositions,
+        profileName: items.find(item => item.id === id)?.profileName // We might need this from somewhere
       } 
     });
   }
@@ -88,7 +90,8 @@ export default function ConnectionList() {
     navigate("/connection/status", { 
       state: { 
         connectionIds: selectedIds,
-        connections: filteredItems.filter(item => selectedIds.includes(item.id))
+        connections: filteredItems.filter(item => selectedIds.includes(item.id)),
+        compositions: compositions
       } 
     });
   }
@@ -115,7 +118,7 @@ export default function ConnectionList() {
               <select
                 value={compositionFilter}
                 onChange={e => setCompositionFilter(e.target.value)}
-                className="bg-transparent outline-none text-sm cursor-pointer"
+                className="bg-neutral-800 outline-none text-sm cursor-pointer rounded px-2 py-1 appearance-none border border-neutral-700 hover:border-neutral-500 transition-colors"
               >
                 <option value="all">{t("allCompositions")}</option>
                 {compositions.map(composition => (
@@ -197,8 +200,6 @@ function ConnectionListItem({ id, channel, message, compositionId, send, selecte
         <div className="w-full">
           <p className="panel1-header">{t("sendTo")} {channel}</p>
           <p className="comment !text-neutral-300 font-bold">{message}</p>
-          <p className="comment">{t("composition")}: {compositionId}</p>
-          <p className="comment">ID: {id}</p>
         </div>
       </div>
 

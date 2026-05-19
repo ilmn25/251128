@@ -61,7 +61,9 @@ async def composition_list(request: Request):
             "message": composition["messages"][0],
             "attachmentCount": len(composition["attachments"]),
             "randomize": composition["randomize"],
-            "count": composition["count"]
+            "count": composition["count"],
+            "messages": composition["messages"],
+            "attachments": composition["attachments"]
         })
 
     return {"success": True, "items": data}

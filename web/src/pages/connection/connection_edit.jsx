@@ -117,7 +117,6 @@ export default function ConnectionEdit() {
       <div className="panel1 space-y-3 ">
         <div>
           <p className="panel1-header">{t("connection")}</p>
-          {connectionId && <p className="comment">ID: {connectionId}</p>}
         </div>
 
         {mode === MODE.CHANNEL ? (
@@ -137,7 +136,6 @@ export default function ConnectionEdit() {
             <div className="panel2 flex content-between centered gap-3 !py-0">
               <div className="w-full">
                 <p className="panel1-header">{channel.name}</p>
-                <p className="comment">ID: {channel.channelId}</p>
               </div>
 
               <div className="my-5 space-y-3 max-w-50 w-full">
@@ -164,7 +162,6 @@ export default function ConnectionEdit() {
                 <p className="comment">
                   {t("selectAttachments", { count: composition.count, attachmentCount: composition.attachmentsCount })}
                 </p>
-                <p className="comment">ID: {composition.compositionId}</p>
               </div>
 
               <div className="my-5 space-y-3 max-w-50 w-full">

@@ -1,14 +1,153 @@
 ﻿import '../../index.css';
 
-import {SaveIcon, Shuffle, Hash, CopyPlus, Trash} from "lucide-react";
+import {SaveIcon, Shuffle, Hash, CopyPlus, Trash, Eye} from "lucide-react";
 import Message from './message.jsx';
 import Attachment from "./attachment.jsx";
 import Media from "./media.jsx";
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import Cookies from "js-cookie";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
+
+function DiscordAttachmentGrid({ attachments }) {
+  if (attachments.length === 0) return null;
+
+  const count = attachments.length;
+
+  const renderItem = (item, className = "", imgClassName = "object-cover") => {
+    const isImage = item.url && ["png","jpg","jpeg","gif","webp"].some(e => 
+      (item.url || "").toLowerCase().endsWith(e) || (item.ext || "").toLowerCase().includes(e)
+    );
+
+    return (
+      <div className={`rounded-md overflow-hidden bg-neutral-800 border border-neutral-700 flex items-center justify-center relative ${className}`}>
+        {item.url ? (
+          isImage ? (
+            <img src={item.url} alt="Preview" className={`w-full h-full ${imgClassName}`} />
+          ) : (
+            <div className="p-2 flex flex-col items-center">
+              <Hash className="w-4 h-4 text-neutral-500 mb-1" />
+              <span className="text-[10px] text-neutral-400 truncate max-w-full px-1">{item.name}</span>
+            </div>
+          )
+        ) : (
+          <div className="p-4 bg-neutral-800 animate-pulse w-full h-full"></div>
+        )}
+      </div>
+    );
+  };
+
+  if (count === 1) {
+    return <div className="mt-2 w-full max-w-md">{renderItem(attachments[0], "h-auto", "object-contain")}</div>;
+  }
+
+  if (count === 2) {
+    return (
+      <div className="mt-2 grid grid-cols-2 gap-1 aspect-[2/1] w-full max-w-lg">
+        {renderItem(attachments[0], "h-full")}
+        {renderItem(attachments[1], "h-full")}
+      </div>
+    );
+  }
+
+  if (count === 3) {
+    return (
+      <div className="mt-2 grid grid-cols-3 grid-rows-2 gap-1 aspect-[3/2] w-full max-w-lg">
+        <div className="col-span-2 row-span-2">
+          {renderItem(attachments[0], "h-full")}
+        </div>
+        <div className="col-span-1 row-span-1">
+          {renderItem(attachments[1], "h-full")}
+        </div>
+        <div className="col-span-1 row-span-1">
+          {renderItem(attachments[2], "h-full")}
+        </div>
+      </div>
+    );
+  }
+
+  if (count === 4) {
+    return (
+      <div className="mt-2 grid grid-cols-2 grid-rows-2 gap-1 aspect-square w-full max-w-lg">
+        {attachments.map((att, idx) => renderItem(att, "h-full"))}
+      </div>
+    );
+  }
+
+  if (count === 5) {
+    return (
+      <div className="mt-2 grid grid-cols-6 grid-rows-2 gap-1 aspect-[3/2] w-full max-w-lg">
+        <div className="col-span-3 row-span-1">{renderItem(attachments[0], "h-full")}</div>
+        <div className="col-span-3 row-span-1">{renderItem(attachments[1], "h-full")}</div>
+        <div className="col-span-2 row-span-1">{renderItem(attachments[2], "h-full")}</div>
+        <div className="col-span-2 row-span-1">{renderItem(attachments[3], "h-full")}</div>
+        <div className="col-span-2 row-span-1">{renderItem(attachments[4], "h-full")}</div>
+      </div>
+    );
+  }
+
+  if (count === 6) {
+    return (
+      <div className="mt-2 grid grid-cols-3 grid-rows-2 gap-1 aspect-[3/2] w-full max-w-lg">
+        {attachments.map((att, idx) => (
+          renderItem(att, "h-full")
+        ))}
+      </div>
+    );
+  }
+
+  if (count === 7) {
+    return (
+      <div className="mt-2 grid grid-cols-3 grid-rows-10 gap-1 aspect-[3/5] w-full max-w-lg">
+        <div className="col-span-3 row-span-4">
+          {renderItem(attachments[0], "h-full")}
+        </div>
+        {attachments.slice(1, 7).map((att, idx) => (
+          <div key={idx} className="col-span-1 row-span-2">
+            {renderItem(att, "h-full")}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (count === 8) {
+    return (
+      <div className="mt-2 grid grid-cols-4 grid-rows-2 gap-1 aspect-[2/1] w-full max-w-lg">
+        {attachments.map((att, idx) => (
+          renderItem(att, "h-full")
+        ))}
+      </div>
+    );
+  }
+
+  if (count === 9) {
+    return (
+      <div className="mt-2 grid grid-cols-3 grid-rows-3 gap-1 aspect-square w-full max-w-lg">
+        {attachments.map((att, idx) => renderItem(att, "h-full", idx))}
+      </div>
+    );
+  }
+
+  if (count >= 10) {
+    return (
+      <div className="mt-2 grid grid-cols-3 grid-rows-4 gap-1 aspect-[3/4] w-full max-w-lg">
+        <div className="col-span-3 row-span-1">
+          {renderItem(attachments[0], "h-full")}
+        </div>
+        {attachments.slice(1, 10).map((att, idx) => (
+          <div key={idx} className="col-span-1 row-span-1">
+            {renderItem(att, "h-full")}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export default function CompositionEdit() {
   const navigate = useNavigate();
@@ -18,6 +157,7 @@ export default function CompositionEdit() {
   const [media, setMedia] = useState([]);
   const [randomize, setRandomize] = useState(false);
   const [count, setCount] = useState(1);
+  const [profile, setProfile] = useState(null);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -58,8 +198,22 @@ export default function CompositionEdit() {
       }
     }
 
+    async function loadProfile() {
+      const res = await fetch(API_URL + "/profile", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.success) {
+        const currentProfileId = Cookies.get("profile");
+        const found = data.items.find(p => p.id === currentProfileId);
+        if (found) setProfile(found);
+      }
+    }
+
     loadComposition();
     loadMedia();
+    loadProfile();
   }, [compositionId, navigate, t]);
 
   async function submit(saveAs) {
@@ -185,6 +339,32 @@ export default function CompositionEdit() {
           onUpload={uploadMedia}
           onDelete={deleteMedia}
         />
+        
+        <p className="panel1-subheader mt-6">{t("preview")}</p>
+        <div className="panel2 bg-neutral-900/50 space-y-4 max-w-2xl">
+          <div className="flex items-center gap-2 text-neutral-400 mb-2">
+            <Eye className="w-4 h-4" />
+            <span className="text-xs uppercase tracking-wider font-semibold">{t("discordPreview")}</span>
+          </div>
+          
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </div>
+            <div className="flex-grow space-y-1 overflow-hidden">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sky-400">{profile ? profile.username : "Selfbot"}</span>
+                <span className="text-xs text-neutral-500">Today at 12:00 PM</span>
+              </div>
+              <div className="text-sm whitespace-pre-wrap break-all">
+                {messages.length > 0 ? messages[0] : <span className="text-neutral-600 italic">{t("noMessageContent")}</span>}
+              </div>
+              <DiscordAttachmentGrid attachments={attachments.slice(0, count)} />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-3">
