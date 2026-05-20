@@ -52,8 +52,7 @@
   "preview": "预览",
   "regenerate": "刷新预览",
   "discordPreview": "Discord 信息预览",
-  "noMessageContent": "尚未添加信息内容",
-  "finish": "完成",
+  "noMessageContent": "尚未添加信息内容",  "emptyComposition": "空组合",  "finish": "完成",
   "save": "保存",
   "saveAsNew": "另存新组合",
   "clearSelection": "清除选择",
@@ -119,5 +118,8 @@
   "updateProfileToken": "更新个人档案 Token",
   "userId": "用户 ID",
   "upload": "上传",
-  "yes": "是"
+  "yes": "是",
+  "profileRequired": "需要选择个人资料",
+  "profileRequiredDesc": "您必须选择一个 Discord 个人资料才能管理组合并发送消息。请前往个人资料选项卡进行选择。",
+  "goToProfiles": "前往个人资料"
 }

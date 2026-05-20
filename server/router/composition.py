@@ -58,7 +58,7 @@ async def composition_list(request: Request):
     for composition in compositions:
         data.append({
             "compositionId": str(composition["_id"]),
-            "message": composition["messages"][0],
+            "message": composition["messages"][0] if composition["messages"] else "",
             "attachmentCount": len(composition["attachments"]),
             "randomize": composition["randomize"],
             "count": composition["count"],

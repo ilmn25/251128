@@ -105,20 +105,30 @@ async def channel_get(request: Request):
     
     for channel in channels:
         guild_id = channel.get("guildId")
+        icon = None
         
         # Fallback for old records or if missing
-        if not guild_id and bot:
-            discord_ch = bot.get_channel(int(channel["channelId"]))
-            if discord_ch and hasattr(discord_ch, "guild") and discord_ch.guild:
-                guild_id = str(discord_ch.guild.id)
-            elif discord_ch and isinstance(discord_ch, (discord.DMChannel, discord.GroupChannel)):
-                guild_id = "@me"
+        if bot:
+            if guild_id and guild_id != "@me":
+                guild = bot.get_guild(int(guild_id))
+                if guild and guild.icon:
+                    icon = str(guild.icon.url)
+            
+            if not guild_id:
+                discord_ch = bot.get_channel(int(channel["channelId"]))
+                if discord_ch and hasattr(discord_ch, "guild") and discord_ch.guild:
+                    guild_id = str(discord_ch.guild.id)
+                    if discord_ch.guild.icon:
+                        icon = str(discord_ch.guild.icon.url)
+                elif discord_ch and isinstance(discord_ch, (discord.DMChannel, discord.GroupChannel)):
+                    guild_id = "@me"
 
         data.append({
             "id": str(channel["_id"]),
             "channelId": channel["channelId"],
             "name": channel["name"],
             "guildId": guild_id,
+            "icon": icon,
             "linkFilter": channel.get("linkFilter", True),
             "mediaFilter": channel.get("mediaFilter", True),
             "attachmentPerm": channel.get("attachmentPerm", True),

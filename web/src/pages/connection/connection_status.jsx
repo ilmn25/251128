@@ -170,7 +170,10 @@ export default function ConnectionStatus() {
         composition,
         connection: connectionInfo,
         status: 'pending',
-        preview: composition ? generatePreview(composition, connectionInfo) : null
+        preview: composition ? generatePreview(composition, connectionInfo) : null,
+        guildIcon: connectionInfo?.guildIcon,
+        profileAvatar: connectionInfo?.profileAvatar,
+        profileName: connectionInfo?.profileName
       };
     });
     
@@ -179,8 +182,11 @@ export default function ConnectionStatus() {
   }, [connectionIds, navigate, location.state]);
 
   function generatePreview(composition, connection) {
-    if (!composition) return null;
-    let msg = composition.messages[Math.floor(Math.random() * composition.messages.length)];
+    if (!composition || !composition.messages || composition.messages.length === 0) {
+      return { message: "", attachments: [] };
+    }
+    
+    let msg = composition.messages[Math.floor(Math.random() * composition.messages.length)] || "";
     if (connection && connection.linkFilter === false) {
       msg = msg.replace(/https?:\/\//g, "");
     }
@@ -190,8 +196,8 @@ export default function ConnectionStatus() {
       atts = [];
     } else {
       atts = composition.randomize 
-        ? [...composition.attachments].sort(() => 0.5 - Math.random()).slice(0, composition.count)
-        : composition.attachments.slice(0, composition.count);
+        ? [...(composition.attachments || [])].sort(() => 0.5 - Math.random()).slice(0, composition.count)
+        : (composition.attachments || []).slice(0, composition.count);
     }
 
     return { message: msg, attachments: atts };
@@ -304,6 +310,9 @@ export default function ConnectionStatus() {
               <div>
                 <p className="text-xs text-sky-400 font-bold uppercase tracking-widest mb-1">{t("currentlyReviewing")}</p>
                 <div className="flex items-center gap-2">
+                  {results[currentIndex].guildIcon ? (
+                    <img src={results[currentIndex].guildIcon} alt="" className="w-5 h-5 rounded object-cover" />
+                  ) : <Hash className="w-5 h-5 text-neutral-500" />}
                   <h3 className="text-xl font-bold">{results[currentIndex].name}</h3>
                   {results[currentIndex].connection?.guildId && (
                     <button
@@ -346,15 +355,19 @@ export default function ConnectionStatus() {
 
           <div className="bg-[#2b2d31] rounded-lg border border-neutral-700 p-4 max-w-2xl mx-auto shadow-xl">
             <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0">
-                <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="currentColor">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                </svg>
-              </div>
-              <div className="flex-grow space-y-1 overflow-hidden font-sans">
+              {results[currentIndex].profileAvatar ? (
+                <img src={results[currentIndex].profileAvatar} alt="" className="w-10 h-10 rounded-full flex-shrink-0 object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                </div>
+              )}
+              <div className="flex-grow space-y-1 overflow-hidden font-sans text-left">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-white text-sm">
-                    {results[currentIndex].connection?.profileName || t("profile")}
+                    {results[currentIndex].profileName || t("profile")}
                   </span>
                   <span className="text-[10px] text-neutral-400">
                     {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

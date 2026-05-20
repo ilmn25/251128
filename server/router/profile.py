@@ -20,6 +20,8 @@ async def profile_post(data: ProfileData, request: Request):
     if not await bot.validate_token(data.token):
         return {"success": False, "error": "Invalid token"}
 
+    avatar = str(bot.user.display_avatar.url) if bot.user and bot.user.display_avatar else None
+
     # If id is provided and matches → update
     if data.accountId:
         profile = services.profiles.find_one({"accountId": data.accountId, "userId": user["_id"]})
@@ -29,6 +31,7 @@ async def profile_post(data: ProfileData, request: Request):
                 {"$set": {
                     "token": session.cipher.encrypt(data.token.encode()).decode(),
                     "username": bot.user.name,
+                    "avatar": avatar
                 }}
             )
             return {"success": True}
@@ -39,6 +42,7 @@ async def profile_post(data: ProfileData, request: Request):
         "userId": user["_id"],
         "token": session.cipher.encrypt(data.token.encode()).decode(),
         "username": bot.user.name,
+        "avatar": avatar
     })
     return {"success": True}
 
@@ -71,6 +75,7 @@ async def profiles_get(request: Request):
             "id": str(profile["_id"]),
             "accountId": profile["accountId"],
             "username": profile["username"],
+            "avatar": profile.get("avatar"),
             "channels": profile_channels
         })
 
@@ -82,11 +87,16 @@ async def profile_delete(request: Request, profile_id: str):
     if not user:
         return {"success": False, "error": "Invalid session"}
 
-    # Find the profile belonging to this user
-    profile = services.profiles.find_one({
-        "_id": ObjectId(profile_id),
-        "userId": user["_id"]
-    })
+    # Find the profile belonging to this user (check both internal _id and accountId)
+    query = {"userId": user["_id"]}
+    try:
+        # Try as internal _id first
+        query["_id"] = ObjectId(profile_id)
+    except:
+        # Otherwise treat as accountId (Discord ID)
+        query["accountId"] = profile_id
+
+    profile = services.profiles.find_one(query)
     if not profile:
         return {"success": False, "error": "Profile not found"}
 
@@ -94,3 +104,37 @@ async def profile_delete(request: Request, profile_id: str):
     services.profiles.delete_one({"_id": profile["_id"]})
 
     return {"success": True}
+
+@router.post("/profile/refresh/{profile_id}")
+async def profile_refresh(request: Request, profile_id: str):
+    user = session.get_user_from_request(request)
+    if not user:
+        return {"success": False, "error": "Invalid session"}
+
+    profile = services.profiles.find_one({
+        "_id": ObjectId(profile_id),
+        "userId": user["_id"]
+    })
+    if not profile:
+        return {"success": False, "error": "Profile not found"}
+
+    token = session.cipher.decrypt(profile["token"].encode()).decode()
+    bot = selfbot.Main()
+    if not await bot.validate_token(token):
+        return {"success": False, "error": "Invalid token"}
+
+    avatar = str(bot.user.display_avatar.url) if bot.user and bot.user.display_avatar else None
+    
+    services.profiles.update_one(
+        {"_id": profile["_id"]},
+        {"$set": {
+            "username": bot.user.name,
+            "avatar": avatar
+        }}
+    )
+
+    return {
+        "success": True, 
+        "username": bot.user.name, 
+        "avatar": avatar
+    }

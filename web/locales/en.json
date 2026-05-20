@@ -60,6 +60,7 @@
   "regenerate": "Regenerate Preview",
   "discordPreview": "Discord Message Preview",
   "noMessageContent": "No message content added yet",
+  "emptyComposition": "Empty Composition",
   "finish": "Finish",
   "save": "Save",
   "saveAsNew": "Save As New",
@@ -126,5 +127,8 @@
   "updateProfileToken": "Update Profile Token",
   "userId": "User ID",
   "upload": "Upload",
-  "yes": "Yes"
+  "yes": "Yes",
+  "profileRequired": "Profile Selection Required",
+  "profileRequiredDesc": "You must select a Discord profile to manage compositions and send messages. Go to the profile tab to pick one.",
+  "goToProfiles": "Go to Profiles"
 }

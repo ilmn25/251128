@@ -143,8 +143,9 @@ async def connection_list(request: Request):
             "mediaFilter": channel.get("mediaFilter", True),
             "attachmentPerm": channel.get("attachmentPerm", True),
             "compositionId": str(conn["compositionId"]),
-            "message": composition["messages"][0],
-            "profileName": profile.get("username", "User")
+            "message": composition["messages"][0] if composition["messages"] else "",
+            "profileName": profile.get("username", "User"),
+            "profileAvatar": profile.get("avatar")
         })
 
     return {"success": True, "items": items}

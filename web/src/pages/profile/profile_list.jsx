@@ -1,6 +1,6 @@
 ﻿import React, {useEffect, useState, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
-import {PencilRuler, UserPlus, User, UserRoundCheck, ChevronDown, ChevronRight, Server, Hash, User as UserIcon, Plus, ExternalLink} from "lucide-react";
+import {PencilRuler, UserPlus, User, UserRoundCheck, ChevronDown, ChevronRight, Server, Hash, User as UserIcon, Plus, ExternalLink, RefreshCw} from "lucide-react";
 import Cookies from "js-cookie";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
@@ -57,10 +57,32 @@ export default function ProfileList() {
   );
 }
 
-function ProfileListItem({ id, accountId, username, currentId, setCurrentId, channels, onRefresh}) {
+function ProfileListItem({ id, accountId, username, avatar, currentId, setCurrentId, channels, onRefresh}) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  async function handleRefresh(e) {
+    e.stopPropagation();
+    setIsRefreshing(true);
+    try {
+      const res = await fetch(`${API_URL}/profile/refresh/${id}`, {
+        method: "POST",
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(t("toastSaveSuccess"));
+        onRefresh();
+      } else {
+        toast.error(data.error);
+      }
+    } catch (err) {
+      toast.error(t("toastFetchError"));
+    }
+    setIsRefreshing(false);
+  }
 
   const groupedChannels = useMemo(() => {
     const groups = {};
@@ -82,16 +104,37 @@ function ProfileListItem({ id, accountId, username, currentId, setCurrentId, cha
     <div className="panel1 !p-0 overflow-hidden border border-neutral-800">
       <div className="p-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0 flex-grow cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-          <div className="p-2 bg-neutral-800 rounded-xl flex-shrink-0">
-            {isExpanded ? <ChevronDown className="w-6 h-6 text-neutral-400" /> : <ChevronRight className="w-6 h-6 text-neutral-400" />}
+          <div className="flex-shrink-0 relative">
+            <div className="p-2 bg-neutral-800 rounded-xl">
+              {isExpanded ? <ChevronDown className="w-6 h-6 text-neutral-400" /> : <ChevronRight className="w-6 h-6 text-neutral-400" />}
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="font-bold text-2xl text-white truncate">@{username}</p>
-            <p className="comment truncate">ID: {accountId} • {channels.length} {t("channels")}</p>
+          <div className="flex items-center gap-4 min-w-0">
+            {avatar ? (
+              <img src={avatar} alt="" className="w-12 h-12 rounded-2xl shadow-lg border border-neutral-800 object-cover" />
+            ) : (
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                <User className="w-6 h-6 text-indigo-400" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="font-bold text-2xl text-white truncate">@{username}</p>
+              <p className="comment truncate">ID: {accountId} • {channels.length} {t("channels")}</p>
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3 flex-shrink-0">
+          <button
+            type="button"
+            disabled={isRefreshing}
+            onClick={handleRefresh}
+            className="p-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-400 rounded-xl transition-all"
+            title={t("refresh")}
+          >
+            <RefreshCw className={`w-6 h-6 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
+
           <button
             type="button"
             onClick={(e) => {

@@ -42,6 +42,7 @@ export default function CompositionList() {
       const channelGuildMap = {};
       const channelDiscordIdMap = {};
       const channelFiltersMap = {};
+      const channelIconMap = {};
       
       // Safety check if items exist
       const channels = chanData.items || [];
@@ -51,6 +52,7 @@ export default function CompositionList() {
         if (ch.id) {
           channelGuildMap[ch.id] = ch.guildId;
           channelDiscordIdMap[ch.id] = ch.channelId;
+          channelIconMap[ch.id] = ch.icon;
           channelFiltersMap[ch.id] = {
             linkFilter: ch.linkFilter,
             mediaFilter: ch.mediaFilter,
@@ -63,6 +65,7 @@ export default function CompositionList() {
         ...conn,
         guildId: channelGuildMap[conn.channelId] || null,
         realChannelId: channelDiscordIdMap[conn.channelId] || null,
+        guildIcon: channelIconMap[conn.channelId] || null,
         ...(channelFiltersMap[conn.channelId] || {})
       }));
 
@@ -115,6 +118,8 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
   const [search, setSearch] = useState("");
   const [expandedGuilds, setExpandedGuilds] = useState({});
   const [selectedGuildId, setSelectedGuildId] = useState(null);
+
+  const safeMessage = message || "";
 
   // Group connections by server (simulated from channel name for now)
   const groupedConnections = useMemo(() => {
@@ -171,8 +176,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
       state: { 
         connectionIds: selectedIds,
         connections: selectedConns,
-        compositions: [{ compositionId, messages, attachments, count, randomize }],
-        profileName: selectedConns[0]?.profileName
+        compositions: [{ compositionId, messages, attachments, count, randomize }]
       } 
     });
   };
@@ -183,8 +187,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
       state: { 
         connectionIds: connections.map(c => c.id),
         connections: connections,
-        compositions: [{ compositionId, messages, attachments, count, randomize }],
-        profileName: connections[0]?.profileName
+        compositions: [{ compositionId, messages, attachments, count, randomize }]
       } 
     });
   };
@@ -292,7 +295,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
               <div className="space-y-8 py-10 animate-in zoom-in-95 duration-300">
                 <div className="text-center space-y-2">
                   <p className="text-3xl font-black text-white uppercase tracking-tight italic">{t("addChannel")}</p>
-                  <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] italic">{message}</p>
+                  <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] italic">{safeMessage}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -386,7 +389,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                     <p className="text-2xl font-black text-white uppercase tracking-tight italic">Select Channels</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="px-1.5 py-0.5 bg-sky-500/20 text-sky-400 text-[9px] font-black rounded uppercase tracking-widest">{treeSelectedIds.length} {t("selected")}</div>
-                      <p className="text-[10px] text-neutral-600 font-bold uppercase tracking-widest italic">— {message}</p>
+                      <p className="text-[10px] text-neutral-600 font-bold uppercase tracking-widest italic">— {safeMessage}</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
@@ -556,7 +559,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <span className="font-bold text-2xl text-white truncate">{message}</span>
+              <span className="font-bold text-2xl text-white truncate">{safeMessage || t("emptyComposition")}</span>
               {randomize ? <Shuffle className="w-5 h-5 text-sky-400 opacity-70 flex-shrink-0" /> : <Repeat className="w-5 h-5 text-emerald-400 opacity-70 flex-shrink-0" />}
             </div>
             <p className="comment mt-1 truncate">
@@ -636,8 +639,12 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
             ) : (
               Object.entries(groupedConnections).map(([server, conns]) => (
                 <div key={server} className="space-y-2">
-                  <div className="flex items-center gap-2 px-1 text-xs font-bold text-neutral-500 uppercase tracking-widest">
-                    {server === "DMs" ? <User className="w-4 h-4" /> : <Server className="w-4 h-4" />}
+                  <div className="flex items-center gap-2 px-1 text-[10px] font-black text-neutral-500 uppercase tracking-widest">
+                    {conns[0]?.guildIcon ? (
+                      <img src={conns[0].guildIcon} alt="" className="w-4 h-4 rounded-md object-cover" />
+                    ) : (
+                      server === "DMs" ? <User className="w-4 h-4" /> : <Server className="w-4 h-4" />
+                    )}
                     {server}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

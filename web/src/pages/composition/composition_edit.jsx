@@ -12,7 +12,7 @@ import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
 
 function DiscordAttachmentGrid({ attachments }) {
-  if (attachments.length === 0) return null;
+  if (!attachments || attachments.length === 0) return null;
 
   const count = attachments.length;
 
@@ -163,14 +163,14 @@ export default function CompositionEdit() {
 
   useEffect(() => {
     function updatePreview() {
-      if (messages.length === 0) {
+      if (!messages || messages.length === 0) {
         setPreviewData({ message: "", attachments: [] });
         return;
       }
 
-      const msg = messages[Math.floor(Math.random() * messages.length)];
+      const msg = messages[Math.floor(Math.random() * messages.length)] || "";
       let atts = [];
-      if (attachments.length > 0) {
+      if (attachments && attachments.length > 0) {
         const selectedCount = Math.min(count, attachments.length);
         if (randomize) {
           atts = [...attachments].sort(() => 0.5 - Math.random()).slice(0, selectedCount);
@@ -186,10 +186,10 @@ export default function CompositionEdit() {
   }, [messages.length, attachments.length, count, randomize]);
 
   const regeneratePreview = () => {
-    if (messages.length === 0) return;
-    const msg = messages[Math.floor(Math.random() * messages.length)];
+    if (!messages || messages.length === 0) return;
+    const msg = messages[Math.floor(Math.random() * messages.length)] || "";
     let atts = [];
-    if (attachments.length > 0) {
+    if (attachments && attachments.length > 0) {
       const selectedCount = Math.min(count, attachments.length);
       if (randomize) {
         atts = [...attachments].sort(() => 0.5 - Math.random()).slice(0, selectedCount);
