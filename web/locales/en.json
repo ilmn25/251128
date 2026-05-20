@@ -131,6 +131,8 @@
   "userId": "User ID",
   "upload": "Upload",
   "yes": "Yes",
+  "confirmDeleteComposition": "Are you sure you want to delete this composition? This action cannot be undone.",
+  "confirmDeleteProfile": "Are you sure you want to delete this profile? This action cannot be undone.",
   "profileRequired": "Profile Selection Required",
   "profileRequiredDesc": "You must select a Discord profile to manage compositions and send messages. Go to the profile tab to pick one.",
   "goToProfiles": "Go to Profiles",

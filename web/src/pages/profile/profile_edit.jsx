@@ -36,6 +36,7 @@ export default function ProfileEdit() {
   }
 
   async function Delete() {
+    if (!window.confirm(t("confirmDeleteProfile"))) return;
     const res = await fetch(API_URL + "/profile/" + accountId, {
       method: "DELETE",
       headers: {"Content-Type": "application/json"},

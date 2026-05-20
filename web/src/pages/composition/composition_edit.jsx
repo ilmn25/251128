@@ -340,6 +340,7 @@ export default function CompositionEdit() {
   }
 
   async function Delete() {
+    if (!window.confirm(t("confirmDeleteComposition"))) return;
     const res = await fetch(API_URL + "/composition/" + compositionId, {
       method: "DELETE",
       headers: {"Content-Type": "application/json"},

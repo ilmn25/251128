@@ -107,7 +107,7 @@ export default function CompositionList() {
 function CompositionListItem({ compositionId, message, attachmentCount, randomize, count, connections, onRefresh, allConnections, messages, attachments, cachedGuilds, setCachedGuilds }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChannel, setIsAddingChannel] = useState(false);
   const [isTreeLoading, setIsTreeLoading] = useState(false);
   const [addingStep, setAddingStep] = useState("choice"); // "choice", "id", "tree"
@@ -624,7 +624,9 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <span className="font-bold text-2xl text-white truncate">{safeMessage || t("emptyComposition")}</span>
+              <span className="font-bold text-2xl text-white truncate">
+                {safeMessage || (attachmentCount > 0 ? `${attachmentCount} ${t("attachments")}` : t("emptyComposition"))}
+              </span>
               {randomize ? <Shuffle className="w-5 h-5 text-sky-400 opacity-70 flex-shrink-0" /> : <Repeat className="w-5 h-5 text-emerald-400 opacity-70 flex-shrink-0" />}
             </div>
             <p className="comment mt-1 truncate">
