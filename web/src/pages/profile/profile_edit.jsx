@@ -83,6 +83,17 @@ export default function ProfileEdit() {
             placeholder={t("tokenPlaceholder")}
           />
         </div>
+
+        <div className="panel2 !p-0 overflow-hidden rounded-xl border border-neutral-800">
+          <p className="p-3 text-xs font-bold text-neutral-500 bg-neutral-800/50 uppercase tracking-widest border-b border-neutral-800">
+            {t("tokenExample")}
+          </p>
+          <img 
+            src="/static/token_example.png" 
+            alt="Token Example" 
+            className="w-full h-auto opacity-80 hover:opacity-100 transition-opacity"
+          />
+        </div>
       </div>
 
       <div className="flex gap-3">

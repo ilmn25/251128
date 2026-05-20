@@ -1,6 +1,6 @@
 ﻿import React, {useEffect, useState, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
-import {PencilRuler, UserPlus, User, UserRoundCheck, ChevronDown, ChevronRight, Server, Hash, User as UserIcon, Plus} from "lucide-react";
+import {PencilRuler, UserPlus, User, UserRoundCheck, ChevronDown, ChevronRight, Server, Hash, User as UserIcon, Plus, ExternalLink} from "lucide-react";
 import Cookies from "js-cookie";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
@@ -93,19 +93,6 @@ function ProfileListItem({ id, accountId, username, currentId, setCurrentId, cha
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              Cookies.set("profile", id, { expires: 365, path: "/" });
-              setCurrentId(id);
-              navigate("/channel/new");
-            }}
-            className="p-3 bg-neutral-800 hover:bg-sky-500/10 text-sky-400 rounded-xl transition-all"
-            title={t("addChannel")}
-          >
-            <Plus className="w-6 h-6" />
-          </button>
-          
-          <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
@@ -164,10 +151,25 @@ function ProfileListItem({ id, accountId, username, currentId, setCurrentId, cha
                       className="group flex items-center justify-between p-3 bg-neutral-800/40 border border-transparent hover:border-neutral-700 rounded-xl transition-all cursor-pointer"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <Hash className="w-4 h-4 text-neutral-600" />
-                        <span className="text-sm text-neutral-300 font-medium truncate">{ch.name.split(" in ")[0]}</span>
+                        <Hash className="w-4 h-4 text-neutral-600 group-hover:text-sky-400 transition-colors" />
+                        <span className="text-sm text-neutral-300 font-medium truncate group-hover:text-white transition-colors">{ch.name.split(" in ")[0]}</span>
                       </div>
-                      <PencilRuler className="w-3.5 h-3.5 text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => window.open(ch.guildId === "@me" ? `https://discord.com/channels/@me/${ch.channelId}` : `https://discord.com/channels/${ch.guildId}/${ch.channelId}`, "_blank")}
+                          className="p-1.5 hover:bg-neutral-700 text-neutral-400 rounded-lg transition-colors"
+                          title={t("openInDiscord")}
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => navigate("/channel/edit/" + ch.id)}
+                          className="p-1.5 hover:bg-neutral-700 text-neutral-400 rounded-lg transition-colors"
+                          title={t("edit")}
+                        >
+                          <PencilRuler className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

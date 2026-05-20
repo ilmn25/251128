@@ -1,6 +1,6 @@
 ﻿import React, {useEffect, useState, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
-import {PencilRuler, BadgePlus, Server, Hash, User, Trash2} from "lucide-react";
+import {PencilRuler, BadgePlus, Server, Hash, User, ExternalLink} from "lucide-react";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
@@ -76,6 +76,15 @@ export default function ChannelList() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                    {ch.guildId && (
+                      <button
+                        onClick={() => window.open(ch.guildId === "@me" ? `https://discord.com/channels/@me/${ch.channelId}` : `https://discord.com/channels/${ch.guildId}/${ch.channelId}`, "_blank")}
+                        className="p-2 hover:bg-neutral-800 text-neutral-400 rounded-lg transition-colors"
+                        title={t("openInDiscord")}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </button>
+                    )}
                     <button
                         onClick={() => navigate("/channel/edit/" + ch.id)}
                         className="p-2 hover:bg-neutral-800 text-neutral-400 rounded-lg transition-colors"

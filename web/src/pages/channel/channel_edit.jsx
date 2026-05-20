@@ -1,4 +1,4 @@
-﻿import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import Toggle from "../../components/toggle.jsx";
 import {SaveIcon, Trash} from "lucide-react";
@@ -6,7 +6,7 @@ import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
 
-export function ChannelEdit() {
+export default function ChannelEdit() {
   const navigate = useNavigate();
   const {channelId} = useParams();
   const [id, setId] = useState("");
@@ -121,3 +121,4 @@ export function ChannelEdit() {
     </div>
   );
 }
+

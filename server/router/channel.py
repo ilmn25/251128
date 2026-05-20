@@ -1,4 +1,4 @@
-﻿import discord
+﻿import discord, asyncio
 from fastapi import APIRouter, Request
 from bson.objectid import ObjectId
 from pydantic import BaseModel
@@ -50,40 +50,45 @@ async def channel_new(data: ChannelNewData  , request: Request):
 
     if isinstance(channel, discord.TextChannel):
         name = f"#{channel.name} in {channel.guild.name}"
+        guild_id = str(channel.guild.id)
         cooldown = channel.slowmode_delay
         perms = channel.permissions_for(channel.guild.me)
         attachment_perm = perms.attach_files
 
     elif isinstance(channel, discord.VoiceChannel):
         name = f"#{channel.name} in {channel.guild.name}"
+        guild_id = str(channel.guild.id)
         cooldown = 0
         perms = channel.permissions_for(channel.guild.me)
         attachment_perm = perms.attach_files
 
     elif isinstance(channel, discord.DMChannel):
         name = f"@{channel.recipient.name} in DMs"
+        guild_id = "@me"
         cooldown = 0
         attachment_perm = True
 
     elif isinstance(channel, discord.GroupChannel):
         name = f"{channel.name} in Group DM"
+        guild_id = "@me"
         cooldown = 0
         attachment_perm = True
 
     else:
         return {"success": False, "error": "Channel invalid"}
 
-    services.channels.insert_one({
+    res = services.channels.insert_one({
         "channelId": data.id,
         "profileId": profile["_id"],
         "name": name,
+        "guildId": guild_id,
         "cooldown": cooldown,
         "attachmentPerm": attachment_perm,
         "mediaFilter": True,
         "linkFilter": True,
     })
 
-    return {"success": True}
+    return {"success": True, "id": str(res.inserted_id)}
 
 
 
@@ -95,15 +100,75 @@ async def channel_get(request: Request):
 
     channels = services.channels.find({"profileId": profile["_id"]})
     data = []
+    
+    bot = await selfbot.get_bot(profile["_id"])
+    
     for channel in channels:
+        guild_id = channel.get("guildId")
+        
+        # Fallback for old records or if missing
+        if not guild_id and bot:
+            discord_ch = bot.get_channel(int(channel["channelId"]))
+            if discord_ch and hasattr(discord_ch, "guild") and discord_ch.guild:
+                guild_id = str(discord_ch.guild.id)
+            elif discord_ch and isinstance(discord_ch, (discord.DMChannel, discord.GroupChannel)):
+                guild_id = "@me"
+
         data.append({
             "id": str(channel["_id"]),
             "channelId": channel["channelId"],
-            "name": channel["name"]
+            "name": channel["name"],
+            "guildId": guild_id
         })
 
     return {"success": True, "items": data}
 
+
+@router.get("/channel/available")
+async def channel_available(request: Request):
+    profile = get_profile_from_request(request)
+    if not profile:
+        return {"success": False, "error": "Invalid Session"}
+
+    bot = await selfbot.get_bot(profile["_id"])
+    if not bot:
+        return {"success": False, "error": "Bot not found"}
+
+    if not bot.is_ready():
+        # Wait up to 5 seconds for bot to be ready
+        for _ in range(50):
+            if bot.is_ready():
+                break
+            await asyncio.sleep(0.1)
+
+    guilds = []
+
+    # DMs/Groups
+    dms = []
+    for channel in bot.private_channels:
+        if isinstance(channel, discord.DMChannel):
+            name = channel.recipient.name if channel.recipient else "Unknown DM"
+            dms.append({"id": str(channel.id), "name": name})
+        elif isinstance(channel, discord.GroupChannel):
+            dms.append({"id": str(channel.id), "name": channel.name or "Unnamed Group"})
+    
+    if dms:
+        guilds.append({"id": "dms", "name": "Direct Messages", "channels": dms})
+
+    # Sort guilds by name
+    sorted_guilds = sorted(bot.guilds, key=lambda g: g.name)
+
+    for guild in sorted_guilds:
+        channels = []
+        # Get text channels and voice channels (some voice channels allow messages now)
+        for channel in guild.channels:
+            if isinstance(channel, (discord.TextChannel, discord.VoiceChannel, discord.StageChannel)):
+                channels.append({"id": str(channel.id), "name": channel.name})
+        
+        if channels:
+            guilds.append({"id": str(guild.id), "name": guild.name, "channels": channels})
+
+    return {"success": True, "guilds": guilds}
 
 
 @router.get("/channel/{channel_id}")

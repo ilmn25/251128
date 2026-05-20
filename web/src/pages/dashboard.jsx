@@ -6,8 +6,8 @@ import Profile from "./profile/profile.jsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import Loading from "../components/loading.jsx";
 import {MessageCircle} from "lucide-react";
-import Channel from "./channel/channel.jsx";
 import Connection from "./connection/connection.jsx";
+import Channel from "./channel/channel.jsx";
 import {toast} from "sonner";
 import {API_URL} from "../main.jsx";
 import { useTranslation } from "react-i18next";
@@ -69,9 +69,9 @@ export default function Dashboard() {
       </div>
 
       {location.pathname.startsWith("/composition") && <Composition/>}
-      {location.pathname.startsWith("/channel") && <Channel/>}
       {location.pathname.startsWith("/profile") && <Profile/>}
       {location.pathname.startsWith("/connection") && <Connection/>}
+      {location.pathname.startsWith("/channel") && <Channel/>}
     </div>
   );
 }
