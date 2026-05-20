@@ -98,6 +98,9 @@
   "unselectAll": "Unselect All",
   "send": "Send",
   "sendTo": "Send to",
+  "openingLocation": "Opening storage location...",
+  "openUploads": "Open Uploaded Files",
+  "openDb": "Open Database Location",
   "sendingWait": "Sending, please wait...",
   "serverBotFilters": "Server Bot Filters",
   "submit": "Submit",
@@ -130,5 +133,6 @@
   "yes": "Yes",
   "profileRequired": "Profile Selection Required",
   "profileRequiredDesc": "You must select a Discord profile to manage compositions and send messages. Go to the profile tab to pick one.",
-  "goToProfiles": "Go to Profiles"
+  "goToProfiles": "Go to Profiles",
+  "previouslyAdded": "Quick Add Previously Seen Channels"
 }

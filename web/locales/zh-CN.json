@@ -89,6 +89,9 @@
   "unselectAll": "取消全选",
   "send": "发送",
   "sendTo": "发送至",
+  "openingLocation": "正在打开存储位置...",
+  "openUploads": "打开上传的文件",
+  "openDb": "打开数据库位置",
   "sendingWait": "正在发送，请稍候...",
   "serverBotFilters": "服务器机器人过滤器",
   "submit": "提交",
@@ -121,5 +124,6 @@
   "yes": "是",
   "profileRequired": "需要选择个人资料",
   "profileRequiredDesc": "您必须选择一个 Discord 个人资料才能管理组合并发送消息。请前往个人资料选项卡进行选择。",
-  "goToProfiles": "前往个人资料"
+  "goToProfiles": "前往个人资料",
+  "previouslyAdded": "快速添加之前见过的频道"
 }

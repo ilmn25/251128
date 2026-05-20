@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
     services.client.close()
 
 # ==================== API ====================
-from router import attachment, user, composition, profile, channel, connection, send
+from router import attachment, user, composition, profile, channel, connection, send, system
 import static
 
 app = FastAPI(lifespan=lifespan)
@@ -60,6 +60,7 @@ app.include_router(profile.router, prefix="/api")
 app.include_router(channel.router, prefix="/api")
 app.include_router(connection.router, prefix="/api")
 app.include_router(send.router, prefix="/api")
+app.include_router(system.router, prefix="/api")
 
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 app.include_router(static.router)

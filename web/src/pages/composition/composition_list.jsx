@@ -118,8 +118,21 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
   const [search, setSearch] = useState("");
   const [expandedGuilds, setExpandedGuilds] = useState({});
   const [selectedGuildId, setSelectedGuildId] = useState(null);
+  const [existingChannels, setExistingChannels] = useState([]);
 
   const safeMessage = message || "";
+
+  useEffect(() => {
+    if (addingStep === "id") {
+      fetch(API_URL + "/channel", { credentials: "include" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setExistingChannels(data.items || []);
+          }
+        });
+    }
+  }, [addingStep]);
 
   // Group connections by server (simulated from channel name for now)
   const groupedConnections = useMemo(() => {
@@ -378,6 +391,58 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                     </button>
                   </div>
                 </div>
+
+                {existingChannels.length > 0 && (
+                  <div className="mt-12 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-px flex-grow bg-neutral-800" />
+                      <p className="text-[10px] text-neutral-500 font-black uppercase tracking-[0.3em] italic shrink-0">{t("previouslyAdded")}</p>
+                      <div className="h-px flex-grow bg-neutral-800" />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {existingChannels
+                        .filter(ch => !connections.some(c => c.channelId === ch.id))
+                        .map(ch => (
+                        <button
+                          key={ch.id}
+                          onClick={() => {
+                            setDirectId(ch.channelId);
+                            // Auto-submit if user clicks an existing one
+                            const submitExisting = async () => {
+                              const res = await fetch(`${API_URL}/connection/bulk`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                credentials: "include",
+                                body: JSON.stringify({ channelIds: [ch.channelId], compositionId })
+                              });
+                              const data = await res.json();
+                              if (data.success) {
+                                toast.success(t("toastSubmitSuccess"));
+                                setIsAddingChannel(false);
+                                setDirectId("");
+                                onRefresh();
+                              }
+                            };
+                            submitExisting();
+                          }}
+                          className="flex items-center justify-between p-4 bg-neutral-900/40 border border-neutral-800 hover:border-sky-500/30 rounded-2xl transition-all group text-left hover:bg-sky-500/[0.02]"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-neutral-900 flex items-center justify-center text-neutral-600 group-hover:text-sky-400 transition-colors border border-neutral-800">
+                              <Hash className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-neutral-300 group-hover:text-white truncate">{ch.name}</p>
+                              <p className="text-[10px] text-neutral-600 font-mono tracking-tight">{ch.channelId}</p>
+                            </div>
+                          </div>
+                          <Plus className="w-4 h-4 text-neutral-800 group-hover:text-sky-500 transition-colors flex-shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

@@ -1,22 +1,22 @@
 import '../../index.css';
-import {CheckCircle2, XCircle, Loader2, ArrowLeft, Send, Hash, RefreshCw, ExternalLink, Link2, Image, ImageOff, Link2Off, Lock} from "lucide-react";
+import {CheckCircle2, XCircle, Loader2, ArrowLeft, Send, Hash, RefreshCw, ExternalLink, Link2, Image, ImageOff, Link2Off, Lock, PencilRuler, Trash2} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
 
-function DiscordAttachmentGrid({ attachments }) {
+function DiscordAttachmentGrid({ attachments, onRemove }) {
   if (!attachments || attachments.length === 0) return null;
 
   const count = attachments.length;
 
-  const renderItem = (item, className = "", imgClassName = "object-cover") => {
+  const renderItem = (item, index, className = "", imgClassName = "object-cover") => {
     const isImage = item.url && ["png","jpg","jpeg","gif","webp"].some(e => 
       (item.url || "").toLowerCase().endsWith(e) || (item.ext || "").toLowerCase().includes(e)
     );
 
     return (
-      <div className={`rounded-md overflow-hidden bg-neutral-800 border border-neutral-700 flex items-center justify-center relative ${className}`}>
+      <div key={index} className={`rounded-md overflow-hidden bg-neutral-800 border border-neutral-700 flex items-center justify-center relative group ${className}`}>
         {item.url ? (
           isImage ? (
             <img src={item.url} alt="Preview" className={`w-full h-full ${imgClassName}`} />
@@ -29,19 +29,32 @@ function DiscordAttachmentGrid({ attachments }) {
         ) : (
           <div className="p-4 bg-neutral-800 animate-pulse w-full h-full"></div>
         )}
+        
+        {onRemove && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(index);
+            }}
+            className="absolute top-1 right-1 p-1 bg-rose-600/90 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600 z-10"
+            title="Remove attachment"
+          >
+            <Trash2 className="size-3" />
+          </button>
+        )}
       </div>
     );
   };
 
   if (count === 1) {
-    return <div className="mt-2 w-full max-w-md">{renderItem(attachments[0], "h-auto", "object-contain")}</div>;
+    return <div className="mt-2 w-full max-w-md">{renderItem(attachments[0], 0, "h-auto", "object-contain")}</div>;
   }
 
   if (count === 2) {
     return (
       <div className="mt-2 grid grid-cols-2 gap-1 aspect-[2/1] w-full max-w-lg">
-        {renderItem(attachments[0], "h-full")}
-        {renderItem(attachments[1], "h-full")}
+        {renderItem(attachments[0], 0, "h-full")}
+        {renderItem(attachments[1], 1, "h-full")}
       </div>
     );
   }
@@ -50,13 +63,13 @@ function DiscordAttachmentGrid({ attachments }) {
     return (
       <div className="mt-2 grid grid-cols-3 grid-rows-2 gap-1 aspect-[3/2] w-full max-w-lg">
         <div className="col-span-2 row-span-2">
-          {renderItem(attachments[0], "h-full")}
+          {renderItem(attachments[0], 0, "h-full")}
         </div>
         <div className="col-span-1 row-span-1">
-          {renderItem(attachments[1], "h-full")}
+          {renderItem(attachments[1], 1, "h-full")}
         </div>
         <div className="col-span-1 row-span-1">
-          {renderItem(attachments[2], "h-full")}
+          {renderItem(attachments[2], 2, "h-full")}
         </div>
       </div>
     );
@@ -65,7 +78,7 @@ function DiscordAttachmentGrid({ attachments }) {
   if (count === 4) {
     return (
       <div className="mt-2 grid grid-cols-2 grid-rows-2 gap-1 aspect-square w-full max-w-lg">
-        {attachments.map((att) => renderItem(att, "h-full"))}
+        {attachments.map((att, i) => renderItem(att, i, "h-full"))}
       </div>
     );
   }
@@ -73,11 +86,11 @@ function DiscordAttachmentGrid({ attachments }) {
   if (count === 5) {
     return (
       <div className="mt-2 grid grid-cols-6 grid-rows-2 gap-1 aspect-[3/2] w-full max-w-lg">
-        <div className="col-span-3 row-span-1">{renderItem(attachments[0], "h-full")}</div>
-        <div className="col-span-3 row-span-1">{renderItem(attachments[1], "h-full")}</div>
-        <div className="col-span-2 row-span-1">{renderItem(attachments[2], "h-full")}</div>
-        <div className="col-span-2 row-span-1">{renderItem(attachments[3], "h-full")}</div>
-        <div className="col-span-2 row-span-1">{renderItem(attachments[4], "h-full")}</div>
+        <div className="col-span-3 row-span-1">{renderItem(attachments[0], 0, "h-full")}</div>
+        <div className="col-span-3 row-span-1">{renderItem(attachments[1], 1, "h-full")}</div>
+        <div className="col-span-2 row-span-1">{renderItem(attachments[2], 2, "h-full")}</div>
+        <div className="col-span-2 row-span-1">{renderItem(attachments[3], 3, "h-full")}</div>
+        <div className="col-span-2 row-span-1">{renderItem(attachments[4], 4, "h-full")}</div>
       </div>
     );
   }
@@ -85,8 +98,8 @@ function DiscordAttachmentGrid({ attachments }) {
   if (count === 6) {
     return (
       <div className="mt-2 grid grid-cols-3 grid-rows-2 gap-1 aspect-[3/2] w-full max-w-lg">
-        {attachments.map((att) => (
-          renderItem(att, "h-full")
+        {attachments.map((att, i) => (
+          renderItem(att, i, "h-full")
         ))}
       </div>
     );
@@ -96,11 +109,11 @@ function DiscordAttachmentGrid({ attachments }) {
     return (
       <div className="mt-2 grid grid-cols-3 grid-rows-10 gap-1 aspect-[3/5] w-full max-w-lg">
         <div className="col-span-3 row-span-4">
-          {renderItem(attachments[0], "h-full")}
+          {renderItem(attachments[0], 0, "h-full")}
         </div>
         {attachments.slice(1, 7).map((att, idx) => (
-          <div key={idx} className="col-span-1 row-span-2">
-            {renderItem(att, "h-full")}
+          <div key={idx+1} className="col-span-1 row-span-2">
+            {renderItem(att, idx+1, "h-full")}
           </div>
         ))}
       </div>
@@ -110,8 +123,8 @@ function DiscordAttachmentGrid({ attachments }) {
   if (count === 8) {
     return (
       <div className="mt-2 grid grid-cols-4 grid-rows-2 gap-1 aspect-[2/1] w-full max-w-lg">
-        {attachments.map((att) => (
-          renderItem(att, "h-full")
+        {attachments.map((att, i) => (
+          renderItem(att, i, "h-full")
         ))}
       </div>
     );
@@ -120,7 +133,7 @@ function DiscordAttachmentGrid({ attachments }) {
   if (count === 9) {
     return (
       <div className="mt-2 grid grid-cols-3 grid-rows-3 gap-1 aspect-square w-full max-w-lg">
-        {attachments.map((att) => renderItem(att, "h-full"))}
+        {attachments.map((att, i) => renderItem(att, i, "h-full"))}
       </div>
     );
   }
@@ -129,11 +142,11 @@ function DiscordAttachmentGrid({ attachments }) {
     return (
       <div className="mt-2 grid grid-cols-3 grid-rows-4 gap-1 aspect-[3/4] w-full max-w-lg">
         <div className="col-span-3 row-span-1">
-          {renderItem(attachments[0], "h-full")}
+          {renderItem(attachments[0], 0, "h-full")}
         </div>
         {attachments.slice(1, 10).map((att, idx) => (
-          <div key={idx} className="col-span-1 row-span-1">
-            {renderItem(att, "h-full")}
+          <div key={idx+1} className="col-span-1 row-span-1">
+            {renderItem(att, idx+1, "h-full")}
           </div>
         ))}
       </div>
@@ -252,6 +265,18 @@ export default function ConnectionStatus() {
     setCurrentIndex(prev => prev + 1);
   }
 
+  function handleRemoveAttachment(attIndex) {
+    setResults(prev => prev.map((item, idx) => {
+      if (idx !== currentIndex) return item;
+      const newAttachments = [...(item.preview?.attachments || [])];
+      newAttachments.splice(attIndex, 1);
+      return { 
+        ...item, 
+        preview: { ...item.preview, attachments: newAttachments } 
+      };
+    }));
+  }
+
   function handleRegenerate() {
     if (currentIndex >= results.length) return;
     setResults(prev => prev.map((item, idx) => {
@@ -348,12 +373,15 @@ export default function ConnectionStatus() {
                 </div>
               </div>
             </div>
-            <div className="text-neutral-500 text-sm">
-              {currentIndex + 1} / {results.length}
+            <div className="flex flex-col items-end gap-1">
+              <div className="text-neutral-500 text-sm">
+                {currentIndex + 1} / {results.length}
+              </div>
             </div>
           </div>
 
-          <div className="bg-[#2b2d31] rounded-lg border border-neutral-700 p-4 max-w-2xl mx-auto shadow-xl">
+          <p className="text-xs text-sky-400 font-bold uppercase tracking-widest mb-1">{t("preview")}</p>
+          <div className="panel2 bg-neutral-900/50 max-w-2xl mx-auto space-y-4 py-4">
             <div className="flex gap-4">
               {results[currentIndex].profileAvatar ? (
                 <img src={results[currentIndex].profileAvatar} alt="" className="w-10 h-10 rounded-full flex-shrink-0 object-cover" />
@@ -366,7 +394,7 @@ export default function ConnectionStatus() {
               )}
               <div className="flex-grow space-y-1 overflow-hidden font-sans text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white text-sm">
+                  <span className="font-bold text-sky-400">
                     {results[currentIndex].profileName || t("profile")}
                   </span>
                   <span className="text-[10px] text-neutral-400">
@@ -378,9 +406,32 @@ export default function ConnectionStatus() {
                 </p>
                 <DiscordAttachmentGrid 
                   attachments={results[currentIndex].preview?.attachments} 
+                  onRemove={handleRemoveAttachment}
                 />
               </div>
             </div>
+          </div>
+
+          <div className="max-w-2xl mx-auto w-full space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5">
+                <PencilRuler className="w-3 h-3" />
+                Edit Content
+              </p>
+            </div>
+            <textarea
+              className="panel2 input resize-none overflow-hidden min-h-[80px]"
+              placeholder="..."
+              value={results[currentIndex].preview?.message || ""}
+              onChange={(e) => {
+                const newVal = e.target.value;
+                setResults(prev => prev.map((item, idx) => 
+                  idx === currentIndex 
+                    ? { ...item, preview: { ...item.preview, message: newVal } }
+                    : item
+                ));
+              }}
+            />
           </div>
 
           <div className="flex gap-4 justify-center pt-4">
