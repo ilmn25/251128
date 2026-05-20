@@ -7,7 +7,7 @@ export default function Connection() {
   return (
     <div className="space-y-4">
       <Routes>
-        <Route path="/connection/status" element={<ConnectionStatus />} />
+        <Route path="status" element={<ConnectionStatus />} />
         <Route path="*" element={<Navigate to="/composition" replace />} />
       </Routes>
     </div>

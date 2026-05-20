@@ -1,6 +1,6 @@
 ﻿import React, {useEffect, useState, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
-import {PencilRuler, MessageCirclePlus, Shuffle, Repeat, ChevronDown, ChevronRight, Plus, Trash2, Send, Server, Hash, User, Square, CheckSquare, Search, User as UserIcon, ExternalLink} from "lucide-react";
+import {PencilRuler, MessageCirclePlus, Shuffle, Repeat, ChevronDown, ChevronRight, Plus, Trash2, Send, Server, Hash, User, Square, CheckSquare, Search, User as UserIcon, ExternalLink, Globe2, RefreshCw, Clock, CheckCircle2, X} from "lucide-react";
 import {toast} from "sonner";
 import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
@@ -8,9 +8,17 @@ import { useTranslation } from "react-i18next";
 export default function CompositionList() {
   const [items, setItems] = useState();
   const [connections, setConnections] = useState([]);
-  const [cachedGuilds, setCachedGuilds] = useState(null);
+  const [cachedGuilds, setCachedGuilds] = useState(() => {
+    const saved = localStorage.getItem("cached_discord_guilds");
+    return saved ? JSON.parse(saved) : null;
+  });
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const updateCachedGuilds = (guilds) => {
+    setCachedGuilds(guilds);
+    localStorage.setItem("cached_discord_guilds", JSON.stringify(guilds));
+  };
 
   const fetchData = async () => {
     const [compRes, connRes, chanRes] = await Promise.all([
@@ -33,6 +41,7 @@ export default function CompositionList() {
     if (connData.success && chanData.success) {
       const channelGuildMap = {};
       const channelDiscordIdMap = {};
+      const channelFiltersMap = {};
       
       // Safety check if items exist
       const channels = chanData.items || [];
@@ -42,13 +51,19 @@ export default function CompositionList() {
         if (ch.id) {
           channelGuildMap[ch.id] = ch.guildId;
           channelDiscordIdMap[ch.id] = ch.channelId;
+          channelFiltersMap[ch.id] = {
+            linkFilter: ch.linkFilter,
+            mediaFilter: ch.mediaFilter,
+            attachmentPerm: ch.attachmentPerm
+          };
         }
       });
 
       const enrichedConnections = conns.map(conn => ({
         ...conn,
         guildId: channelGuildMap[conn.channelId] || null,
-        realChannelId: channelDiscordIdMap[conn.channelId] || null
+        realChannelId: channelDiscordIdMap[conn.channelId] || null,
+        ...(channelFiltersMap[conn.channelId] || {})
       }));
 
       setConnections(enrichedConnections);
@@ -71,7 +86,7 @@ export default function CompositionList() {
           allConnections={connections}
           onRefresh={fetchData}
           cachedGuilds={cachedGuilds}
-          setCachedGuilds={setCachedGuilds}
+          setCachedGuilds={updateCachedGuilds}
         />
       ))}
 
@@ -213,21 +228,28 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
   };
 
   const startTreeSearch = async () => {
-    setIsTreeLoading(true);
     if (cachedGuilds) {
       setAvailableGuilds(cachedGuilds);
       setAddingStep("tree");
-      setIsTreeLoading(false);
+      if (cachedGuilds.length > 0) setSelectedGuildId(cachedGuilds[0].id);
       return;
     }
+    await refreshDiscordData();
+  };
 
-    const res = await fetch(`${API_URL}/channel/available`, { credentials: "include" });
-    const data = await res.json();
-    if (data.success) {
-      setAvailableGuilds(data.guilds);
-      setCachedGuilds(data.guilds);
-      setAddingStep("tree");
-      if (data.guilds.length > 0) setSelectedGuildId(data.guilds[0].id);
+  const refreshDiscordData = async () => {
+    setIsTreeLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/channel/available`, { credentials: "include" });
+      const data = await res.json();
+      if (data.success) {
+        setAvailableGuilds(data.guilds);
+        setCachedGuilds(data.guilds);
+        setAddingStep("tree");
+        if (data.guilds.length > 0) setSelectedGuildId(data.guilds[0].id);
+      }
+    } catch (e) {
+      toast.error(t("toastFetchError"));
     }
     setIsTreeLoading(false);
   };
@@ -255,51 +277,51 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
     <div className="panel1 !p-6 space-y-4">
       {/* Add Channel Full Page Overlay */}
       {isAddingChannel && (
-        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl animate-in fade-in duration-500 overflow-y-auto px-12 py-16">
-          <div className="max-w-4xl mx-auto space-y-12">
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl animate-in fade-in duration-300 overflow-y-auto px-6 py-10">
+          <div className="max-w-5xl mx-auto space-y-8">
             
             {isTreeLoading && (
-              <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-                <div className="w-24 h-24 border-t-4 border-emerald-500 border-solid rounded-full animate-spin mb-8 shadow-[0_0_50px_rgba(16,185,129,0.3)]"></div>
-                <p className="text-4xl font-black text-white uppercase tracking-tighter italic animate-pulse">Loading...</p>
+              <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="w-16 h-16 border-t-4 border-sky-500 border-solid rounded-full animate-spin mb-4 shadow-[0_0_30px_rgba(14,165,233,0.3)]"></div>
+                <p className="text-xl font-bold text-white uppercase tracking-widest animate-pulse">Loading Discord...</p>
               </div>
             )}
 
             {/* Step: Choice */}
             {addingStep === "choice" && (
-              <div className="space-y-12 py-20 animate-in zoom-in-95">
-                <div className="text-center space-y-4">
-                  <p className="text-6xl font-black text-white uppercase tracking-tighter italic">{t("addChannel")}</p>
-                  <p className="text-neutral-500 font-bold uppercase tracking-[0.3em] text-sm italic">{message}</p>
+              <div className="space-y-8 py-10 animate-in zoom-in-95 duration-300">
+                <div className="text-center space-y-2">
+                  <p className="text-3xl font-black text-white uppercase tracking-tight italic">{t("addChannel")}</p>
+                  <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] italic">{message}</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                   <button 
                     onClick={() => setAddingStep("id")}
-                    className="group p-1 bg-gradient-to-br from-neutral-800 to-transparent rounded-[3rem] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="group p-0.5 bg-gradient-to-br from-neutral-800 to-transparent rounded-3xl transition-all hover:scale-[1.01] active:scale-[0.99]"
                   >
-                    <div className="bg-neutral-900/80 rounded-[2.8rem] p-12 text-center space-y-6 border border-neutral-800">
-                      <div className="mx-auto w-24 h-24 bg-sky-500/10 rounded-3xl flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
-                        <Hash className="w-12 h-12" />
+                    <div className="bg-neutral-900/80 rounded-[1.7rem] p-8 text-center space-y-4 border border-neutral-800">
+                      <div className="mx-auto w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-400 group-hover:scale-105 transition-transform">
+                        <Hash className="w-8 h-8" />
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-3xl font-black text-white uppercase tracking-tight italic">By ID</p>
-                        <p className="text-sm text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Direct connection using<br/>Discord Channel ID</p>
+                      <div className="space-y-1">
+                        <p className="text-xl font-black text-white uppercase tracking-tight italic">By ID</p>
+                        <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Direct connection via<br/>Channel ID</p>
                       </div>
                     </div>
                   </button>
 
                   <button 
                     onClick={startTreeSearch}
-                    className="group p-1 bg-gradient-to-br from-neutral-800 to-transparent rounded-[3rem] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="group p-0.5 bg-gradient-to-br from-neutral-800 to-transparent rounded-3xl transition-all hover:scale-[1.01] active:scale-[0.99]"
                   >
-                    <div className="bg-neutral-900/80 rounded-[2.8rem] p-12 text-center space-y-6 border border-neutral-800">
-                      <div className="mx-auto w-24 h-24 bg-emerald-500/10 rounded-3xl flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                        <Search className="w-12 h-12" />
+                    <div className="bg-neutral-900/80 rounded-[1.7rem] p-8 text-center space-y-4 border border-neutral-800">
+                      <div className="mx-auto w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                        <Search className="w-8 h-8" />
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-3xl font-black text-white uppercase tracking-tight italic">Browse</p>
-                        <p className="text-sm text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Search through your<br/>accessible servers</p>
+                      <div className="space-y-1">
+                        <p className="text-xl font-black text-white uppercase tracking-tight italic">Browse</p>
+                        <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Search through<br/>accessible servers</p>
                       </div>
                     </div>
                   </button>
@@ -308,7 +330,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                 <div className="flex justify-center">
                   <button 
                     onClick={() => setIsAddingChannel(false)}
-                    className="px-12 py-5 bg-neutral-900 text-neutral-500 hover:text-white font-black uppercase tracking-widest text-sm rounded-full transition-all border border-neutral-800 hover:border-neutral-600"
+                    className="px-8 py-3 bg-neutral-900 text-neutral-500 hover:text-white font-bold uppercase tracking-widest text-[10px] rounded-full transition-all border border-neutral-800 hover:border-neutral-600"
                   >
                     {t("back")}
                   </button>
@@ -318,18 +340,18 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
 
             {/* Step: Direct ID */}
             {addingStep === "id" && (
-              <div className="space-y-12 py-20 animate-in slide-in-from-right-12 duration-500">
-                <div className="text-center space-y-4">
-                  <p className="text-6xl font-black text-white uppercase tracking-tighter italic">Connect by ID</p>
-                  <p className="text-neutral-500 font-bold uppercase tracking-[0.3em] text-sm italic">Enter a unique Discord Channel ID</p>
+              <div className="space-y-8 py-10 animate-in slide-in-from-right-8 duration-400">
+                <div className="text-center space-y-2">
+                  <p className="text-3xl font-black text-white uppercase tracking-tight italic">Connect by ID</p>
+                  <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] italic">Enter a unique Discord Channel ID</p>
                 </div>
 
-                <div className="max-w-2xl mx-auto space-y-8">
+                <div className="max-w-xl mx-auto space-y-6">
                   <div className="relative group">
-                    <Hash className="absolute left-8 top-1/2 -translate-y-1/2 w-8 h-8 text-neutral-700 group-focus-within:text-sky-400 transition-colors" />
+                    <Hash className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-neutral-700 group-focus-within:text-sky-400 transition-colors" />
                     <input 
                       autoFocus
-                      className="w-full bg-black border-2 border-neutral-800 rounded-[2.5rem] py-10 pl-20 pr-10 text-4xl font-black text-white focus:outline-none focus:border-sky-500/50 transition-all placeholder:text-neutral-800"
+                      className="w-full bg-black border-2 border-neutral-800 rounded-2xl py-6 pl-16 pr-8 text-2xl font-black text-white focus:outline-none focus:border-sky-500/50 transition-all placeholder:text-neutral-800"
                       placeholder="123456789123456"
                       value={directId}
                       onChange={(e) => setDirectId(e.target.value)}
@@ -337,17 +359,17 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                     />
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     <button 
                       onClick={handleAddDirectId}
                       disabled={!directId.trim()}
-                      className="flex-grow py-8 bg-sky-500 hover:bg-sky-400 disabled:bg-neutral-800 disabled:text-neutral-600 text-white text-xl font-black rounded-[2rem] transition-all shadow-[0_20px_40px_rgba(14,165,233,0.3)] hover:-translate-y-1 active:translate-y-0 uppercase tracking-widest"
+                      className="flex-grow py-5 bg-sky-500 hover:bg-sky-400 disabled:bg-neutral-800 disabled:text-neutral-600 text-white font-black rounded-xl transition-all shadow-[0_10px_20px_rgba(14,165,233,0.2)] hover:-translate-y-0.5 active:translate-y-0 uppercase tracking-widest text-sm"
                     >
                       {t("submit")}
                     </button>
                     <button 
                       onClick={() => setAddingStep("choice")}
-                      className="px-12 py-8 bg-neutral-900 text-neutral-500 hover:text-white text-sm font-black rounded-[2rem] transition-all border border-neutral-800"
+                      className="px-8 py-5 bg-neutral-900 text-neutral-500 hover:text-white text-xs font-bold rounded-xl transition-all border border-neutral-800"
                     >
                       {t("back")}
                     </button>
@@ -358,104 +380,164 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
 
             {/* Step: Tree Tree Selection */}
             {addingStep === "tree" && (
-              <div className="animate-in slide-in-from-right-12 duration-500 pb-20 max-w-7xl mx-auto h-[80vh] flex flex-col">
-                <div className="flex justify-between items-end pb-12 border-b border-neutral-800 shrink-0">
+              <div className="animate-in slide-in-from-right-8 duration-400 pb-10 max-w-6xl mx-auto h-[75vh] flex flex-col">
+                <div className="flex justify-between items-center pb-6 border-b border-neutral-800 shrink-0">
                   <div>
-                    <p className="text-5xl font-black text-white uppercase tracking-tighter mb-2 italic">Select Channels</p>
-                    <div className="flex items-center gap-2">
-                      <div className="px-2 py-0.5 bg-sky-500/20 text-sky-400 text-[10px] font-black rounded uppercase tracking-widest">{treeSelectedIds.length} {t("selected")}</div>
-                      <p className="text-xs text-neutral-500 font-bold uppercase tracking-widest italic">— {message}</p>
+                    <p className="text-2xl font-black text-white uppercase tracking-tight italic">Select Channels</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="px-1.5 py-0.5 bg-sky-500/20 text-sky-400 text-[9px] font-black rounded uppercase tracking-widest">{treeSelectedIds.length} {t("selected")}</div>
+                      <p className="text-[10px] text-neutral-600 font-bold uppercase tracking-widest italic">— {message}</p>
                     </div>
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={refreshDiscordData}
+                      disabled={isTreeLoading}
+                      className="p-3 bg-neutral-900 border border-neutral-800 hover:text-sky-400 text-neutral-500 rounded-xl transition-all"
+                      title={t("refresh")}
+                    >
+                      <RefreshCw className={`w-5 h-5 ${isTreeLoading ? 'animate-spin' : ''}`} />
+                    </button>
                     {treeSelectedIds.length > 0 && (
                       <button 
                         onClick={handleAddSelectedChannels}
-                        className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white text-sm font-black rounded-2xl transition-all flex items-center gap-3 shadow-[0_20px_40px_rgba(14,165,233,0.3)] hover:-translate-y-1 active:translate-y-0 uppercase tracking-widest"
+                        className="px-6 py-3 bg-sky-500 hover:bg-sky-400 text-white text-xs font-black rounded-xl transition-all flex items-center gap-2 shadow-[0_10px_20px_rgba(14,165,233,0.2)] hover:-translate-y-0.5 active:translate-y-0 uppercase tracking-widest"
                       >
-                        <Plus className="w-5 h-5" /> {t("addMessage")} ({treeSelectedIds.length})
+                        <Plus className="w-4 h-4" /> {t("addMessage")} ({treeSelectedIds.length})
                       </button>
                     )}
                     <button 
                       onClick={() => setAddingStep("choice")} 
-                      className="px-8 py-4 bg-neutral-900 border border-neutral-800 hover:text-white text-neutral-500 text-sm font-black rounded-2xl transition-all uppercase tracking-widest"
+                      className="px-6 py-3 bg-neutral-900 border border-neutral-800 hover:text-white text-neutral-500 text-xs font-black rounded-xl transition-all uppercase tracking-widest"
                     >
                       {t("back")}
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-8 relative group shrink-0">
-                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-neutral-600 group-focus-within:text-sky-400 transition-colors" />
+                <div className="mt-6 relative group shrink-0">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-700 group-focus-within:text-sky-400 transition-colors" />
                   <input 
-                    className="w-full bg-neutral-900/30 border-2 border-neutral-800 rounded-3xl py-6 pl-16 pr-8 text-xl font-bold focus:outline-none focus:border-sky-500/50 transition-all placeholder:text-neutral-700"
+                    className="w-full bg-neutral-900/20 border border-neutral-800 rounded-2xl py-4 pl-14 pr-6 text-sm font-bold focus:outline-none focus:border-sky-500/30 transition-all placeholder:text-neutral-700"
                     placeholder={t("search")}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
 
-                <div className="mt-12 flex-grow flex gap-8 overflow-hidden">
+                <div className="mt-8 flex-grow flex gap-6 overflow-hidden min-h-0">
                   {/* Left Sidebar: Servers */}
-                  <div className="w-1/3 overflow-y-auto space-y-2 pr-4 custom-scrollbar">
+                  <div className="w-1/3 overflow-y-auto space-y-0.5 pr-1 custom-scrollbar">
                     {filteredGuilds.map((guild) => (
                       <button
                         key={guild.id}
                         onClick={() => setSelectedGuildId(guild.id)}
-                        className={`w-full flex items-center gap-4 p-5 rounded-[2rem] border transition-all text-left group ${selectedGuildId === guild.id ? 'bg-sky-500/10 border-sky-500/40 shadow-inner' : 'bg-neutral-900/20 border-transparent hover:bg-neutral-800/40'}`}
+                        className={`w-full flex items-center gap-2 p-2 rounded-xl border transition-all text-left group ${selectedGuildId === guild.id ? 'bg-sky-500/10 border-sky-500/30' : 'bg-neutral-900/10 border-transparent hover:bg-neutral-800/20'}`}
                       >
-                        <div className={`p-3 rounded-2xl transition-all ${selectedGuildId === guild.id ? 'bg-sky-500/20 text-sky-400' : 'bg-neutral-800 text-neutral-500 group-hover:text-neutral-300'}`}>
-                          {guild.id === "dms" ? <UserIcon className="w-6 h-6" /> : <Server className="w-6 h-6" />}
+                        <div className="flex-shrink-0">
+                          {guild.icon ? (
+                            <img src={guild.icon} alt="" className="w-7 h-7 rounded-lg object-cover" />
+                          ) : (
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-[10px] ${guild.id === 'dms' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-neutral-800 text-neutral-600 group-hover:text-neutral-400'}`}>
+                              {guild.id === 'dms' ? <UserIcon className="size-3.5" /> : guild.name.substring(0, 1)}
+                            </div>
+                          )}
                         </div>
                         <div className="flex-grow min-w-0">
-                          <p className={`font-black uppercase tracking-tight italic truncate ${selectedGuildId === guild.id ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
+                          <p className={`text-[11px] font-bold uppercase tracking-tight truncate ${selectedGuildId === guild.id ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
                             {guild.name}
                           </p>
-                          <p className="text-[10px] text-neutral-600 font-bold uppercase tracking-widest italic">{guild.channels.length} {t("channels")}</p>
+                          <div className="flex items-center gap-1.5 overflow-hidden">
+                            <span className="text-[8px] text-neutral-600 font-bold uppercase tracking-widest flex-shrink-0">{guild.channels.length} {t("channels")}</span>
+                            {guild.memberCount && (
+                              <>
+                                <span className="text-neutral-800">•</span>
+                                <span className="text-[8px] text-neutral-600 font-bold uppercase tracking-widest truncate">{guild.memberCount.toLocaleString()} {t("members")}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        {selectedGuildId === guild.id && <ChevronRight className="w-5 h-5 text-sky-400" />}
                       </button>
                     ))}
                   </div>
 
                   {/* Right Content: Channels */}
-                  <div className="flex-grow bg-neutral-900/20 rounded-[3rem] border border-neutral-800/50 overflow-y-auto p-8 custom-scrollbar">
+                  <div className="flex-grow bg-neutral-900/10 rounded-3xl border border-neutral-800/30 overflow-y-auto p-4 custom-scrollbar">
                     {selectedGuildId && filteredGuilds.find(g => g.id === selectedGuildId) ? (
-                      <div className="space-y-3">
-                        {filteredGuilds.find(g => g.id === selectedGuildId).channels.map(ch => (
-                          <div 
-                            key={ch.id}
-                            className={`flex items-center gap-6 p-6 rounded-[2rem] border transition-all group ${treeSelectedIds.includes(ch.id) ? 'bg-sky-500/10 border-sky-500/40 shadow-inner' : 'bg-black/20 border-transparent hover:border-neutral-700'}`}
-                          >
-                            <div 
-                              onClick={() => toggleTreeSelection(ch.id)}
-                              className="flex items-center gap-6 flex-grow cursor-pointer"
-                            >
-                              <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${treeSelectedIds.includes(ch.id) ? 'bg-sky-500 border-sky-500' : 'border-neutral-800 group-hover:border-neutral-600'}`}>
-                                {treeSelectedIds.includes(ch.id) && <Plus className="w-5 h-5 text-white" />}
-                              </div>
-                              <Hash className={`w-6 h-6 flex-shrink-0 ${treeSelectedIds.includes(ch.id) ? 'text-sky-400' : 'text-neutral-700'}`} />
-                              <span className={`text-xl font-black italic truncate ${treeSelectedIds.includes(ch.id) ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-300'}`}>{ch.name}</span>
-                            </div>
-                            
-                            <a 
-                              href={`https://discord.com/channels/${selectedGuildId === 'dms' ? '@me' : selectedGuildId}/${ch.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-4 rounded-2xl bg-neutral-800/50 hover:bg-neutral-700 text-neutral-500 hover:text-white transition-all transform hover:scale-110 active:scale-95 shadow-lg"
-                              title="View on Discord"
-                            >
-                              <ExternalLink className="w-5 h-5" />
-                            </a>
+                      <div className="grid grid-cols-1 gap-1">
+                        <div className="flex items-center justify-between gap-1 mb-2 px-1">
+                          <div className="flex items-center gap-1.5 opacity-60">
+                            <Globe2 className="size-3" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">{t("selectServer")}</span>
                           </div>
-                        ))}
+                          <button
+                            onClick={refreshDiscordData}
+                            className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-black/5 opacity-60 hover:opacity-100 transition-all text-[10px] font-medium"
+                          >
+                            <RefreshCw className="size-2.5" />
+                            {t("refresh")}
+                          </button>
+                        </div>
+                        {filteredGuilds.find(g => g.id === selectedGuildId).channels.map(ch => {
+                          const isAlreadyConnected = connections.some(c => c.realChannelId === ch.id);
+                          const isConnectedElsewhere = !isAlreadyConnected && allConnections.some(c => c.realChannelId === ch.id);
+
+                          return (
+                            <div 
+                              key={ch.id}
+                              className={`flex items-center gap-3 p-2 rounded-xl border transition-all group ${treeSelectedIds.includes(ch.id) ? 'bg-sky-500/10 border-sky-500/30' : (isAlreadyConnected || isConnectedElsewhere) ? 'bg-neutral-800/10 border-transparent' : 'bg-black/10 border-transparent hover:border-neutral-800'}`}
+                            >
+                              <div 
+                                onClick={() => !isAlreadyConnected && toggleTreeSelection(ch.id)}
+                                className={`flex items-center gap-2.5 flex-grow ${isAlreadyConnected ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                              >
+                                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${treeSelectedIds.includes(ch.id) ? 'bg-sky-500 border-sky-500' : isAlreadyConnected ? 'bg-neutral-800 border-neutral-700' : 'border-neutral-800 group-hover:border-neutral-700'}`}>
+                                  {treeSelectedIds.includes(ch.id) && <Plus className="w-2.5 h-2.5 text-white" />}
+                                  {isAlreadyConnected && <CheckCircle2 className="w-2.5 h-2.5 text-neutral-600" />}
+                                </div>
+                                <Hash className={`w-3.5 h-3.5 flex-shrink-0 ${treeSelectedIds.includes(ch.id) ? 'text-sky-400' : isAlreadyConnected ? 'text-neutral-700' : 'text-neutral-600'}`} />
+                                <div className="flex flex-col min-w-0">
+                                  <span className={`text-[12px] font-bold truncate ${treeSelectedIds.includes(ch.id) ? 'text-white' : isAlreadyConnected ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-200'}`}>
+                                    {ch.name}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {ch.slowmode > 0 && (
+                                      <span className="text-[8px] text-amber-500/60 font-black uppercase tracking-tighter flex items-center gap-1">
+                                        <Clock className="size-2" />
+                                        {ch.slowmode}s slow
+                                      </span>
+                                    )}
+                                    {(isAlreadyConnected || isConnectedElsewhere) && (
+                                      <span className={`text-[8px] uppercase font-black ${isAlreadyConnected ? 'text-emerald-500/60' : 'text-sky-500/40'} tracking-tighter`}>
+                                        {isAlreadyConnected ? t("selected") : "Elsewhere"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-1 opacity-20 group-hover:opacity-100 transition-opacity">
+                                <a 
+                                  href={`https://discord.com/channels/${selectedGuildId === 'dms' ? '@me' : selectedGuildId}/${ch.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded-lg bg-neutral-800/50 hover:bg-neutral-700 text-neutral-500 hover:text-white transition-all shadow-sm"
+                                  onClick={(e) => e.stopPropagation()}
+                                  title={t("openInDiscord")}
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     ) : (
-                      <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-                        <div className="w-24 h-24 bg-neutral-800/50 rounded-full flex items-center justify-center">
-                          <Server className="w-10 h-10 text-neutral-600" />
+                      <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-40">
+                        <div className="w-16 h-16 bg-neutral-800/50 rounded-2xl flex items-center justify-center">
+                          <Server className="w-8 h-8 text-neutral-600" />
                         </div>
-                        <p className="text-xl font-black text-neutral-700 uppercase tracking-widest italic">Select a server to view channels</p>
+                        <p className="text-xs font-bold text-neutral-600 uppercase tracking-widest">Select a server</p>
                       </div>
                     )}
                   </div>
@@ -571,7 +653,7 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                             <span className={`text-sm font-medium ${selectedIds.includes(conn.id) ? 'text-white' : 'text-neutral-300'}`}>{conn.channel.split(" in ")[0]}</span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1 opacity-20 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                           {conn.guildId && (
                             <button
                               onClick={() => window.open(conn.guildId === "@me" ? `https://discord.com/channels/@me/${conn.realChannelId}` : `https://discord.com/channels/${conn.guildId}/${conn.realChannelId}`, "_blank")}
@@ -581,6 +663,13 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                               <ExternalLink className="w-4 h-4" />
                             </button>
                           )}
+                          <button
+                            onClick={() => navigate(`/channel/edit/${conn.channelId}`)}
+                            className="p-2 hover:bg-neutral-700 text-neutral-400 rounded-lg transition-colors"
+                            title={t("edit")}
+                          >
+                            <PencilRuler className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => navigate("/connection/status", { 
                               state: { 

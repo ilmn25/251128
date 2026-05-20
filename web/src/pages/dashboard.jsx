@@ -3,7 +3,7 @@
 import Composition from "./composition/composition.jsx";
 import React, {useEffect, useState} from "react";
 import Profile from "./profile/profile.jsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation, useNavigate, Routes, Route, Navigate} from "react-router-dom";
 import Loading from "../components/loading.jsx";
 import {MessageCircle} from "lucide-react";
 import Connection from "./connection/connection.jsx";
@@ -55,23 +55,26 @@ export default function Dashboard() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => navigate("/composition")}
-            className={`panel1 ${location.pathname === "/composition" ? "buttonstyle3" : "buttonstyle2"}`}
+            className={`panel1 ${location.pathname.startsWith("/composition") ? "buttonstyle3" : "buttonstyle2"}`}
           >
             {t("composition")}
           </button>
           <button
             onClick={() => navigate("/profile")}
-            className={`panel1 ${location.pathname === "/profile" ? "buttonstyle3" : "buttonstyle2"}`}
+            className={`panel1 ${location.pathname.startsWith("/profile") ? "buttonstyle3" : "buttonstyle2"}`}
           >
             {t("profile")}
           </button>
         </div>
       </div>
 
-      {location.pathname.startsWith("/composition") && <Composition/>}
-      {location.pathname.startsWith("/profile") && <Profile/>}
-      {location.pathname.startsWith("/connection") && <Connection/>}
-      {location.pathname.startsWith("/channel") && <Channel/>}
+      <Routes>
+        <Route path="/composition/*" element={<Composition/>} />
+        <Route path="/profile/*" element={<Profile/>} />
+        <Route path="/connection/*" element={<Connection/>} />
+        <Route path="/channel/*" element={<Channel/>} />
+        <Route path="/" element={<Navigate to="/composition" replace />} />
+      </Routes>
     </div>
   );
 }

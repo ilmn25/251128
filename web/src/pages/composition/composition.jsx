@@ -8,10 +8,10 @@ export default function Composition() {
   return (
     <div className="space-y-4">
       <Routes>
-        <Route path="/composition" element={<CompositionList />} />
-        <Route path="/composition/new" element={<CompositionEdit />} />
-        <Route path="/composition/edit/:compositionId" element={<CompositionEdit />} />
-        <Route path="*" element={<Navigate to="/composition" replace />} />
+        <Route index element={<CompositionList />} />
+        <Route path="new" element={<CompositionEdit />} />
+        <Route path="edit/:compositionId" element={<CompositionEdit />} />
+        <Route path="*" element={<Navigate to="." replace />} />
       </Routes>
     </div>
   );

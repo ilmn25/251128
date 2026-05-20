@@ -118,7 +118,10 @@ async def channel_get(request: Request):
             "id": str(channel["_id"]),
             "channelId": channel["channelId"],
             "name": channel["name"],
-            "guildId": guild_id
+            "guildId": guild_id,
+            "linkFilter": channel.get("linkFilter", True),
+            "mediaFilter": channel.get("mediaFilter", True),
+            "attachmentPerm": channel.get("attachmentPerm", True),
         })
 
     return {"success": True, "items": data}
@@ -148,12 +151,13 @@ async def channel_available(request: Request):
     for channel in bot.private_channels:
         if isinstance(channel, discord.DMChannel):
             name = channel.recipient.name if channel.recipient else "Unknown DM"
-            dms.append({"id": str(channel.id), "name": name})
+            avatar = str(channel.recipient.avatar.url) if channel.recipient and channel.recipient.avatar else None
+            dms.append({"id": str(channel.id), "name": name, "icon": avatar})
         elif isinstance(channel, discord.GroupChannel):
-            dms.append({"id": str(channel.id), "name": channel.name or "Unnamed Group"})
+            dms.append({"id": str(channel.id), "name": channel.name or "Unnamed Group", "icon": str(channel.icon.url) if channel.icon else None})
     
     if dms:
-        guilds.append({"id": "dms", "name": "Direct Messages", "channels": dms})
+        guilds.append({"id": "dms", "name": "Direct Messages", "channels": dms, "icon": None})
 
     # Sort guilds by name
     sorted_guilds = sorted(bot.guilds, key=lambda g: g.name)
@@ -163,10 +167,23 @@ async def channel_available(request: Request):
         # Get text channels and voice channels (some voice channels allow messages now)
         for channel in guild.channels:
             if isinstance(channel, (discord.TextChannel, discord.VoiceChannel, discord.StageChannel)):
-                channels.append({"id": str(channel.id), "name": channel.name})
+                slowmode = 0
+                if hasattr(channel, "slowmode_delay"):
+                    slowmode = channel.slowmode_delay
+                channels.append({
+                    "id": str(channel.id), 
+                    "name": channel.name,
+                    "slowmode": slowmode
+                })
         
         if channels:
-            guilds.append({"id": str(guild.id), "name": guild.name, "channels": channels})
+            guilds.append({
+                "id": str(guild.id), 
+                "name": guild.name, 
+                "channels": channels,
+                "memberCount": guild.member_count,
+                "icon": str(guild.icon.url) if guild.icon else None
+            })
 
     return {"success": True, "guilds": guilds}
 

@@ -11,9 +11,11 @@ router = APIRouter()
 
 class BatchSendData(BaseModel):
     connectionIds: list[str]
+    message: str = None
+    attachments: list = None
 
 
-async def send_connection(profile, connection_id: str):
+async def send_connection(profile, connection_id: str, message: str = None, attachments: list = None):
     connection = services.connections.find_one({
         "_id": ObjectId(connection_id),
         "profileId": ObjectId(profile["_id"])
@@ -28,25 +30,28 @@ async def send_connection(profile, connection_id: str):
         return {"success": False, "error": "Channel not found"}
     if not composition:
         return {"success": False, "error": "Composition not found"}
-    if not composition.get("messages"):
-        return {"success": False, "error": "Composition has no messages"}
 
     bot = await selfbot.get_bot(profile["_id"])
     if not bot:
         return {"success": False, "error": "Unable to start bot"}
 
-    count = min(composition["count"], len(composition["attachments"]))
-    if composition["randomize"]:
-        attachments = random.sample(composition["attachments"], count)
-    else:
-        attachments = composition["attachments"][:count]
+    if message is None:
+        if not composition.get("messages"):
+            return {"success": False, "error": "Composition has no messages"}
+        message = random.choice(composition["messages"])
 
-    message = random.choice(composition["messages"])
+    if attachments is None:
+        count = min(composition.get("count", 1), len(composition.get("attachments", [])))
+        if composition.get("randomize"):
+            attachments = random.sample(composition["attachments"], count)
+        else:
+            attachments = composition.get("attachments", [])[:count]
 
-    if not channel.get("linkFilter"):
+    # Filters
+    if channel.get("linkFilter") is False:
         message = message.replace("https://", "").replace("http://", "")
-
-    if not channel.get("mediaFilter") or not channel.get("attachmentPerm"):
+    
+    if channel.get("mediaFilter") is False or not channel.get("attachmentPerm", True):
         attachments = []
 
     return await bot.post(
@@ -69,7 +74,7 @@ async def send_batch(request: Request, data: BatchSendData):
     fail_count = 0
 
     for connection_id in data.connectionIds:
-        result = await send_connection(profile, connection_id)
+        result = await send_connection(profile, connection_id, message=data.message, attachments=data.attachments)
         results.append({"connectionId": connection_id, **result})
         if result.get("success"):
             success_count += 1
@@ -84,11 +89,15 @@ async def send_batch(request: Request, data: BatchSendData):
     }
 
 
+class SendItemData(BaseModel):
+    message: str | None = None
+    attachments: list[dict] | None = None
+
 @router.post("/send/{connectionId}")
-async def send(request: Request, connectionId: str):
+async def send(request: Request, connectionId: str, data: SendItemData):
     profile = get_profile_from_request(request)
     if not profile:
         return {"success": False, "error": "Invalid Profile"}
 
-    return await send_connection(profile, connectionId)
+    return await send_connection(profile, connectionId, message=data.message, attachments=data.attachments)
 

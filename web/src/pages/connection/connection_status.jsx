@@ -1,5 +1,5 @@
 import '../../index.css';
-import {CheckCircle2, XCircle, Loader2, ArrowLeft, Send, Hash, RefreshCw} from "lucide-react";
+import {CheckCircle2, XCircle, Loader2, ArrowLeft, Send, Hash, RefreshCw, ExternalLink, Link2, Image, ImageOff, Link2Off, Lock} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {API_URL} from "../../main.jsx";
@@ -181,12 +181,12 @@ export default function ConnectionStatus() {
   function generatePreview(composition, connection) {
     if (!composition) return null;
     let msg = composition.messages[Math.floor(Math.random() * composition.messages.length)];
-    if (connection && !connection.linkFilter) {
+    if (connection && connection.linkFilter === false) {
       msg = msg.replace(/https?:\/\//g, "");
     }
 
     let atts = [];
-    if (connection && (!connection.mediaFilter || !connection.attachmentPerm)) {
+    if (connection && (connection.mediaFilter === false || connection.attachmentPerm === false)) {
       atts = [];
     } else {
       atts = composition.randomize 
@@ -207,7 +207,12 @@ export default function ConnectionStatus() {
     try {
       const res = await fetch(`${API_URL}/send/${id}`, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: currentResult.preview?.message,
+          attachments: currentResult.preview?.attachments
+        })
       });
       const data = await res.json();
       const success = data.success;
@@ -295,9 +300,44 @@ export default function ConnectionStatus() {
       {currentIndex < results.length ? (
         <div className="panel1 border-2 border-sky-500/30 p-6 space-y-6">
           <div className="flex justify-between items-center">
-            <div>
-              <p className="text-xs text-sky-400 font-bold uppercase tracking-widest mb-1">{t("currentlyReviewing")}</p>
-              <h3 className="text-xl font-bold">{results[currentIndex].name}</h3>
+            <div className="flex items-center gap-4">
+              <div>
+                <p className="text-xs text-sky-400 font-bold uppercase tracking-widest mb-1">{t("currentlyReviewing")}</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-bold">{results[currentIndex].name}</h3>
+                  {results[currentIndex].connection?.guildId && (
+                    <button
+                      onClick={() => window.open(results[currentIndex].connection.guildId === "@me" ? `https://discord.com/channels/@me/${results[currentIndex].connection.realChannelId}` : `https://discord.com/channels/${results[currentIndex].connection.guildId}/${results[currentIndex].connection.realChannelId}`, "_blank")}
+                      className="p-1.5 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-md transition-colors"
+                      title={t("openInDiscord")}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <div 
+                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter border ${results[currentIndex].connection?.linkFilter !== false ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}
+                    title={results[currentIndex].connection?.linkFilter !== false ? "Links Allowed" : "Links Stripped"}
+                  >
+                    {results[currentIndex].connection?.linkFilter !== false ? <Link2 className="size-3" /> : <Link2Off className="size-3" />}
+                    {t("links")}
+                  </div>
+                  <div 
+                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter border ${results[currentIndex].connection?.mediaFilter !== false ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}
+                    title={results[currentIndex].connection?.mediaFilter !== false ? "Media Allowed" : "Media Stripped"}
+                  >
+                    {results[currentIndex].connection?.mediaFilter !== false ? <Image className="size-3" /> : <ImageOff className="size-3" />}
+                    {t("media")}
+                  </div>
+                  {!results[currentIndex].connection?.attachmentPerm && (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter border bg-amber-500/10 border-amber-500/20 text-amber-500" title="No Attachment Permission">
+                      <Lock className="size-3" />
+                      Locked
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="text-neutral-500 text-sm">
               {currentIndex + 1} / {results.length}
@@ -387,6 +427,18 @@ export default function ConnectionStatus() {
                       <p className="text-sm font-medium">{result.name}</p>
                       {result.error && <p className="text-xs text-rose-400 mt-1">{result.error}</p>}
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {result.connection?.guildId && (
+                      <button
+                        onClick={() => window.open(result.connection.guildId === "@me" ? `https://discord.com/channels/@me/${result.connection.realChannelId}` : `https://discord.com/channels/${result.connection.guildId}/${result.connection.realChannelId}`, "_blank")}
+                        className="p-2 hover:bg-neutral-700 text-neutral-400 rounded-lg transition-colors"
+                        title={t("openInDiscord")}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

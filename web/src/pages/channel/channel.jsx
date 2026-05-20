@@ -7,7 +7,7 @@ export default function Channel() {
   return (
     <div className="space-y-4">
       <Routes>
-        <Route path="/channel/edit/:channelId" element={<ChannelEdit/>} />
+        <Route path="edit/:channelId" element={<ChannelEdit/>} />
       </Routes>
     </div>
   );

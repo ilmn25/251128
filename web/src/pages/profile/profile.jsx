@@ -8,9 +8,9 @@ export default function Profile() {
   return (
     <div className="space-y-4">
       <Routes>
-        <Route path="/profile" element={<ProfileList/>} />
-        <Route path="/profile/new" element={<ProfileEdit/>} />
-        <Route path="/profile/edit/:accountId" element={<ProfileEdit/>} />
+        <Route index element={<ProfileList/>} />
+        <Route path="new" element={<ProfileEdit/>} />
+        <Route path="edit/:accountId" element={<ProfileEdit/>} />
       </Routes>
     </div>
   );
