@@ -2,6 +2,7 @@
 from fastapi import APIRouter
 from starlette.requests import Request
 import random
+from datetime import datetime
 import services, selfbot
 from session import get_profile_from_request
 from pydantic import BaseModel
@@ -54,11 +55,19 @@ async def send_connection(profile, connection_id: str, message: str = None, atta
     if channel.get("mediaFilter") is False or not channel.get("attachmentPerm", True):
         attachments = []
 
-    return await bot.post(
+    res = await bot.post(
         channel_id=channel["channelId"],
         attachments=attachments,
         message=message
     )
+
+    if res.get("success"):
+        services.connections.update_one(
+            {"_id": ObjectId(connection_id)},
+            {"$set": {"lastSentAt": datetime.now()}}
+        )
+
+    return res
 
 @router.post("/send/batch")
 async def send_batch(request: Request, data: BatchSendData):

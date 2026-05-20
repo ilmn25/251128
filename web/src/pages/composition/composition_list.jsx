@@ -107,6 +107,21 @@ export default function CompositionList() {
 function CompositionListItem({ compositionId, message, attachmentCount, randomize, count, connections, onRefresh, allConnections, messages, attachments, cachedGuilds, setCachedGuilds }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const getTimeColor = (lastSentAt) => {
+    if (!lastSentAt) return "rgb(56, 189, 248)"; // sky-400
+    const diff = Date.now() - new Date(lastSentAt).getTime();
+    const twoDays = 2 * 24 * 60 * 60 * 1000;
+    const ratio = Math.min(diff / twoDays, 1);
+    
+    // Interpolate from Sky 400 (56, 189, 248) to Rose 500 (244, 63, 94)
+    const r = Math.floor(56 + (244 - 56) * ratio);
+    const g = Math.floor(189 + (63 - 189) * ratio);
+    const b = Math.floor(248 + (94 - 248) * ratio);
+    
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChannel, setIsAddingChannel] = useState(false);
   const [isTreeLoading, setIsTreeLoading] = useState(false);
@@ -728,6 +743,15 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
                           </div>
                         </div>
                         <div className="flex items-center gap-1 opacity-20 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                          {conn.lastSentAt && (
+                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-neutral-900/40 border border-neutral-800/50 text-[10px] font-bold text-neutral-500 mr-1 whitespace-nowrap">
+                              <RefreshCw 
+                                className="w-2.5 h-2.5" 
+                                style={{ color: getTimeColor(conn.lastSentAt) }}
+                              />
+                              {new Date(conn.lastSentAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          )}
                           {conn.guildId && (
                             <button
                               onClick={() => window.open(conn.guildId === "@me" ? `https://discord.com/channels/@me/${conn.realChannelId}` : `https://discord.com/channels/${conn.guildId}/${conn.realChannelId}`, "_blank")}

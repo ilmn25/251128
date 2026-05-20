@@ -145,7 +145,8 @@ async def connection_list(request: Request):
             "compositionId": str(conn["compositionId"]),
             "message": composition["messages"][0] if composition["messages"] else "",
             "profileName": profile.get("username", "User"),
-            "profileAvatar": profile.get("avatar")
+            "profileAvatar": profile.get("avatar"),
+            "lastSentAt": conn.get("lastSentAt").isoformat() if conn.get("lastSentAt") else None
         })
 
     return {"success": True, "items": items}
