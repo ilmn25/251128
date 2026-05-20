@@ -166,16 +166,18 @@ async def channel_available(request: Request):
         elif isinstance(channel, discord.GroupChannel):
             dms.append({"id": str(channel.id), "name": channel.name or "Unnamed Group", "icon": str(channel.icon.url) if channel.icon else None})
     
+    # Direct Messages always first
     if dms:
         guilds.append({"id": "dms", "name": "Direct Messages", "channels": dms, "icon": None})
 
-    # Sort guilds by name
-    sorted_guilds = sorted(bot.guilds, key=lambda g: g.name)
-
-    for guild in sorted_guilds:
+    # Sort guilds by their position in the user's guild list
+    # For selfbots, discord.py handles the guild order from the READY payload
+    for guild in bot.guilds:
         channels = []
-        # Get text channels and voice channels (some voice channels allow messages now)
-        for channel in guild.channels:
+        # Sort channels by position to match Discord's sidebar order
+        sorted_channels = sorted(guild.channels, key=lambda c: (c.position, c.id))
+        
+        for channel in sorted_channels:
             if isinstance(channel, (discord.TextChannel, discord.VoiceChannel, discord.StageChannel)):
                 slowmode = 0
                 if hasattr(channel, "slowmode_delay"):
