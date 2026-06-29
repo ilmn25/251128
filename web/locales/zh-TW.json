@@ -19,6 +19,7 @@
   "loadingConnecting": "正在連線伺服器...",
   "linkPerm": "有權限傳送連結",
   "mediaPerm": "有權限傳送媒體",
+  "deadChannel": "失效",
   "messageCooldown": "訊息冷卻時間",
   "messages": "訊息",
   "media": "媒體",

@@ -56,7 +56,8 @@ export default function CompositionList() {
           channelFiltersMap[ch.id] = {
             linkFilter: ch.linkFilter,
             mediaFilter: ch.mediaFilter,
-            attachmentPerm: ch.attachmentPerm
+            attachmentPerm: ch.attachmentPerm,
+            dead: ch.dead
           };
         }
       });
@@ -199,10 +200,14 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
 
   const handleSendSelected = () => {
     if (selectedIds.length === 0) return;
-    const selectedConns = connections.filter(c => selectedIds.includes(c.id));
+    const selectedConns = connections.filter(c => selectedIds.includes(c.id) && c.dead !== true);
+    if (selectedConns.length === 0) {
+      toast.error(t("noChannelsSelected"));
+      return;
+    }
     navigate("/connection/status", { 
       state: { 
-        connectionIds: selectedIds,
+        connectionIds: selectedConns.map(c => c.id),
         connections: selectedConns,
         compositions: [{ compositionId, messages, attachments, count, randomize }]
       } 
@@ -210,11 +215,15 @@ function CompositionListItem({ compositionId, message, attachmentCount, randomiz
   };
 
   const handleSendAll = () => {
-    if (connections.length === 0) return;
+    const sendableConnections = connections.filter(c => c.dead !== true);
+    if (sendableConnections.length === 0) {
+      toast.error(t("noChannelsSelected"));
+      return;
+    }
     navigate("/connection/status", { 
       state: { 
-        connectionIds: connections.map(c => c.id),
-        connections: connections,
+        connectionIds: sendableConnections.map(c => c.id),
+        connections: sendableConnections,
         compositions: [{ compositionId, messages, attachments, count, randomize }]
       } 
     });

@@ -10,6 +10,7 @@ class ChannelEditData(BaseModel):
     id: str
     linkFilter: bool
     mediaFilter: bool
+    dead: bool
 
 @router.post("/channel/edit")
 async def channel_edit(data: ChannelEditData, request: Request):
@@ -25,6 +26,7 @@ async def channel_edit(data: ChannelEditData, request: Request):
             {"$set": {
                 "linkFilter": data.linkFilter,
                 "mediaFilter": data.mediaFilter,
+                "dead": data.dead,
             }}
         )
         return {"success": True}
@@ -86,6 +88,7 @@ async def channel_new(data: ChannelNewData  , request: Request):
         "attachmentPerm": attachment_perm,
         "mediaFilter": True,
         "linkFilter": True,
+        "dead": False,
     })
 
     return {"success": True, "id": str(res.inserted_id)}
@@ -132,6 +135,7 @@ async def channel_get(request: Request):
             "linkFilter": channel.get("linkFilter", True),
             "mediaFilter": channel.get("mediaFilter", True),
             "attachmentPerm": channel.get("attachmentPerm", True),
+            "dead": channel.get("dead", False),
         })
 
     return {"success": True, "items": data}
@@ -220,6 +224,7 @@ async def channel_get_one(request: Request, channel_id: str):
         "attachmentPerm": channel["attachmentPerm"],
         "mediaFilter": channel["mediaFilter"],
         "linkFilter": channel["linkFilter"],
+        "dead": channel.get("dead", False),
     }
 
     return {"success": True, "item": data}

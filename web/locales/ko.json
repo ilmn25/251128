@@ -19,6 +19,7 @@
   "loadingConnecting": "서버에 연결 중...",
   "linkPerm": "링크를 보낼 권한이 있습니다",
   "mediaPerm": "미디어를 보낼 권한이 있습니다",
+  "deadChannel": "비활성",
   "messageCooldown": "메시지 쿨다운",
   "messages": "메시지",
   "media": "미디어",

@@ -15,6 +15,7 @@ export default function ChannelEdit() {
   const [attachmentPerm, setAttachmentPerm] = useState(true);
   const [linkFilter, setLinkFilter] = useState(false);
   const [mediaFilter, setMediaFilter] = useState(false);
+  const [dead, setDead] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function ChannelEdit() {
         setAttachmentPerm(data.item.attachmentPerm);
         setLinkFilter(data.item.linkFilter);
         setMediaFilter(data.item.mediaFilter);
+        setDead(data.item.dead);
       } else {
         navigate("/channel/new");
         toast.error(data.error || t("toastFetchError"));
@@ -51,7 +53,7 @@ export default function ChannelEdit() {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       credentials: "include",
-      body: JSON.stringify({id, linkFilter, mediaFilter})
+      body: JSON.stringify({id, linkFilter, mediaFilter, dead})
     });
     const data = await res.json();
     if (data.success) {
@@ -106,6 +108,11 @@ export default function ChannelEdit() {
           <div className="flex justify-between text-neutral-400">
             <span>{t("linkPerm")}</span>
             <Toggle item={linkFilter} setItem={setLinkFilter}/>
+          </div>
+
+          <div className="flex justify-between text-neutral-400">
+            <span>{t("deadChannel")}</span>
+            <Toggle item={dead} setItem={setDead}/>
           </div>
         </div>
       </div>

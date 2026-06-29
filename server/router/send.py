@@ -81,10 +81,26 @@ async def send_batch(request: Request, data: BatchSendData):
     results = []
     success_count = 0
     fail_count = 0
+    skipped_count = 0
 
     for connection_id in data.connectionIds:
-        result = await send_connection(profile, connection_id, message=data.message, attachments=data.attachments)
+        connection = services.connections.find_one({
+            "_id": ObjectId(connection_id),
+            "profileId": ObjectId(profile["_id"])
+        })
+        if not connection:
+            result = {"success": False, "error": "Connection not found"}
+        else:
+            channel = services.channels.find_one({"_id": ObjectId(connection["channelId"])} )
+            if channel and channel.get("dead"):
+                result = {"success": False, "skipped": True, "error": "Channel is marked dead"}
+            else:
+                result = await send_connection(profile, connection_id, message=data.message, attachments=data.attachments)
+
         results.append({"connectionId": connection_id, **result})
+        if result.get("skipped"):
+            skipped_count += 1
+            continue
         if result.get("success"):
             success_count += 1
         else:
@@ -94,6 +110,7 @@ async def send_batch(request: Request, data: BatchSendData):
         "success": success_count > 0,
         "successCount": success_count,
         "failCount": fail_count,
+        "skippedCount": skipped_count,
         "results": results
     }
 

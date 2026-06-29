@@ -1,6 +1,6 @@
 import '../../index.css';
 import {CheckCircle2, XCircle, Loader2, ArrowLeft, Send, Hash, RefreshCw, ExternalLink, Link2, Image, ImageOff, Link2Off, Lock, PencilRuler, Trash2} from "lucide-react";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {API_URL} from "../../main.jsx";
 import { useTranslation } from "react-i18next";
@@ -166,14 +166,18 @@ export default function ConnectionStatus() {
   const [stats, setStats] = useState({ success: 0, fail: 0, total: 0 });
 
   const connectionIds = location.state?.connectionIds || [];
+  const activeConnectionIds = useMemo(() => connectionIds.filter(id => {
+    const connectionInfo = location.state?.connections?.find(c => c.id === id);
+    return connectionInfo?.dead !== true;
+  }), [connectionIds, location.state]);
 
   useEffect(() => {
-    if (connectionIds.length === 0) {
+    if (activeConnectionIds.length === 0) {
       navigate("/connection");
       return;
     }
 
-    const initialResults = connectionIds.map(id => {
+    const initialResults = activeConnectionIds.map(id => {
       const connectionInfo = location.state?.connections?.find(c => c.id === id);
       const composition = connectionInfo ? location.state?.compositions?.find(c => c.compositionId === connectionInfo.compositionId) : null;
       
@@ -191,8 +195,8 @@ export default function ConnectionStatus() {
     });
     
     setResults(initialResults);
-    setStats({ success: 0, fail: 0, total: connectionIds.length });
-  }, [connectionIds, navigate, location.state]);
+    setStats({ success: 0, fail: 0, total: activeConnectionIds.length });
+  }, [activeConnectionIds, navigate, location.state]);
 
   function generatePreview(composition, connection) {
     if (!composition || !composition.messages || composition.messages.length === 0) {

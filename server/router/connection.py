@@ -109,6 +109,7 @@ async def connection_bulk(data: ConnectionBulkData, request: Request):
                         "attachmentPerm": attachment_perm,
                         "mediaFilter": True,
                         "linkFilter": True,
+                        "dead": False,
                     })
                     channel_oid = res.inserted_id
                 else:
@@ -142,6 +143,7 @@ async def connection_list(request: Request):
             "linkFilter": channel.get("linkFilter", True),
             "mediaFilter": channel.get("mediaFilter", True),
             "attachmentPerm": channel.get("attachmentPerm", True),
+            "dead": channel.get("dead", False),
             "compositionId": str(conn["compositionId"]),
             "message": composition["messages"][0] if composition["messages"] else "",
             "profileName": profile.get("username", "User"),

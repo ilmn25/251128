@@ -19,6 +19,7 @@
   "loadingConnecting": "サーバーに接続中...",
   "linkPerm": "リンクを送信する権限があります",
   "mediaPerm": "メディアを送信する権限があります",
+  "deadChannel": "無効",
   "messageCooldown": "メッセージのクールダウン",
   "messages": "メッセージ",
   "media": "メディア",

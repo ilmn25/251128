@@ -19,6 +19,7 @@
   "loadingConnecting": "Connecting to Server...",
   "linkPerm": "Has permissions to send links",
   "mediaPerm": "Has permissions to send media",
+  "deadChannel": "Dead",
   "links": "Links",
   "media": "Media",
   "messageCooldown": "Message cooldown",
