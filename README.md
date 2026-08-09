@@ -1,4 +1,4 @@
-﻿# Discord Message Automation Tool
+﻿# DisBatch: Discord Message Batch Sending Automation Tool
 - Automate sending hiring posts on commission boards, sharing new social media posts, and more!
 - English, Japanese, Chinese (Traditional and Simplified), and Korean localization
 
